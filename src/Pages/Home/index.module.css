@@ -1,0 +1,11 @@
+/* index.module.css (or Home.module.css) */
+.home {
+    background-color: lightblue;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .home h1 {
+    color: darkblue;
+  }
+  

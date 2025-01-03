@@ -5,7 +5,7 @@ import styles from './index.module.css'; // Import as a module
 const Home = () => {
   return (
     <div className={styles.home}> {/* Use styles from the module */}
-      <h1>Welcome to the Home Page TEST 3!</h1>
+      <h1>Welcome to the Home Page TEST 4!</h1>
     </div>
   );
 }

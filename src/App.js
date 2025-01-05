@@ -22,7 +22,7 @@ function App() {
         </header>
         <main> {/* Add top padding to the main content */}
           <Routes>
-            <Route path="/" exact element={<Home />} />
+            <Route path="/" exact element={<AuthRouter><Home /></AuthRouter>} />
             <Route path="/login" exact element={<SignIn />} />
             <Route path="/register" exact element={<SignUp />} />
           </Routes>

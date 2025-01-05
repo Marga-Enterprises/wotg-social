@@ -8,7 +8,7 @@ const AuthRouter = ({ children }) => {
 
   useEffect(() => {
     if (!token) {
-      navigate('/');
+      navigate('/login');
     }
   }, [navigate, token]);
 

@@ -61,7 +61,7 @@ const Page = () => {
 
     return (
         <div className="flex items-center justify-center mt-10">
-            <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+            <div className="w-full max-w-md p-12 bg-white rounded-lg shadow-2xl min-h-[600px] flex flex-col justify-center">
                 <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Login</h1>
                 <form className="space-y-4" onSubmit={handleSubmitLogin}>
                     <div>

@@ -12,16 +12,17 @@ import * as types from '../types';
 
 export const setAuthorizationHeader = (token) => {
     const bearerToken = `Bearer ${token}`;
-    Cookies.set('token', token);
+    Cookies.set('token', token); // Set cookie properly
     axios.defaults.headers.common.Authorization = bearerToken;
+    console.log('Token Set in Axios Header:', bearerToken); // Verify header set
 };
+
 
 export const setUserDetails = (userDetails) => {
     const { user } = userDetails;
     Cookies.set('account', JSON.stringify(user));
     Cookies.set('authenticated', true);
-    Cookies.set('role', user.role);
-    // Cookies.set('category', user.category);
+    Cookies.set('role', user.user_role);
 
     return {
         type: types.SET_USER_DETAILS,
@@ -41,6 +42,8 @@ export const loginFunction = (payload) => async (dispatch) => {
             console.log('RESPONSEEEE', res);
             const { token } = data;
             const account = jwtDecode(token);
+
+            console.log('ACCOUNT', account);
 
             setAuthorizationHeader(token);
             dispatch(setUserDetails(account));
@@ -90,7 +93,6 @@ export const userLogout = () => {
     Cookies.remove('account');
     Cookies.remove('role');
     Cookies.remove('authenticated');
-    Cookies.remove('category');
     window.location.replace('/login');
 
     // Router.push('/logout');

@@ -1,0 +1,7 @@
+.chatItem {
+    transition: background-color 0.2s ease;
+  }
+  .chatItem:hover {
+    background-color: #e5e7eb; /* Tailwind's bg-gray-200 */
+  }
+  

@@ -1,30 +1,83 @@
-// Import necessary dependencies
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
-import styles from './index.module.css'; // Import styles if needed
+
+// Components
+import ChatSidebar from '../../components/ChatSidebar';
+import ChatWindow from '../../components/ChatWindow';
+import RightPanel from '../../components/RightPanel';
 
 const Page = () => {
-    // State to store user details
+    const dispatch = useDispatch();
+
+    // Redux state
+    const { chatrooms } = useSelector((state) => state.wotgsocial.chatroom);
+    const { messages } = useSelector((state) => state.wotgsocial.message);
+    const {
+        ui: { loading },
+    } = useSelector((state) => state.common);
+
+    // Local state
     const [user, setUser] = useState(null);
+    const [selectedChatroom, setSelectedChatroom] = useState(1);
 
-    // UseEffect to get the authenticated user from cookies when the component mounts
+    console.log('Messages', messages);
+
+    // Fetch user details from cookies
     useEffect(() => {
-        // Get the user data from the 'account' cookie
         const account = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
-
-        // If the user is authenticated and we have the user data, set it to state
         if (account) {
             setUser(account);
         }
     }, []);
 
+    // Fetch chatrooms on component mount
+    useEffect(() => {
+        dispatch(common.ui.setLoading());
+        dispatch(wotgsocial.chatroom.getAllChatroomsAction())
+            .finally(() => {
+                dispatch(common.ui.clearLoading());
+            });
+    }, [dispatch]);
+
+    // Fetch messages when chatroom changes
+    useEffect(() => {
+        if (selectedChatroom) {
+            dispatch(common.ui.setLoading());
+            dispatch(wotgsocial.message.getMessagesByChatroomAction(selectedChatroom))
+                .finally(() => {
+                    dispatch(common.ui.clearLoading());
+                });
+        }
+    }, [selectedChatroom, dispatch]);
+
+    // Handle chatroom selection
+    const handleSelectChatroom = (chatroomId) => {
+        setSelectedChatroom(chatroomId);
+    };
+
+    // Handle sending a message
+    const handleSendMessage = (message) => {
+        if (!selectedChatroom || !user) return;
+
+        const payload = {
+            content: message,
+            senderId: user.id,
+            chatroomId: selectedChatroom,
+        };
+
+        dispatch(wotgsocial.message.sendMessageAction(payload));
+    };
+
     return (
-        <div className="flex flex-col items-center min-h-screen p-4">
-            {user ? (
-                <h1>Hello, {user.user_fname} {user.user_lname}!</h1> 
-            ) : (
-                <h1>Welcome, guest!</h1>  
-            )}
+        <div className="flex min-h-screen">
+             <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} />
+             <ChatWindow
+                messages={messages}
+                onSendMessage={handleSendMessage}
+                selectedChatroom={selectedChatroom}
+             />
         </div>
     );
 };

@@ -25,11 +25,24 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom }) => {
               className="flex items-center p-2 cursor-pointer hover:bg-gray-200 rounded"
               onClick={() => onSelectChatroom(chat.id)}
             >
-              <img
-                src={chat.avatar || '/default-avatar.png'}
-                alt={chat.name}
-                className="w-10 h-10 rounded-full mr-4"
-              />
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center mr-4"
+                style={{
+                  backgroundColor: chat.avatar ? 'transparent' : '#c0392b', // Set bg color only when no avatar
+                }}
+              >
+                {chat.avatar ? (
+                  <img
+                    src={chat.avatar}
+                    alt={chat.name}
+                    className="w-10 h-10 rounded-full"
+                  />
+                ) : (
+                  <span className="text-white font-bold">
+                    {chat.name ? chat.name.charAt(0).toUpperCase() : 'A'}
+                  </span>
+                )}
+              </div>
               <div>
                 <p className="font-bold">{chat.name}</p>
                 <p className="text-sm text-gray-500">{chat.lastActive || 'Active now'}</p>

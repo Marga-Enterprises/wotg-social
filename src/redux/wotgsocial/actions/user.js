@@ -68,10 +68,10 @@ export const addUser = (payload) => async (dispatch) => {
         console.log('RESPONSEEEE SA REDUX', res);
 
         if (success) {
-        dispatch({
-            type: types.USER_ADD_SUCCESS,
-            payload: res.data.docs,
-        });
+            dispatch({
+                type: types.USER_ADD_SUCCESS,
+                payload: res.data.docs,
+            });
         }
 
         return res; // Return the response object in both success and error cases
@@ -95,5 +95,7 @@ export const userLogout = () => {
     Cookies.remove('authenticated');
     window.location.replace('/login');
 
-    // Router.push('/logout');
+    return {
+        type: 'USER_LOGOUT',
+    };
 };

@@ -21,36 +21,43 @@ const Page = () => {
     // Local state
     const [user, setUser] = useState(null);
     const [selectedChatroom, setSelectedChatroom] = useState(1);
+    const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication status
 
     console.log('Messages', messages);
 
-    // Fetch user details from cookies
+    // Fetch user details and authentication status from cookies
     useEffect(() => {
         const account = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
-        if (account) {
+        const authenticated = Cookies.get('authenticated') === 'true'; // Assuming "authenticated" cookie is a string
+        if (account && authenticated) {
             setUser(account);
+            setIsAuthenticated(true);
+        } else {
+            setIsAuthenticated(false);
         }
     }, []);
 
     // Fetch chatrooms on component mount
     useEffect(() => {
+        if (!isAuthenticated) return; // Skip fetching chatrooms if not authenticated
+
         dispatch(common.ui.setLoading());
         dispatch(wotgsocial.chatroom.getAllChatroomsAction())
             .finally(() => {
                 dispatch(common.ui.clearLoading());
             });
-    }, [dispatch]);
+    }, [dispatch, isAuthenticated]);
 
     // Fetch messages when chatroom changes
     useEffect(() => {
-        if (selectedChatroom) {
-            dispatch(common.ui.setLoading());
-            dispatch(wotgsocial.message.getMessagesByChatroomAction(selectedChatroom))
-                .finally(() => {
-                    dispatch(common.ui.clearLoading());
-                });
-        }
-    }, [selectedChatroom, dispatch]);
+        if (!isAuthenticated || !selectedChatroom) return; // Skip fetching messages if not authenticated
+
+        dispatch(common.ui.setLoading());
+        dispatch(wotgsocial.message.getMessagesByChatroomAction(selectedChatroom))
+            .finally(() => {
+                dispatch(common.ui.clearLoading());
+            });
+    }, [selectedChatroom, dispatch, isAuthenticated]);
 
     // Handle chatroom selection
     const handleSelectChatroom = (chatroomId) => {
@@ -72,12 +79,14 @@ const Page = () => {
 
     return (
         <div className="flex min-h-screen">
-             <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} />
-             <ChatWindow
-                messages={messages}
-                onSendMessage={handleSendMessage}
-                selectedChatroom={selectedChatroom}
-             />
+            {isAuthenticated && <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} />}
+            {isAuthenticated && (
+                <ChatWindow
+                    messages={messages}
+                    onSendMessage={handleSendMessage}
+                    selectedChatroom={selectedChatroom}
+                />
+            )}
         </div>
     );
 };

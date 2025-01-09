@@ -129,6 +129,7 @@ const Page = () => {
     
         try {
             // Attempt to dispatch subscription to Redux for storing it in your backend
+            console.log('Attempting to subscribe:', subscriptionData);
             const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
     
             // Check if the response indicates an error (e.g., subscription already exists in backend)

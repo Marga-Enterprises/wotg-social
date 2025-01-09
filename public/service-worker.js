@@ -4,7 +4,7 @@ self.addEventListener('push', (event) => {
 
     self.registration.showNotification(data.title, {
         body: data.body,
-        icon: '/logo192.png', // Adjust the path for your app logo 
+        icon: '/wotg-logo-with-bg.jpeg', // Adjust the path for your app logo 
         data: data.data,
     });
 });

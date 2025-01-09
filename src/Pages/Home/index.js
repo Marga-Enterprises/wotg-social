@@ -34,8 +34,6 @@ const Page = () => {
 
     // Initialize Socket.IO connection
     useEffect(() => {
-        if (!isAuthenticated) return;
-
         const socketUrl = process.env.NODE_ENV === 'development' 
             ? 'http://localhost:5000' 
             : 'https://community.wotgonline.com';
@@ -159,8 +157,6 @@ const Page = () => {
 
     // Fetch chatrooms
     const fetchChatrooms = useCallback(async () => {
-        if (!isAuthenticated) return;
-
         dispatch(common.ui.setLoading());
         const res = await dispatch(wotgsocial.chatroom.getAllChatroomsAction());
         dispatch(common.ui.clearLoading());
@@ -172,8 +168,10 @@ const Page = () => {
 
     // Fetch chatrooms on component mount
     useEffect(() => {
-        fetchChatrooms();
-    }, [fetchChatrooms]);
+        if (isAuthenticated) {
+            fetchChatrooms();
+        }
+    }, [fetchChatrooms, isAuthenticated]);
 
     // Fetch messages for the selected chatroom
     const fetchMessages = useCallback(async () => {
@@ -190,8 +188,10 @@ const Page = () => {
 
     // Fetch messages when chatroom changes
     useEffect(() => {
-        fetchMessages();
-    }, [fetchMessages]);
+        if (isAuthenticated) {
+            fetchMessages();
+        }
+    }, [fetchMessages, isAuthenticated]);
 
     // Listen for new messages in real-time
     useEffect(() => {

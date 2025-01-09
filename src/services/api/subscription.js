@@ -5,10 +5,11 @@ import { GET, POST, DELETE } from '../request';
 
 // Save a new subscription
 export async function saveSubscription(payload) {
-  return POST('/subscribe', payload);
+  console.log('API PAYLOAD', payload);
+  return POST('/subscriptions/subscribe', payload);
 }
 
 // Delete a subscription
 export async function deleteSubscription(subscriptionId) {
-  return DELETE(`/unsubscribe/${subscriptionId}`);
+  return DELETE(`/subscriptions/unsubscribe/${subscriptionId}`);
 }

@@ -58,6 +58,97 @@ const Page = () => {
         };
     }, [isAuthenticated]);
 
+    // Web Push Notification: Request Permission and Subscribe
+    const subscribeToPushNotifications = async () => {
+        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+            console.error('Push notifications are not supported in this browser');
+            return;
+        }
+    
+        // Check if notification permissions are already granted
+        const permission = await Notification.requestPermission();
+        
+        // Proceed only if permission is granted
+        if (permission !== 'granted') {
+            console.log('Push notification permission denied');
+            return;
+        }
+    
+        // Service worker registration
+        const registration = await navigator.serviceWorker.ready;
+        
+        // Check if a subscription already exists
+        const existingSubscription = await registration.pushManager.getSubscription();
+    
+        // If a subscription exists, do not proceed with dispatching or subscribing again
+        if (existingSubscription) {
+            console.log('Existing subscription found, no need to subscribe again.');
+            return null; // Return early if the subscription already exists
+        }
+    
+        // Now subscribe with the correct applicationServerKey (VAPID public key)
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: process.env.REACT_APP_VAPID_PUBLIC_KEY, // VAPID public key
+        });
+    
+        console.log('New push notification subscription:', subscription);
+    
+        // Prepare subscription data
+
+        // Function to convert ArrayBuffer to Base64 string
+        const arrayBufferToBase64 = (buffer) => {
+            const binary = String.fromCharCode(...new Uint8Array(buffer));  // Convert ArrayBuffer to binary string
+            return window.btoa(binary);  // Convert binary string to base64
+        };
+
+        // Get the raw ArrayBuffer for p256dh and auth
+        const p256dh = subscription.getKey('p256dh');
+        const auth = subscription.getKey('auth');
+
+        // Convert both to base64
+        const p256dhBase64 = arrayBufferToBase64(p256dh);
+        const authBase64 = arrayBufferToBase64(auth);
+
+        const subscriptionData = {
+            userId: user.id,  // Assuming the user object contains an ID field
+            subscription: {
+                endpoint: subscription.endpoint,
+                keys: {
+                    p256dh: p256dhBase64,  // Encoded base64 public encryption key
+                    auth: authBase64       // Encoded base64 authentication key
+                }
+            }
+        };
+
+        // Log the subscription data
+        console.log('Subscription Data:', subscriptionData);
+
+        // Now you can send the subscriptionData to the backend
+
+    
+        try {
+            // Attempt to dispatch subscription to Redux for storing it in your backend
+            const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
+    
+            // Check if the response indicates an error (e.g., subscription already exists in backend)
+            if (res.error && res.error.status === 400) {
+                console.log('Subscription already exists in the backend. No need to subscribe again.');
+                return null; // Return null if the subscription already exists in the backend
+            }
+    
+            // If successful, log the response (successfully saved to the backend)
+            console.log('Subscription successfully saved:', res);
+            
+        } catch (error) {
+            console.error('Error occurred while subscribing:', error);
+            return null; // Return null in case of any errors
+        }
+    };
+    
+    
+    
+    
 
     // Fetch chatrooms
     const fetchChatrooms = useCallback(async () => {
@@ -152,6 +243,13 @@ const Page = () => {
             }
         });
     };
+
+    // If the user is authenticated, subscribe them to push notifications
+    useEffect(() => {
+        if (isAuthenticated) {
+            subscribeToPushNotifications();
+        }
+    }, [isAuthenticated]);
 
     return (
         <div className="flex min-h-screen">

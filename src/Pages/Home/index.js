@@ -58,9 +58,11 @@ const Page = () => {
         };
     }, [isAuthenticated]);
 
+    
     // Web Push Notification: Request Permission and Subscribe
     const subscribeToPushNotifications = async () => {
         console.log('Subscribing to push notifications...');
+    
         if (!('Notification' in window) || !('serviceWorker' in navigator)) {
             console.error('Push notifications are not supported in this browser');
             return;
@@ -68,50 +70,57 @@ const Page = () => {
     
         // Check if notification permissions are already granted
         const permission = await Notification.requestPermission();
-        
+    
         // Proceed only if permission is granted
         if (permission !== 'granted') {
             console.log('Push notification permission denied');
             return;
         } else {
             console.log('Push notification permission granted');
-
-            // Service worker registration
-            const registration = await navigator.serviceWorker.ready;
-            
+    
+            // Service worker registration: check if it's already registered
+            let registration;
+            try {
+                registration = await navigator.serviceWorker.register('/service-worker.js');
+                console.log('Service Worker registered successfully.');
+            } catch (error) {
+                console.error('Service Worker registration failed:', error);
+                return;
+            }
+    
             // Check if a subscription already exists
             const existingSubscription = await registration.pushManager.getSubscription();
-        
+    
             // If a subscription exists, do not proceed with dispatching or subscribing again
             if (existingSubscription) {
                 console.log('Existing subscription found, no need to subscribe again.');
                 return null; // Return early if the subscription already exists
             }
-        
+    
             // Now subscribe with the correct applicationServerKey (VAPID public key)
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: process.env.REACT_APP_VAPID_PUBLIC_KEY, // VAPID public key
             });
-        
+    
             console.log('New push notification subscription:', subscription);
-        
+    
             // Prepare subscription data
-
+    
             // Function to convert ArrayBuffer to Base64 string
             const arrayBufferToBase64 = (buffer) => {
                 const binary = String.fromCharCode(...new Uint8Array(buffer));  // Convert ArrayBuffer to binary string
                 return window.btoa(binary);  // Convert binary string to base64
             };
-
+    
             // Get the raw ArrayBuffer for p256dh and auth
             const p256dh = subscription.getKey('p256dh');
             const auth = subscription.getKey('auth');
-
+    
             // Convert both to base64
             const p256dhBase64 = arrayBufferToBase64(p256dh);
             const authBase64 = arrayBufferToBase64(auth);
-
+    
             const subscriptionData = {
                 userId: user.id,  // Assuming the user object contains an ID field
                 subscription: {
@@ -122,36 +131,30 @@ const Page = () => {
                     }
                 }
             };
-
+    
             // Log the subscription data
             console.log('Subscription Data:', subscriptionData);
-
+    
             // Now you can send the subscriptionData to the backend
-
-        
             try {
                 // Attempt to dispatch subscription to Redux for storing it in your backend
                 console.log('Attempting to subscribe:', subscriptionData);
                 const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
-        
+    
                 // Check if the response indicates an error (e.g., subscription already exists in backend)
                 if (res.error && res.error.status === 400) {
                     console.log('Subscription already exists in the backend. No need to subscribe again.');
                     return null; // Return null if the subscription already exists in the backend
                 }
-        
+    
                 // If successful, log the response (successfully saved to the backend)
                 console.log('Subscription successfully saved:', res);
-                
             } catch (error) {
                 console.error('Error occurred while subscribing:', error);
                 return null; // Return null in case of any errors
             }
         }
     };
-    
-    
-    
     
 
     // Fetch chatrooms

@@ -1,0 +1,24 @@
+/* index.module.css */
+
+/* Custom container style for layout */
+.customLayoutContainer {
+    display: flex;
+    height: 85lvh;
+    margin-top: -1rem;
+}
+
+/* Custom sidebar style */
+.customSidebar {
+    width: 300px; /* Fixed width for the sidebar */
+    background-color: #f4f4f4;
+    padding: 1rem;
+}
+
+/* Custom chat window style */
+.customChatWindow {
+    flex-grow: 1; /* Take the remaining space */
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent overflow */
+}

@@ -8,6 +8,8 @@ import Cookies from 'js-cookie';
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
 
+import styles from './index.module.css';
+
 const Page = () => {
     const dispatch = useDispatch();
 
@@ -258,13 +260,14 @@ const Page = () => {
     }, [isAuthenticated]);
 
     return (
-        <div className="flex min-h-screen">
+        <div className={styles.customLayoutContainer}>
             {isAuthenticated && <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} />}
             {isAuthenticated && (
                 <ChatWindow
                     messages={messages}
                     onSendMessage={handleSendMessage}
                     selectedChatroom={selectedChatroom}
+                    userId={user?.id}
                 />
             )}
         </div>

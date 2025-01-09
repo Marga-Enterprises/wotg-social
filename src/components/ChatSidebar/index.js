@@ -1,7 +1,6 @@
 import React from 'react';
 
 const ChatSidebar = ({ chatrooms, onSelectChatroom }) => {
-  console.log('CHAT ROOMS', chatrooms);
   return (
     <div className="w-1/4 bg-gray-100 p-4 border-r">
       {/* Header */}

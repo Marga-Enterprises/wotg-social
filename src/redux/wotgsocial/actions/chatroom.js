@@ -7,7 +7,6 @@ import * as types from '../types';
 export const getAllChatroomsAction = (payload) => async (dispatch) => {
   return getAllChatrooms(payload).then((res) => {
       if (res.success) {
-        console.log('API Response - res.data:', res.data); // Log res.data
         dispatch({
           type: types.CHATROOM_LIST_SUCCESS,
           payload: res.data, 

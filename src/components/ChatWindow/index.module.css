@@ -1,0 +1,12 @@
+/* In your CSS file or in a <style> tag */
+.emojiPickerContainer {
+    position: absolute;
+    bottom: 10rem; /* Adjust this to your needs */
+    right: 30rem; /* Adjust this to your needs */
+    z-index: 10;
+    border-radius: 8px; /* Optional: Adds rounded corners to the emoji picker */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow for better visibility */
+    background-color: white; /* Optional: Makes sure the background is white */
+    padding: 0.5rem; /* Optional: Adds some padding */
+  }
+  

@@ -1,14 +1,19 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react'
+
+import styles from './index.module.css';
 
 const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId }) => {
-  const [message, setMessage] = React.useState('');
-  const [realtimeMessages, setRealtimeMessages] = React.useState([...messages]);
+  const [message, setMessage] = useState('');
+  const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   // Reference for scrolling
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
 
   // Sync initial messages with realtimeMessages
-  React.useEffect(() => {
+  useEffect(() => {
     setRealtimeMessages([...messages]);
   }, [messages]);
 
@@ -20,7 +25,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId 
   }, [realtimeMessages]); // Trigger scroll when messages are updated
 
   // Listen for real-time messages
-  React.useEffect(() => {
+  useEffect(() => {
     if (!socket) return;
 
     socket.on('new_message', (newMessage) => {
@@ -54,6 +59,17 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId 
     }
   };
 
+  // Handle emoji selection
+  const handleEmojiSelect = (emoji) => {
+    setMessage((prevMessage) => prevMessage + emoji.native);
+    setShowEmojiPicker(false); // Close the emoji picker after selection
+  };
+
+  // Toggle emoji picker visibility
+  const toggleEmojiPicker = () => {
+    setShowEmojiPicker((prevState) => !prevState); // Toggle picker
+  };
+
   return (
     <div className="w-2/4 flex flex-col bg-gray-50 p-4">
       <div className="flex-grow overflow-y-auto border border-gray-300 rounded p-4 mb-4">
@@ -63,18 +79,18 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId 
             return (
               <div
                 key={index}
-                className={`p-2 mb-2 rounded ${
-                  isSender
-                    ? 'bg-red-100 self-end text-right' // Sender's message with red background aligned to the right
-                    : 'bg-gray-200 self-start text-left' // Receiver's message with gray background aligned to the left
-                }`}
+                className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-2`} // Align sender's message to the right, others to the left
               >
-                <p className="text-xs text-gray-600 font-semibold">
-                  {msg?.sender?.user_fname && msg?.sender?.user_lname
-                    ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
-                    : 'Unknown User'}
-                </p>
-                <p className="text-xs font-medium">{msg?.content || 'No content available'}</p>
+                <div
+                  className={`p-2 rounded max-w-xs ${isSender ? 'bg-red-100' : 'bg-gray-200'} w-full`}
+                >
+                  <p className="text-xs text-gray-600 font-semibold">
+                    {msg?.sender?.user_fname && msg?.sender?.user_lname
+                      ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
+                      : 'Unknown User'}
+                  </p>
+                  <p className="text-xs font-medium">{msg?.content || 'No content available'}</p>
+                </div>
               </div>
             );
           })
@@ -84,6 +100,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId 
         {/* This empty div is used to trigger the scroll to the bottom */}
         <div ref={messagesEndRef} />
       </div>
+
       <div className="flex mt-auto">
         <input
           type="text"
@@ -94,10 +111,36 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId 
           onKeyDown={handleKeyDown} // Add onKeyDown handler
         />
         <button
-          className="ml-2 p-2 bg-[#c0392b] text-white rounded"
+          className="ml-2 p-2 bg-transparent text-white rounded flex items-center justify-center"
+          onClick={toggleEmojiPicker} // Toggle emoji picker
+        >
+          😊
+        </button>
+
+        {showEmojiPicker && (
+          <div className={styles.emojiPickerContainer}>
+            <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+          </div>
+        )}
+
+        <button
+          className="ml-2 p-2 bg-transparent text-white rounded flex items-center justify-center"
           onClick={handleSend}
         >
-          Send
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6 text-[#c0392b]" // Apply color here (blue)
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+            />
+          </svg>
         </button>
       </div>
     </div>

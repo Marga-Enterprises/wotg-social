@@ -4,7 +4,7 @@ import Picker from '@emoji-mart/react'
 
 import styles from './index.module.css';
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId }) => {
+const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile }) => {
   const [message, setMessage] = useState('');
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -71,7 +71,17 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId 
   };
 
   return (
-    <div className="w-2/4 flex flex-col bg-gray-50 p-4">
+    <div className="w-full flex flex-col bg-gray-50 p-4">
+      {isMobile && onBackClick && (
+        <button
+          className={styles.backButton}
+          onClick={onBackClick} // Trigger the back action
+          aria-label="Back to chatrooms"
+        >
+          Back
+        </button>
+      )}
+
       <div className="flex-grow overflow-y-auto border border-gray-300 rounded p-4 mb-4">
         {realtimeMessages && realtimeMessages.length > 0 ? (
           realtimeMessages.map((msg, index) => {
@@ -82,14 +92,16 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId 
                 className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-2`} // Align sender's message to the right, others to the left
               >
                 <div
-                  className={`p-2 rounded max-w-xs ${isSender ? 'bg-red-100' : 'bg-gray-200'} w-full`}
+                  className={`${styles.messageContainer} ${isSender ? styles.bgSender : styles.bgReceiver}`}
                 >
-                  <p className="text-xs text-gray-600 font-semibold">
+                  <p className={styles.senderName}>
                     {msg?.sender?.user_fname && msg?.sender?.user_lname
                       ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
                       : 'Unknown User'}
                   </p>
-                  <p className="text-xs font-medium">{msg?.content || 'No content available'}</p>
+                  <p className={styles.messageContent}>
+                    {msg?.content || 'No content available'}
+                  </p>
                 </div>
               </div>
             );

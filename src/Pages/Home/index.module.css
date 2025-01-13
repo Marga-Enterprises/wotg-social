@@ -7,6 +7,11 @@
     margin-top: -1rem;
 }
 
+.chatWindowHidden {
+    display: block; /* Show on mobile by default */
+}
+  
+
 /* Custom sidebar style */
 .customSidebar {
     width: 300px; /* Fixed width for the sidebar */
@@ -22,3 +27,16 @@
     flex-direction: column;
     overflow: hidden; /* Prevent overflow */
 }
+
+@media (max-width: 570px) {
+    /* Hide ChatSidebar on mobile */
+    .chatSidebarHidden {
+      display: none;
+    }
+  
+    /* Show ChatWindow on mobile */
+    .chatWindowHidden {
+      display: block;
+    }
+}
+  

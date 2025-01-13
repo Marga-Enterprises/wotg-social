@@ -1,12 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ChatSidebar = ({ chatrooms, onSelectChatroom }) => {
+  const [isMobile, setIsMobile] = useState(false); // State to track if the screen is mobile size
+
+  // Detect screen size (mobile or not)
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 570); // Check if window width is <= 570px
+    };
+
+    handleResize(); // Initial check on mount
+    window.addEventListener('resize', handleResize); // Listen for screen resizing
+
+    return () => {
+      window.removeEventListener('resize', handleResize); // Cleanup on unmount
+    };
+  }, []);
+
   return (
-    <div className="w-1/4 bg-gray-100 p-4 border-r">
+    <div className={`p-4 border-r ${isMobile ? 'w-full' : 'w-1/8'} bg-gray-100`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold">Chat</h2>
-        {/*<button className="px-4 py-2 bg-[#c0392b] text-white rounded">+ Create New</button>*/}
+        {/* <button className="px-4 py-2 bg-[#c0392b] text-white rounded">+ Create New</button> */}
       </div>
 
       {/* Search */}
@@ -16,6 +32,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom }) => {
         className="w-full p-2 mb-4 border border-gray-300 rounded"
       />
 
+      {/* Chatrooms List */}
       <ul className="space-y-4">
         {chatrooms.length > 0 ? (
           chatrooms.map((chat) => (
@@ -52,7 +69,6 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom }) => {
           <p className="text-gray-500 text-sm">No chatrooms available</p>
         )}
       </ul>
-
     </div>
   );
 };

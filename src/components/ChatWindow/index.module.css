@@ -1,12 +1,44 @@
-/* In your CSS file or in a <style> tag */
 .emojiPickerContainer {
-    position: absolute;
-    bottom: 10rem; /* Adjust this to your needs */
-    right: 30rem; /* Adjust this to your needs */
-    z-index: 10;
-    border-radius: 8px; /* Optional: Adds rounded corners to the emoji picker */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow for better visibility */
-    background-color: white; /* Optional: Makes sure the background is white */
-    padding: 0.5rem; /* Optional: Adds some padding */
+  position: absolute;
+  bottom: 10rem;
+  right: 2rem;
+  z-index: 10;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  padding: 0.5rem;
+}
+
+.messageContainer {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  width: 45%;
+}
+
+.senderName {
+  font-size: 0.75rem;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+.messageContent {
+  font-size: 0.70rem;
+  font-weight: 400;
+}
+
+.bgSender {
+  background-color: #fef2f2;
+}
+
+.bgReceiver {
+  background-color: #e5e7eb;
+}
+
+
+
+/*------------------MEDIA QUERIES--------------------------------*/
+@media (max-width: 710px) { /* Adjust max-width as per your needs */
+  .messageContainer {
+    width: 80%; /* Adjust to 80% width on smaller screens */
   }
-  
+}

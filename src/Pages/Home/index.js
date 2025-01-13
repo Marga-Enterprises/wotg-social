@@ -20,6 +20,9 @@ const Page = () => {
     const [selectedChatroom, setSelectedChatroom] = useState(1);
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication status
     const [socket, setSocket] = useState(null); // Manage Socket.IO connection
+    const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 570px or below
+    const [isChatVisible, setIsChatVisible] = useState(true);
+
 
     // Fetch user details and authentication status from cookies
     useEffect(() => {
@@ -33,6 +36,21 @@ const Page = () => {
             setIsAuthenticated(false);
         }
     }, []);
+
+    // Detect screen size (mobile or not)
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 570); // Check if window width is <= 570px
+        };
+
+        handleResize(); // Initial check on mount
+        window.addEventListener('resize', handleResize); // Listen for screen resizing
+
+        return () => {
+            window.removeEventListener('resize', handleResize); // Cleanup on unmount
+        };
+    }, []);
+
 
     // Initialize Socket.IO connection
     useEffect(() => {
@@ -228,8 +246,14 @@ const Page = () => {
 
     // Handle chatroom selection
     const handleSelectChatroom = (chatroomId) => {
-        setSelectedChatroom(chatroomId);
+        setSelectedChatroom(chatroomId);  // Set the selected chatroom
+        setIsChatVisible(true);            // Reset chat window visibility to true when a new chatroom is selected
     };
+
+    const handleBackClick = () => {
+        setIsChatVisible(false);  // Hide the chat window when back is clicked
+    };
+    
 
     // Handle sending a message
     const handleSendMessage = (message) => {
@@ -261,17 +285,22 @@ const Page = () => {
 
     return (
         <div className={styles.customLayoutContainer}>
-            {isAuthenticated && <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} />}
-            {isAuthenticated && (
+            {isAuthenticated && (isMobile ? !isChatVisible : true) && (
+                <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} />
+            )}
+            {isAuthenticated && isChatVisible && (
                 <ChatWindow
                     messages={messages}
                     onSendMessage={handleSendMessage}
                     selectedChatroom={selectedChatroom}
                     userId={user?.id}
+                    className={isMobile ? styles.chatWindowVisible : ''} 
+                    onBackClick={handleBackClick}
+                    isMobile={isMobile}
                 />
             )}
         </div>
-    );
+    );    
 };
 
 export default Page;

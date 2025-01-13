@@ -183,7 +183,9 @@ const Page = () => {
 
         if (res.success) {
             setChatrooms(res.data); // Update local state with chatrooms
-            handleSelectChatroom(res.data[0].id);
+            if (res.data.length > 0) {
+                handleSelectChatroom(res.data[0].id);
+            }
         }
     }, [dispatch, isAuthenticated]);
 

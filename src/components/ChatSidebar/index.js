@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ChatSidebar = ({ chatrooms, onSelectChatroom }) => {
+const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal  }) => {
   const [isMobile, setIsMobile] = useState(false); // State to track if the screen is mobile size
 
   // Detect screen size (mobile or not)
@@ -22,7 +22,12 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold">Chat</h2>
-        {/* <button className="px-4 py-2 bg-[#c0392b] text-white rounded">+ Create New</button> */}
+        <button
+          onClick={onOpenCreateChatroomModal} // Call parent's function to open modal
+          className="px-4 py-2 bg-[#c0392b] text-white rounded"
+        >
+          + New Chat
+        </button>
       </div>
 
       {/* Search */}

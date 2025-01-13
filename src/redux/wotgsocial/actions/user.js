@@ -1,6 +1,6 @@
 //api
 import { loginFunc,
-registerFunc   } from '../../../services/api/user';
+registerFunc, getAllUsers } from '../../../services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -9,6 +9,24 @@ import { jwtDecode } from 'jwt-decode';
 
 //types
 import * as types from '../types';
+
+export const getAllUsersAction = () => async (dispatch) => {
+    return getAllUsers().then((res) => {
+        if (res.success) {
+            dispatch({
+            type: types.USER_LIST_SUCCESS,
+            payload: res.data, 
+            });
+        } else {
+            dispatch({
+            type: types.USER_LIST_FAIL,
+            payload: res.msg,
+            });
+        }
+
+        return res; 
+        });
+};
 
 export const setAuthorizationHeader = (token) => {
     const bearerToken = `Bearer ${token}`;

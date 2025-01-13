@@ -81,3 +81,12 @@ export const evalBoolean = (params) => {
      }, wait);
    };
  };
+
+ export const formatUserName = (firstName, lastName) => {
+  const capitalize = (str) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
+  return `${capitalize(firstName)} ${capitalize(lastName)}`;
+};

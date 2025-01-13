@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 // Components
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
+import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
 
 import styles from './index.module.css';
 
@@ -22,6 +23,8 @@ const Page = () => {
     const [socket, setSocket] = useState(null); // Manage Socket.IO connection
     const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 570px or below
     const [isChatVisible, setIsChatVisible] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+
 
 
     // Fetch user details and authentication status from cookies
@@ -75,6 +78,15 @@ const Page = () => {
             newSocket.disconnect(); // Cleanup on component unmount
         };
     }, [isAuthenticated]);
+
+    const handleOpenCreateChatroomModal = () => {
+        setIsModalOpen(true);
+    };
+    
+    // Function to close the modal
+    const handleCloseCreateChatroomModal = () => {
+        setIsModalOpen(false);
+    };
 
     
     // Web Push Notification: Request Permission and Subscribe
@@ -176,15 +188,19 @@ const Page = () => {
     
 
     // Fetch chatrooms
-    const fetchChatrooms = useCallback(async () => {
+    const fetchChatrooms = useCallback(async (chatId) => {
         dispatch(common.ui.setLoading());
         const res = await dispatch(wotgsocial.chatroom.getAllChatroomsAction());
         dispatch(common.ui.clearLoading());
 
         if (res.success) {
-            setChatrooms(res.data); // Update local state with chatrooms
+            setChatrooms(res.data);
             if (res.data.length > 0) {
-                handleSelectChatroom(res.data[0].id);
+                if (chatId) {
+                    handleSelectChatroom(chatId);
+                } else {
+                    handleSelectChatroom(res.data[0].id);
+                }
             }
         }
     }, [dispatch, isAuthenticated]);
@@ -249,6 +265,7 @@ const Page = () => {
 
     // Handle chatroom selection
     const handleSelectChatroom = (chatroomId) => {
+        console.log('SELECT CHAT ROOM TRIGGERED', chatroomId)
         setSelectedChatroom(chatroomId);  // Set the selected chatroom
         setIsChatVisible(true);            // Reset chat window visibility to true when a new chatroom is selected
     };
@@ -289,7 +306,7 @@ const Page = () => {
     return (
         <div className={styles.customLayoutContainer}>
             {isAuthenticated && (isMobile ? !isChatVisible : true) && (
-                <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} />
+                <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} onOpenCreateChatroomModal={handleOpenCreateChatroomModal} />
             )}
             {isAuthenticated && isChatVisible && (
                 <ChatWindow
@@ -300,6 +317,13 @@ const Page = () => {
                     className={isMobile ? styles.chatWindowVisible : ''} 
                     onBackClick={handleBackClick}
                     isMobile={isMobile}
+                />
+            )}
+
+            {isModalOpen && (
+                <ChatRoomCreateForm
+                    onClose={handleCloseCreateChatroomModal} // Pass down function to close the modal
+                    fetchChatrooms={fetchChatrooms}
                 />
             )}
         </div>

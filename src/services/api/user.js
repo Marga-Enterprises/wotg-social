@@ -11,3 +11,7 @@ export async function loginFunc(payload) {
 export async function registerFunc(payload) {
   return POST('/auth/register', payload);
 }
+
+export async function getAllUsers() {
+  return GET('/users'); // Assuming the backend endpoint is /meetingrooms
+}

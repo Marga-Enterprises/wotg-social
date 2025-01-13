@@ -6,7 +6,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal  }
   // Detect screen size (mobile or not)
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 570); // Check if window width is <= 570px
+      setIsMobile(window.innerWidth <= 780); // Check if window width is <= 780px
     };
 
     handleResize(); // Initial check on mount
@@ -18,7 +18,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal  }
   }, []);
 
   return (
-    <div className={`p-4 border-r ${isMobile ? 'w-full' : 'w-1/8'} bg-gray-100`}>
+    <div className={`p-4 border-r ${isMobile ? 'w-full' : 'w-1/3'} bg-gray-100`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold">Chat</h2>

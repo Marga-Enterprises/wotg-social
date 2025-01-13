@@ -28,7 +28,7 @@
     overflow: hidden; /* Prevent overflow */
 }
 
-@media (max-width: 570px) {
+@media (max-width: 780px) {
     /* Hide ChatSidebar on mobile */
     .chatSidebarHidden {
       display: none;

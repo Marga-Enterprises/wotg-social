@@ -21,7 +21,7 @@ const Page = () => {
     const [selectedChatroom, setSelectedChatroom] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication status
     const [socket, setSocket] = useState(null); // Manage Socket.IO connection
-    const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 570px or below
+    const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 780px or below
     const [isChatVisible, setIsChatVisible] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
 
@@ -43,7 +43,7 @@ const Page = () => {
     // Detect screen size (mobile or not)
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 570); // Check if window width is <= 570px
+            setIsMobile(window.innerWidth <= 780); // Check if window width is <= 780px
         };
 
         handleResize(); // Initial check on mount

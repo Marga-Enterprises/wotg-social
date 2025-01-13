@@ -73,14 +73,27 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   return (
     <div className="w-full flex flex-col bg-gray-50 p-4">
       {isMobile && onBackClick && (
-        <button
-          className={styles.backButton}
-          onClick={onBackClick} // Trigger the back action
-          aria-label="Back to chatrooms"
-        >
-          Back
-        </button>
+        <div className="w-full flex justify-start">
+          <button
+            className={styles.backButton}
+            onClick={onBackClick} // Trigger the back action
+            aria-label="Back to chatrooms"
+          >
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              strokeWidth="3.0" 
+              stroke="currentColor" 
+              class="size-6"
+              className="w-6 h-6 text-[#c0392b]"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+          </button>
+        </div>
       )}
+
 
       <div className="flex-grow overflow-y-auto border border-gray-300 rounded p-4 mb-4">
         {realtimeMessages && realtimeMessages.length > 0 ? (

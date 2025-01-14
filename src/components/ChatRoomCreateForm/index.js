@@ -4,12 +4,12 @@ import { wotgsocial, common } from '../../redux/combineActions'; // Ensure you h
 import { formatUserName } from '../../utils/methods'; // Ensure you have the correct import for the action
 import styles from './index.module.css'; // Import the modal styles
 
-const ChatRoomCreateForm = ({ onClose, fetchChatrooms }) => {
+const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId }) => {
   const dispatch = useDispatch();
   const [chatroomName, setChatroomName] = useState(''); // Track chatroom name
   const [users, setUsers] = useState([]); // Track user list
   const [type, setType] = useState('private'); // Default type is 'private'
-  const [selectedUsers, setSelectedUsers] = useState([]); // Track selected users
+  const [selectedUsers, setSelectedUsers] = useState([currentUserId]); // Ensure current user is selected by default
 
   const fetchUsers = useCallback(async () => {
     dispatch(common.ui.setLoading());
@@ -20,7 +20,7 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms }) => {
       setUsers(res.data); // Set the fetched users
     }
   }, [dispatch]);
-  
+
   // Fetch users on component mount
   useEffect(() => {
     fetchUsers();
@@ -97,22 +97,23 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms }) => {
           <div>
             <label>Participants</label>
             <div className={styles.userList}>
-            {users.map((user) => (
-              <div key={user.id} className={styles.checkboxContainer}>
-                <input
-                  type="checkbox"
-                  id={`user-${user.id}`}
-                  value={user.id}
-                  checked={selectedUsers.includes(user.id)}
-                  onChange={() => handleUserSelection(user.id)}
-                />
-                <label htmlFor={`user-${user.id}`}>
-                  {formatUserName(user.user_fname, user.user_lname)}
-                </label>
-              </div>
-            ))}
-          </div>
-
+              {users.map((user) => (
+                user.id !== currentUserId && ( // Exclude the current user from the list
+                  <div key={user.id} className={styles.checkboxContainer}>
+                    <input
+                      type="checkbox"
+                      id={`user-${user.id}`}
+                      value={user.id}
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={() => handleUserSelection(user.id)}
+                    />
+                    <label htmlFor={`user-${user.id}`}>
+                      {formatUserName(user.user_fname, user.user_lname)}
+                    </label>
+                  </div>
+                )
+              ))}
+            </div>
           </div>
 
           <div className={styles.modalActions}>

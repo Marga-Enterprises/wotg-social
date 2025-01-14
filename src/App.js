@@ -10,9 +10,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AuthRouter from './components/AuthRouter'
 
-// CSS
-import './App.css';
-
 function App() {
   return (
     <BrowserRouter>

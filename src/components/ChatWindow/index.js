@@ -12,6 +12,9 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   // Reference for scrolling
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
 
+  // Reference for the emoji picker container
+  const emojiPickerRef = useRef(null); 
+
   // Sync initial messages with realtimeMessages
   useEffect(() => {
     setRealtimeMessages([...messages]);
@@ -43,10 +46,10 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     };
   }, [socket, selectedChatroom]);
 
+  // Handle Send Message
   const handleSend = () => {
     if (message.trim() && selectedChatroom) {
-      // Send the message through the parent handler (server handles broadcasting)
-      onSendMessage(message);
+      onSendMessage(message); // Send the message through the parent handler
       setMessage(''); // Clear the input field
     }
   };
@@ -62,13 +65,27 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   // Handle emoji selection
   const handleEmojiSelect = (emoji) => {
     setMessage((prevMessage) => prevMessage + emoji.native);
-    setShowEmojiPicker(false); // Close the emoji picker after selection
   };
 
   // Toggle emoji picker visibility
   const toggleEmojiPicker = () => {
     setShowEmojiPicker((prevState) => !prevState); // Toggle picker
   };
+
+  // Close emoji picker when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false); // Close emoji picker
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-full flex flex-col bg-gray-50 p-4">
@@ -85,7 +102,6 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               viewBox="0 0 24 24" 
               strokeWidth="3.0" 
               stroke="currentColor" 
-              class="size-6"
               className="w-6 h-6 text-[#c0392b]"
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
@@ -93,7 +109,6 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           </button>
         </div>
       )}
-
 
       <div className="flex-grow overflow-y-auto border border-gray-300 rounded p-4 mb-4">
         {realtimeMessages && realtimeMessages.length > 0 ? (
@@ -126,7 +141,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex mt-auto">
+      <div className="flex mt-auto items-center">
         <input
           type="text"
           className="flex-grow p-2 border rounded"
@@ -143,13 +158,16 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
         </button>
 
         {showEmojiPicker && (
-          <div className={styles.emojiPickerContainer}>
-            <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+          <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
+            <Picker 
+              data={data} 
+              onEmojiSelect={handleEmojiSelect} 
+            />
           </div>
         )}
 
         <button
-          className="ml-2 p-2 bg-transparent text-white rounded flex items-center justify-center"
+          className="bg-transparent text-white rounded flex items-center justify-center"
           onClick={handleSend}
         >
           <svg

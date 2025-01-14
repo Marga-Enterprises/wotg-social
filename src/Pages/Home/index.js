@@ -327,7 +327,8 @@ const Page = () => {
 
             {isModalOpen && (
                 <ChatRoomCreateForm
-                    onClose={handleCloseCreateChatroomModal} // Pass down function to close the modal
+                    onClose={handleCloseCreateChatroomModal}
+                    currentUserId={user?.id}
                     fetchChatrooms={fetchChatrooms}
                 />
             )}

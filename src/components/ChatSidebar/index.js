@@ -41,8 +41,6 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
       <ul className="space-y-4">
         {chatrooms.length > 0 ? (
           chatrooms.map((chat) => {
-            console.log('[[CHAT CONTENT]]', chat); // Add this line to log each chat object
-            
             return (
               <li
                 key={chat.id}

@@ -17,6 +17,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
   // Sync initial messages with realtimeMessages
   useEffect(() => {
+    console.log('Messages updated:', messages);
     setRealtimeMessages([...messages]);
   }, [messages]);
 
@@ -33,7 +34,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
     socket.on('new_message', (newMessage) => {
       if (newMessage.chatroomId === selectedChatroom) {
-        // Avoid duplicate messages
+        // Avoid duplicate messages for the same chatroom
         setRealtimeMessages((prev) => {
           const isDuplicate = prev.some((msg) => msg.id === newMessage.id);
           return isDuplicate ? prev : [...prev, newMessage];
@@ -112,28 +113,30 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
       <div className="flex-grow overflow-y-auto border border-gray-300 rounded p-4 mb-4">
         {realtimeMessages && realtimeMessages.length > 0 ? (
-          realtimeMessages.map((msg, index) => {
-            const isSender = msg.senderId === userId; // Check if the message is from the current user
-            return (
-              <div
-                key={index}
-                className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-2`} // Align sender's message to the right, others to the left
-              >
+          realtimeMessages
+            .filter((msg) => msg.chatroomId === selectedChatroom) // Only show messages for the selected chatroom
+            .map((msg, index) => {
+              const isSender = msg.senderId === userId; // Check if the message is from the current user
+              return (
                 <div
-                  className={`${styles.messageContainer} ${isSender ? styles.bgSender : styles.bgReceiver}`}
+                  key={index}
+                  className={`flex ${isSender ? 'justify-end' : 'justify-start'} mb-2`} // Align sender's message to the right, others to the left
                 >
-                  <p className={styles.senderName}>
-                    {msg?.sender?.user_fname && msg?.sender?.user_lname
-                      ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
-                      : 'Unknown User'}
-                  </p>
-                  <p className={styles.messageContent}>
-                    {msg?.content || 'No content available'}
-                  </p>
+                  <div
+                    className={`${styles.messageContainer} ${isSender ? styles.bgSender : styles.bgReceiver}`}
+                  >
+                    <p className={styles.senderName}>
+                      {msg?.sender?.user_fname && msg?.sender?.user_lname
+                        ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
+                        : 'Unknown User'}
+                    </p>
+                    <p className={styles.messageContent}>
+                      {msg?.content || 'No content available'}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })
         ) : (
           <p className="text-gray-500">No messages in this chatroom yet.</p>
         )}

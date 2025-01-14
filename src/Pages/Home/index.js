@@ -235,25 +235,49 @@ const Page = () => {
     // Listen for new messages in real-time
     useEffect(() => {
         if (!socket) return;
-
+    
         socket.on('new_message', (message) => {
-            console.log('New message received:', message);
-
-            // Update local messages state
+            // Update messages state first to ensure new messages are displayed
             setMessages((prevMessages) => {
                 const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
                 return isDuplicate ? prevMessages : [...prevMessages, message];
             });
+    
+            // Then update the chatrooms state to reflect the most recent message
+            setChatrooms((prevChatrooms) => {
+                const updatedChatrooms = prevChatrooms.map((chat) => {
+                    if (chat.id === message.chatroomId) {
+                        return {
+                            ...chat,
+                            RecentMessage: message,  // Update RecentMessage in the chatroom
+                        };
+                    }
+                    return chat;
+                });
+    
+                // Sort chatrooms to ensure the most recent message is at the top
+                updatedChatrooms.sort((a, b) => {
+                    const dateA = new Date(a.RecentMessage?.createdAt).getTime();
+                    const dateB = new Date(b.RecentMessage?.createdAt).getTime();
+                    return dateB - dateA; // Sort in descending order
+                });
+    
+                return updatedChatrooms;
+            });
         });
-
+    
         return () => {
             socket.off('new_message'); // Cleanup event listener on component unmount
         };
-    }, [socket]);
+    }, [socket]);    
 
-    // Join the selected chatroom
     useEffect(() => {
         if (!socket || !selectedChatroom) return;
+
+        chatrooms.forEach((chatroom) => {
+            socket.emit('join_room', chatroom.id); // Join each chatroom by its ID
+            console.log(`User ${user.id} joined room ${chatroom.id}`);
+        });
 
         socket.emit('join_room', selectedChatroom);
 
@@ -262,6 +286,7 @@ const Page = () => {
             console.log(`Left room: ${selectedChatroom}`);
         };
     }, [socket, selectedChatroom]);
+
 
     // Handle chatroom selection
     const handleSelectChatroom = (chatroomId) => {
@@ -274,24 +299,26 @@ const Page = () => {
         setIsChatVisible(false);  // Hide the chat window when back is clicked
     };
     
-
     // Handle sending a message
-    const handleSendMessage = (message) => {
+    const handleSendMessage = (messageContent) => {
         if (!selectedChatroom || !user) return;
 
-        const payload = {
-            content: message,
+        const message = {
+            content: messageContent,
             senderId: user.id,
             chatroomId: selectedChatroom,
         };
 
-        // Send message to the server via REST API
-        dispatch(wotgsocial.message.sendMessageAction(payload)).then((res) => {
+        // Emit the message to the server via socket
+        socket.emit('send_message', message);
+
+        // Optionally, update local state immediately for UI feedback
+        // setMessages((prevMessages) => [...prevMessages]);
+
+        // If you want to also update via API (or you can choose one):
+        dispatch(wotgsocial.message.sendMessageAction(message)).then((res) => {
             if (res.success) {
                 console.log('Message sent via API:', res.data);
-
-                // Update local state for immediate feedback to sender
-                setMessages((prevMessages) => [...prevMessages]);
             }
         });
     };

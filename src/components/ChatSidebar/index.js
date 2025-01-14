@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal  }) => {
+const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId  }) => {
   const [isMobile, setIsMobile] = useState(false); // State to track if the screen is mobile size
 
   // Detect screen size (mobile or not)
@@ -60,12 +60,32 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal  }
                   />
                 ) : (
                   <span className="text-white font-bold">
-                    {chat.name ? chat.name.charAt(0).toUpperCase() : 'A'}
+                    {chat.Participants.length <= 2
+                      ? chat.Participants.filter((participant) => participant.user.id !== currentUserId) // Filter out current user
+                          .map((participant, index) => (
+                            <span key={index}>
+                              {participant.user.user_fname.charAt(0).toUpperCase()}
+                            </span>
+                          ))
+                      : chat.name
+                      ? chat.name.charAt(0).toUpperCase()
+                      : 'A'}
                   </span>
                 )}
               </div>
               <div>
-                <p className="font-bold">{chat.name}</p>
+                <p className="font-bold">
+                  {chat.Participants.length <= 2
+                    ? chat.Participants.filter((participant) => participant.user.id !== currentUserId) // Filter out current user
+                        .map((participant, index) => (
+                          <span key={index}>
+                            {participant.user.user_fname} {participant.user.user_lname}
+                          </span>
+                        ))
+                    : chat.name
+                    ? chat.name
+                    : 'Unnamed Chat'}
+                </p>
                 <p className="text-sm text-gray-500">{chat.lastActive || 'Active now'}</p>
               </div>
             </li>

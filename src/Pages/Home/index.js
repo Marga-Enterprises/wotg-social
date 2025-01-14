@@ -306,7 +306,12 @@ const Page = () => {
     return (
         <div className={styles.customLayoutContainer}>
             {isAuthenticated && (isMobile ? !isChatVisible : true) && (
-                <ChatSidebar chatrooms={chatrooms} onSelectChatroom={handleSelectChatroom} onOpenCreateChatroomModal={handleOpenCreateChatroomModal} />
+                <ChatSidebar 
+                    chatrooms={chatrooms} 
+                    onSelectChatroom={handleSelectChatroom} 
+                    onOpenCreateChatroomModal={handleOpenCreateChatroomModal} 
+                    currentUserId={user?.id}
+                />
             )}
             {isAuthenticated && isChatVisible && (
                 <ChatWindow

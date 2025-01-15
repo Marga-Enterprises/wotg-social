@@ -237,19 +237,21 @@ const Page = () => {
         if (!socket) return;
     
         socket.on('new_message', (message) => {
-            // Update messages state first to ensure new messages are displayed
+            // Update messages state to include the new message
             setMessages((prevMessages) => {
                 const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
                 return isDuplicate ? prevMessages : [...prevMessages, message];
             });
     
-            // Then update the chatrooms state to reflect the most recent message
+            // Update chatrooms with the new message and set hasUnread
             setChatrooms((prevChatrooms) => {
                 const updatedChatrooms = prevChatrooms.map((chat) => {
                     if (chat.id === message.chatroomId) {
+                        const isUnread = message.senderId !== user?.id; // Only mark as unread if the sender is not the current user
                         return {
                             ...chat,
-                            RecentMessage: message,  // Update RecentMessage in the chatroom
+                            RecentMessage: message,
+                            hasUnread: chat.hasUnread || isUnread, // Keep unread true unless explicitly read
                         };
                     }
                     return chat;
@@ -268,6 +270,28 @@ const Page = () => {
     
         return () => {
             socket.off('new_message'); // Cleanup event listener on component unmount
+        };
+    }, [socket, user?.id]);
+
+    useEffect(() => {
+        if (!socket) return;
+    
+        // Listen for the message_read event
+        socket.on('message_read', ({ userId, messageIds }) => {
+            // Update the chatrooms to remove the unread highlight for the specific user
+            setChatrooms((prevChatrooms) =>
+                prevChatrooms.map((chat) =>
+                    messageIds.some((messageId) =>
+                        chat.messages?.some((msg) => msg.id === messageId)
+                    )
+                        ? { ...chat, hasUnread: false }
+                        : chat
+                )
+            );
+        });
+    
+        return () => {
+            socket.off('message_read'); // Cleanup the listener
         };
     }, [socket]);    
 
@@ -289,11 +313,24 @@ const Page = () => {
 
 
     // Handle chatroom selection
-    const handleSelectChatroom = (chatroomId) => {
-        console.log('SELECT CHAT ROOM TRIGGERED', chatroomId)
-        setSelectedChatroom(chatroomId);  // Set the selected chatroom
-        setIsChatVisible(true);            // Reset chat window visibility to true when a new chatroom is selected
+    const handleSelectChatroom = async (chatroomId) => {
+        console.log('SELECT CHAT ROOM TRIGGERED', chatroomId);
+        setSelectedChatroom(chatroomId); // Set the selected chatroom
+        setIsChatVisible(true); // Show the chat window
+    
+        // Update chatrooms locally to mark the selected chatroom as read
+        setChatrooms((prevChatrooms) =>
+            prevChatrooms.map((chat) =>
+                chat.id === chatroomId
+                    ? { ...chat, hasUnread: false } // Clear unread highlight
+                    : chat
+            )
+        );
+    
+        // Fetch messages for the selected chatroom (backend will update MessageReadStatus)
+        await fetchMessages();
     };
+    
 
     const handleBackClick = () => {
         setIsChatVisible(false);  // Hide the chat window when back is clicked

@@ -1,7 +1,12 @@
-.chatItem {
-    transition: background-color 0.2s ease;
-  }
-  .chatItem:hover {
-    background-color: #e5e7eb; /* Tailwind's bg-gray-200 */
-  }
-  
+.chatroom-item {
+  transition: background-color 0.3s ease;
+}
+
+.chatroom-item:hover {
+  background-color: #f1f1f1;
+}
+
+.chatroom-item.unread {
+  background-color: #ffeeba; /* Highlight unread chatrooms */
+  font-weight: bold;
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId  }) => {
+const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId }) => {
   const [isMobile, setIsMobile] = useState(false); // State to track if the screen is mobile size
 
   // Detect screen size (mobile or not)
@@ -40,62 +40,71 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
       {/* Chatrooms List */}
       <ul className="space-y-4">
         {chatrooms.length > 0 ? (
-            chatrooms.map(chat => (
-                <li
-                    key={chat.id}
-                    className={`flex items-center p-2 cursor-pointer rounded ${
-                        chat.hasUnread ? 'bg-gray-300 font-bold' : 'hover:bg-gray-200'
-                    }`}
-                    onClick={() => onSelectChatroom(chat.id)}
-                >
-                    <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center mr-4"
-                        style={{
-                            backgroundColor: chat.avatar ? 'transparent' : '#c0392b',
-                        }}
-                    >
-                        {chat.avatar ? (
-                            <img
-                                src={chat.avatar}
-                                alt={chat.name}
-                                className="w-10 h-10 rounded-full"
-                            />
-                        ) : (
-                            <span className="text-white font-bold">
-                                {chat.Participants.length <= 2
-                                    ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
-                                          .map((participant, index) => (
-                                              <span key={index}>
-                                                  {participant.user.user_fname.charAt(0).toUpperCase()}
-                                              </span>
-                                          ))
-                                    : chat.name
-                                    ? chat.name.charAt(0).toUpperCase()
-                                    : 'A'}
-                            </span>
-                        )}
-                    </div>
-                    <div>
-                        <p className="font-bold">
-                            {chat.Participants.length <= 2
-                                ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
-                                      .map((participant, index) => (
-                                          <span key={index}>
-                                              {participant.user.user_fname} {participant.user.user_lname}
-                                          </span>
-                                      ))
-                                : chat.name
-                                ? chat.name
-                                : 'Unnamed Chat'}
-                        </p>
-                        <p className="text-sm text-gray-500">{chat.RecentMessage?.content}</p>
-                    </div>
-                </li>
-            ))
+          chatrooms.map(chat => {
+            return (
+              <li
+                key={chat.id}
+                className={`flex items-center justify-between p-2 cursor-pointer rounded ${
+                  chat.hasUnread ? 'font-bold' : 'hover:bg-gray-200'
+                }`}
+                onClick={() => onSelectChatroom(chat.id)}
+              >
+                <div className="flex items-center">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center mr-4"
+                    style={{
+                      backgroundColor: chat.avatar ? 'transparent' : '#c0392b',
+                    }}
+                  >
+                    {chat.avatar ? (
+                      <img
+                        src={chat.avatar}
+                        alt={chat.name}
+                        className="w-10 h-10 rounded-full"
+                      />
+                    ) : (
+                      <span className="text-white font-bold">
+                        {chat.Participants.length <= 2
+                          ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
+                              .map((participant, index) => (
+                                <span key={index}>
+                                  {participant.user.user_fname.charAt(0).toUpperCase()}
+                                </span>
+                              ))
+                          : chat.name
+                          ? chat.name.charAt(0).toUpperCase()
+                          : 'A'}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-bold">
+                      {chat.Participants.length <= 2
+                        ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
+                            .map((participant, index) => (
+                              <span key={index}>
+                                {participant.user.user_fname} {participant.user.user_lname}
+                              </span>
+                            ))
+                        : chat.name
+                        ? chat.name
+                        : 'Unnamed Chat'}
+                    </p>
+                    <p className="text-sm text-gray-500">{chat.RecentMessage?.content}</p>
+                  </div>
+                </div>
+                {chat.unreadCount > 0 && (
+                    <span className="text-xs text-white bg-red-500 px-2 py-1 rounded-full">
+                        {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
+                    </span>
+                )}
+              </li>
+            );
+          })
         ) : (
-            <p className="text-gray-500 text-sm">No chatrooms available</p>
+          <p className="text-gray-500 text-sm">No chatrooms available</p>
         )}
-    </ul>
+      </ul>
     </div>
   );
 };

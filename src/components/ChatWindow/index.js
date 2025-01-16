@@ -17,7 +17,6 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
   // Sync initial messages with realtimeMessages
   useEffect(() => {
-    console.log('Messages updated:', messages);
     setRealtimeMessages([...messages]);
   }, [messages]);
 

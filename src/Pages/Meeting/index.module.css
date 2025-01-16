@@ -1,22 +1,43 @@
-.pageContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    padding: 20px;
+.meetingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
 }
 
-.createButton {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    margin-bottom: 20px;
+.joinMeetingRoomForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: solid 1px #c0392b;
+  width: 100%;
+  max-width: 500px;
+  padding: 5rem;
+  border-radius: 16px;
 }
 
-.createButton:hover {
-    background-color: #45a049;
+.joinMeetingRoomForm h1 {
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.joinMeetingRoomForm input {
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: solid 1px #ccc;
+  width: 100%;
+}
+
+.joinMeetingRoomForm button {
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: solid 1px #ccc;
+  width: 100%;
+  background-color: #c0392b;
+  color: white;
+  cursor: pointer;
 }

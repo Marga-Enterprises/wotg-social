@@ -1,33 +1,60 @@
-import React, { useState } from 'react';
-import MeetingRoomCreateForm from '../../components/MeetingRoomCreateForm'; // Import the modal component
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { wotgsocial, common } from '../../redux/combineActions';
 
-import styles from './index.module.css'; // Import styles for the page
+import Cookies from 'js-cookie';
 
-const MeetingPage = () => {
-  const [showModal, setShowModal] = useState(false);
+import styles from './index.module.css';
 
-  const handleCreateMeeting = () => {
-    setShowModal(true); // Show the modal to create the room
-  };
+const Page = () => {
+  const dispatch = useDispatch();
 
-  const handleCloseModal = () => {
-    setShowModal(false); // Close the modal when creation is complete
+  const [roomname, setRoomname] = useState();
+  const [email, setEmail] = useState();
+
+  const cookieEmail = Cookies.get('email');
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const payload = {
+      roomname,
+      email,
+    };
+
+    dispatch(wotgsocial.meetingroom.accessMeetingroomAction(payload)).then((res) => {
+        if (res.success) {
+            window.location.href = res.data.jitsiUrl;
+        } else {
+            console.error('An error occurred while creating room:', res.payload);
+        }
+    }); 
   };
 
   return (
-    <div className={styles.pageContainer}>
-      <h1>Meeting Room</h1>
-      <button onClick={handleCreateMeeting} className={styles.createButton}>
-        Create a New Meeting
-      </button>
-
-      {/* Show modal when needed */}
-      {showModal && <MeetingRoomCreateForm onClose={handleCloseModal} />}
-
-      {/* The container where the Jitsi meeting will be rendered */}
-      <div id="jitsi-meet-container" style={{ width: '100%', height: '600px' }}></div>
-    </div>
+    <>
+        <div className={styles.meetingContainer}> 
+            <form className={styles.joinMeetingRoomForm} onSubmit={handleSubmit}>
+                <h1>Join Room</h1>
+                <input
+                    type="text"
+                    placeholder="Room name"
+                    value={roomname}
+                    className={styles.roomnameInput}
+                    onChange={(e) => setRoomname(e.target.value)}
+                />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    className={styles.roomnameInput}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <button type="submit">Create Room</button>
+            </form>
+        </div>
+    </>
   );
 };
 
-export default MeetingPage;
+export default Page;

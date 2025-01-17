@@ -26,7 +26,7 @@ function App() {
             <Route path="/register" exact element={<SignUp />} />
           </Routes>
         </main>
-        <footer className="footer"><Footer /></footer>
+        {/*<footer className="footer"><Footer /></footer>*/}
       </div>
     </BrowserRouter>
   );

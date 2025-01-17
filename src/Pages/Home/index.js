@@ -223,6 +223,7 @@ const Page = () => {
             setMessages(res.data); // Update local state with messages
         }
     }, [selectedChatroom, dispatch]);
+    
 
     // Fetch messages when chatroom changes
     useEffect(() => {
@@ -273,6 +274,29 @@ const Page = () => {
             socket.off('new_message'); // Cleanup the listener
         };
     }, [socket, user?.id]);
+
+    useEffect(() => {
+        if (!socket) return;
+    
+        // Listen for new chatroom event
+        socket.on('new_chatroom', (newChatroom) => {
+            console.log('New chatroom created:', newChatroom);
+    
+            // Add the new chatroom to the chatrooms state
+            setChatrooms((prevChatrooms) => {
+                // Optionally, ensure no duplicates by checking chatroom IDs
+                if (!prevChatrooms.some(chat => chat.id === newChatroom.id)) {
+                    return [newChatroom, ...prevChatrooms];  // Prepend new chatroom to the list
+                }
+                return prevChatrooms;
+            });
+        });
+    
+        return () => {
+            socket.off('new_chatroom'); // Cleanup the listener on unmount
+        };
+    }, [socket]); // Re-run when the socket connection changes
+    
 
     useEffect(() => {
         if (!socket || !selectedChatroom) return;
@@ -378,6 +402,7 @@ const Page = () => {
                     onClose={handleCloseCreateChatroomModal}
                     currentUserId={user?.id}
                     fetchChatrooms={fetchChatrooms}
+                    socket={socket} // Pass socket to the child component
                 />
             )}
         </div>

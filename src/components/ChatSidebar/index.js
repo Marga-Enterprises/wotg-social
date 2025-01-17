@@ -39,7 +39,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
 
       {/* Chatrooms List */}
       <ul className="space-y-4">
-        {chatrooms.length > 0 ? (
+        {chatrooms?.length > 0 ? (
           chatrooms.map(chat => {
             return (
               <li
@@ -64,7 +64,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
                       />
                     ) : (
                       <span className="text-white font-bold">
-                        {chat.Participants.length <= 2
+                        {chat.Participants?.length <= 2
                           ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
                               .map((participant, index) => (
                                 <span key={index}>
@@ -79,7 +79,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
                   </div>
                   <div>
                     <p className="font-bold">
-                      {chat.Participants.length <= 2
+                      {chat.Participants?.length <= 2
                         ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
                             .map((participant, index) => (
                               <span key={index}>

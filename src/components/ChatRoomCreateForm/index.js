@@ -4,7 +4,7 @@ import { wotgsocial, common } from '../../redux/combineActions'; // Ensure you h
 import { formatUserName } from '../../utils/methods'; // Ensure you have the correct import for the action
 import styles from './index.module.css'; // Import the modal styles
 
-const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId }) => {
+const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  }) => {
   const dispatch = useDispatch();
   const [chatroomName, setChatroomName] = useState(''); // Track chatroom name
   const [users, setUsers] = useState([]); // Track user list
@@ -30,24 +30,25 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!chatroomName) return; // Ensure chatroom name is provided
+    if (!chatroomName) return;
 
-    // Prepare the payload for creating the chatroom
     const payload = {
-      name: chatroomName,
-      type: type,
-      participants: selectedUsers, // Use selected users for participants
+        name: chatroomName,
+        type,
+        participants: selectedUsers,
     };
 
     // Dispatch the action to create the chatroom
     const res = await dispatch(wotgsocial.chatroom.createChatroomAction(payload));
 
-    // Handle success
     if (res.success) {
-      onClose(); // Close the modal after successful creation
-      fetchChatrooms(res.data.id); // Fetch the chatrooms after creation
+        onClose(); // Close the modal
+        fetchChatrooms(res.data.id); // Fetch updated chatrooms
+
+        // Emit the new chatroom event via socket
+        socket.emit('new_chatroom', res.data);  // Emit event to the server
     } else {
-      console.log('Error creating chatroom:', res.msg); // Handle any errors
+        console.log('Error creating chatroom:', res.msg);
     }
   };
 

@@ -89,7 +89,6 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
                 id="chatroomName"
                 value={chatroomName}
                 onChange={(e) => setChatroomName(e.target.value)}
-                required
                 placeholder="Enter chatroom name"
               />
             </div>

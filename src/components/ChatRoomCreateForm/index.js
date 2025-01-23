@@ -32,9 +32,11 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
 
   useEffect(() => { 
     if (selectedUsers.length > 2) {
+      setChatroomName('');
       setShowChatroomNameField(true);
     } else {
       setShowChatroomNameField(false);
+      setChatroomName('Private');
     }
   }, [selectedUsers]);
 

@@ -293,16 +293,19 @@ const Page = () => {
     
             // Check if the current user is a participant in the new chatroom
             const isCurrentUserParticipant = newChatroom.Participants?.some(
-                (participant) => participant.userId === user?.id
+                (participant) => participant.userId.toString() === user?.id.toString()
             );
     
             if (isCurrentUserParticipant) {
                 // Add the new chatroom to the chatrooms state
                 setChatrooms((prevChatrooms) => {
                     // Ensure no duplicates by checking chatroom IDs
-                    if (!prevChatrooms.some(chat => chat.id === newChatroom.id)) {
-                        return [newChatroom, ...prevChatrooms]; // Prepend new chatroom to the list
+                    const chatroomExists = prevChatrooms.some(chat => chat.id === newChatroom.id);
+    
+                    if (!chatroomExists) {
+                        return [...prevChatrooms, newChatroom]; // Append new chatroom to the list
                     }
+    
                     return prevChatrooms;
                 });
             }
@@ -312,10 +315,9 @@ const Page = () => {
         return () => {
             socket.off('new_chatroom');
         };
-    }, [socket, user?.id]);
+    }, [socket, user?.id]);      
+      
     
-    
-
     useEffect(() => {
         if (!socket || !selectedChatroom) return;
 

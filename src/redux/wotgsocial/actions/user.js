@@ -10,8 +10,8 @@ import { jwtDecode } from 'jwt-decode';
 //types
 import * as types from '../types';
 
-export const getAllUsersAction = () => async (dispatch) => {
-    return getAllUsers().then((res) => {
+export const getAllUsersAction = (payload) => async (dispatch) => {
+    return getAllUsers(payload).then((res) => {
         if (res.success) {
             dispatch({
             type: types.USER_LIST_SUCCESS,

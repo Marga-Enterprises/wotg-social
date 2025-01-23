@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId }) => {
+const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId, onSearchChange }) => {
   const [isMobile, setIsMobile] = useState(false); // State to track if the screen is mobile size
 
   // Detect screen size (mobile or not)
@@ -32,9 +32,10 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
 
       {/* Search */}
       <input
-        type="text"
-        placeholder="Search Name"
-        className="w-full p-2 mb-4 border border-gray-300 rounded"
+          type="text"
+          placeholder="Search Name"
+          className="w-full p-2 mb-4 border border-gray-300 rounded"
+          onChange={(e) => onSearchChange(e.target.value)} // Notify parent of search changes
       />
 
       {/* Chatrooms List */}

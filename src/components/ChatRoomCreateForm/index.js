@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions'; // Ensure you have the correct import for the action
 import { formatUserName } from '../../utils/methods'; // Ensure you have the correct import for the action
 import styles from './index.module.css'; // Import the modal styles
+import ErrorSnackbar from '../ErrorSnackbar';
+import SuccessSnackbar from '../SuccessSnackbar';
 
 const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  }) => {
   const dispatch = useDispatch();
@@ -11,6 +13,10 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
   const [search, setSearch] = useState('');
   const [selectedUsers, setSelectedUsers] = useState([currentUserId]);
   const [showChatroomNameField, setShowChatroomNameField] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [showError, setShowError] = useState(false);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const fetchUsers = useCallback(async () => {
     const payload = {
@@ -35,8 +41,9 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
       setChatroomName('');
       setShowChatroomNameField(true);
     } else {
+      console.log(selectedUsers);
       setShowChatroomNameField(false);
-      setChatroomName('Private');
+      // setChatroomName('Private');
     }
   }, [selectedUsers]);
 
@@ -44,7 +51,7 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!chatroomName) return;
+    // if (!chatroomName) return;
 
     const payload = {
         name: chatroomName,
@@ -55,13 +62,17 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
     const res = await dispatch(wotgsocial.chatroom.createChatroomAction(payload));
 
     if (res.success) {
-        onClose(); // Close the modal
+        setTimeout(() => {
+          onClose(); 
+      }, 2000);
         fetchChatrooms(res.data.id); // Fetch updated chatrooms
-
+        setSuccessMsg('Chatroom created successfully');
+        setShowSuccess(true);
         // Emit the new chatroom event via socket
         socket.emit('new_chatroom', res.data);  // Emit event to the server
     } else {
-        console.log('Error creating chatroom:', res.msg);
+        setErrorMsg(res.payload);
+        setShowError(true);
     }
   };
 
@@ -79,59 +90,64 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
   };
 
   return (
-    <div className={styles.modalContainer}>
-      <div className={styles.modalContent}>
-        <h2>Create a New Chatroom</h2>
-        <form onSubmit={handleSubmit}>
-          { showChatroomNameField && ( 
+    <>
+      <div className={styles.modalContainer}>
+        <div className={styles.modalContent}>
+          {showError && <ErrorSnackbar message={errorMsg} onClose={() => setShowError(false)} />}
+          {showSuccess && <SuccessSnackbar message={successMsg} onClose={() => setShowSuccess(false)} />}
+          <h2>Create a New Chatroom</h2>
+          <form onSubmit={handleSubmit}>
+            { showChatroomNameField && ( 
+              <div>
+                <label htmlFor="chatroomName">Chatroom Name</label>
+                <input
+                  type="text"
+                  id="chatroomName"
+                  value={chatroomName}
+                  required
+                  onChange={(e) => setChatroomName(e.target.value)}
+                  placeholder="Enter chatroom name"
+                />
+              </div>
+            )}
+
             <div>
-              <label htmlFor="chatroomName">Chatroom Name</label>
+              <label>Search Participants</label>
               <input
                 type="text"
-                id="chatroomName"
-                value={chatroomName}
-                onChange={(e) => setChatroomName(e.target.value)}
-                placeholder="Enter chatroom name"
+                id="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Enter name"
               />
+              <div className={styles.userList}>
+                {users.map((user) => (
+                  user.id !== currentUserId && ( // Exclude the current user from the list
+                    <div key={user.id} className={styles.checkboxContainer}>
+                      <input
+                        type="checkbox"
+                        id={`user-${user.id}`}
+                        value={user.id}
+                        checked={selectedUsers.includes(user.id)}
+                        onChange={() => handleUserSelection(user.id)}
+                      />
+                      <label htmlFor={`user-${user.id}`}>
+                        {formatUserName(user.user_fname, user.user_lname)}
+                      </label>
+                    </div>
+                  )
+                ))}
+              </div>
             </div>
-          )}
 
-          <div>
-            <label>Search Participants</label>
-            <input
-              type="text"
-              id="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Enter name"
-            />
-            <div className={styles.userList}>
-              {users.map((user) => (
-                user.id !== currentUserId && ( // Exclude the current user from the list
-                  <div key={user.id} className={styles.checkboxContainer}>
-                    <input
-                      type="checkbox"
-                      id={`user-${user.id}`}
-                      value={user.id}
-                      checked={selectedUsers.includes(user.id)}
-                      onChange={() => handleUserSelection(user.id)}
-                    />
-                    <label htmlFor={`user-${user.id}`}>
-                      {formatUserName(user.user_fname, user.user_lname)}
-                    </label>
-                  </div>
-                )
-              ))}
+            <div className={styles.modalActions}>
+              <button type="submit" className={styles.submitButton}>Create</button>
+              <button type="button" className={styles.cancelButton} onClick={onClose}>Cancel</button>
             </div>
-          </div>
-
-          <div className={styles.modalActions}>
-            <button type="submit" className={styles.submitButton}>Create</button>
-            <button type="button" className={styles.cancelButton} onClick={onClose}>Cancel</button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

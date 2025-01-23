@@ -8,7 +8,7 @@ import Cookies from 'js-cookie';
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
 import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
-
+import SuccessSnackbar from '../../components/SuccessSnackbar';
 import styles from './index.module.css';
 
 const Page = () => {
@@ -24,7 +24,7 @@ const Page = () => {
     const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 780px or below
     const [isChatVisible, setIsChatVisible] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
-
+    const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
 
 
     // Fetch user details and authentication status from cookies
@@ -187,22 +187,31 @@ const Page = () => {
     
 
     // Fetch chatrooms
-    const fetchChatrooms = useCallback(async (chatId) => {
-        dispatch(common.ui.setLoading());
-        const res = await dispatch(wotgsocial.chatroom.getAllChatroomsAction());
-        dispatch(common.ui.clearLoading());
-
-        if (res.success) {
-            setChatrooms(res.data);
-            if (res.data.length > 0) {
-                if (chatId) {
-                    handleSelectChatroom(chatId);
-                } else {
-                    handleSelectChatroom(res.data[0].id);
+    const fetchChatrooms = useCallback(
+        async (chatId) => {
+            dispatch(common.ui.setLoading());
+    
+            const res = await dispatch(
+                wotgsocial.chatroom.getAllChatroomsAction({ search: searchQuery }) // Pass the search query here
+            );
+    
+            dispatch(common.ui.clearLoading());
+    
+            if (res.success) {
+                setChatrooms(res.data);
+    
+                if (res.data.length > 0) {
+                    if (chatId) {
+                        handleSelectChatroom(chatId);
+                    } else {
+                        handleSelectChatroom(res.data[0].id);
+                    }
                 }
             }
-        }
-    }, [dispatch, isAuthenticated]);
+        },
+        [dispatch, isAuthenticated, searchQuery] // Add searchQuery as a dependency
+    );
+    
 
     // Fetch chatrooms on component mount
     useEffect(() => {
@@ -282,20 +291,29 @@ const Page = () => {
         socket.on('new_chatroom', (newChatroom) => {
             console.log('New chatroom created:', newChatroom);
     
-            // Add the new chatroom to the chatrooms state
-            setChatrooms((prevChatrooms) => {
-                // Optionally, ensure no duplicates by checking chatroom IDs
-                if (!prevChatrooms.some(chat => chat.id === newChatroom.id)) {
-                    return [newChatroom, ...prevChatrooms];  // Prepend new chatroom to the list
-                }
-                return prevChatrooms;
-            });
+            // Check if the current user is a participant in the new chatroom
+            const isCurrentUserParticipant = newChatroom.Participants?.some(
+                (participant) => participant.userId === user?.id
+            );
+    
+            if (isCurrentUserParticipant) {
+                // Add the new chatroom to the chatrooms state
+                setChatrooms((prevChatrooms) => {
+                    // Ensure no duplicates by checking chatroom IDs
+                    if (!prevChatrooms.some(chat => chat.id === newChatroom.id)) {
+                        return [newChatroom, ...prevChatrooms]; // Prepend new chatroom to the list
+                    }
+                    return prevChatrooms;
+                });
+            }
         });
     
+        // Cleanup the listener on unmount
         return () => {
-            socket.off('new_chatroom'); // Cleanup the listener on unmount
+            socket.off('new_chatroom');
         };
-    }, [socket]); // Re-run when the socket connection changes
+    }, [socket, user?.id]);
+    
     
 
     useEffect(() => {
@@ -383,6 +401,7 @@ const Page = () => {
                     onSelectChatroom={handleSelectChatroom} 
                     onOpenCreateChatroomModal={handleOpenCreateChatroomModal} 
                     currentUserId={user?.id}
+                    onSearchChange={(query) => setSearchQuery(query)}
                 />
             )}
             {isAuthenticated && isChatVisible && (

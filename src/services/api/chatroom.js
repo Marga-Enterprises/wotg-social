@@ -5,7 +5,8 @@ import { GET, POST, PUT, DELETE } from '../request';
 
 
 export async function getAllChatrooms(payload) {
-  return GET('/chatrooms', payload);
+  const params = methods.convertQueryString(payload);
+  return GET(`/chatrooms?${params}`);
 }
 
 export async function createChatroom(payload) {

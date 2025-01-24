@@ -19,6 +19,7 @@ const Page = () => {
     const [chatrooms, setChatrooms] = useState([]); // Local state for chatrooms
     const [messages, setMessages] = useState([]); // Local state for messages
     const [selectedChatroom, setSelectedChatroom] = useState(null);
+    const [selectedChatroomDetails, setSelectedChatroomDetails] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication status
     const [socket, setSocket] = useState(null); // Manage Socket.IO connection
     const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 780px or below
@@ -229,7 +230,8 @@ const Page = () => {
         dispatch(common.ui.clearLoading());
 
         if (res.success) {
-            setMessages(res.data); // Update local state with messages
+            setMessages(res.data.messages); // Update local state with messages
+            setSelectedChatroomDetails(res.data.chatroom); // Update the selected chatroom name
         }
     }, [selectedChatroom, dispatch]);
     
@@ -411,6 +413,7 @@ const Page = () => {
                     messages={messages}
                     onSendMessage={handleSendMessage}
                     selectedChatroom={selectedChatroom}
+                    selectedChatroomDetails={selectedChatroomDetails}
                     userId={user?.id}
                     className={isMobile ? styles.chatWindowVisible : ''} 
                     onBackClick={handleBackClick}

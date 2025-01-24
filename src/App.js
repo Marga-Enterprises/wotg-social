@@ -15,9 +15,9 @@ function App() {
   return (
     <BrowserRouter>
       <div className="grid-container">
-        <header>
+        {/*<header>
           <Navbar />
-        </header>
+        </header>*/}
         <main> {/* Add top padding to the main content */}
           <Routes>
             <Route path="/" exact element={<AuthRouter><Home /></AuthRouter>} />

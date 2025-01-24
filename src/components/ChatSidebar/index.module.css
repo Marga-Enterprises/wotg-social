@@ -1,14 +1,13 @@
 .chatContainer {
   padding: 16px;
   border-right: 1px solid #e0e0e0;
-  background: linear-gradient(to left, #c0392b, #d46a5e, #f88658);
+  background: linear-gradient(to left, #c95c50, #db8178, #f8a271);
   width: 100%;
   max-width: 450px; /* Constrain the width of the container */
   overflow-y: auto; /* Allow vertical scrolling */
   word-wrap: break-word; /* Break long words to prevent overflow */
   box-sizing: border-box; /* Include padding and border in width/height calculation */
 }
-
 
 @media (min-width: 950px) {
   .chatParticipant {

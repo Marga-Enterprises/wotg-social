@@ -23,27 +23,6 @@ export const getAllChatroomsAction = (payload) => async (dispatch) => {
 };
 
 
-/*
-export const createChatroomAction = (payload) => async (dispatch) => {
-    return createChatroom(payload).then((res) => {
-        console.log('Error creating chatroom:', res);
-        if (res.success) {
-          dispatch({
-            type: types.CHATROOM_CREATE_SUCCESS,
-            payload: res.data.docs,
-          });
-        } else {
-          //console.log('Error creating chatroom:', res);
-          dispatch({
-            type: types.CHATROOM_CREATE_FAIL,
-            payload: res.msg,
-          });
-        }
-    
-        return res;
-      });
-};
-*/
 
 export const createChatroomAction = (payload) => async (dispatch) => {
   try {

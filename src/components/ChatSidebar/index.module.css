@@ -1,12 +1,129 @@
-.chatroom-item {
-  transition: background-color 0.3s ease;
+.chatContainer {
+  padding: 16px;
+  border-right: 1px solid #e0e0e0;
+  background: linear-gradient(to left, #c0392b, #d46a5e, #f88658);
+  width: 100%;
+  max-width: 450px; /* Constrain the width of the container */
+  overflow-y: auto; /* Allow vertical scrolling */
+  word-wrap: break-word; /* Break long words to prevent overflow */
+  box-sizing: border-box; /* Include padding and border in width/height calculation */
 }
 
-.chatroom-item:hover {
-  background-color: #f1f1f1;
+
+@media (min-width: 950px) {
+  .chatParticipant {
+    font-size: .7rem;
+  }
 }
 
-.chatroom-item.unread {
-  background-color: #ffeeba; /* Highlight unread chatrooms */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 30px;
+  color: #fff;
+  font-weight: bolder;
+}
+
+.newChatButton {
+  padding: 8px;
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  border-radius: 100%;
+  cursor: pointer;
+  width : 3rem;
+}
+
+.newChatButton:hover {
+  color: #e9adad;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.chatList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chatItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chatItem:hover {
+  background-color: #e9adad;
+}
+
+.unreadChat {
   font-weight: bold;
+}
+
+.chatDetails {
+  display: flex;
+  align-items: center;
+}
+
+.chatAvatar {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 16px;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.avatarText {
+  color: white;
+  font-weight: bold;
+}
+
+.chatName {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.chatMessage {
+  font-size: 14px;
+  color: #fff;
+}
+
+.chatParticipant {
+  font-size: 1rem;
+  color: #fff;
+}
+
+.unreadBadge {
+  font-size: 12px;
+  color: white;
+  background-color: #ff4d4f;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.noChatrooms {
+  color: #999;
+  font-size: 14px;
 }

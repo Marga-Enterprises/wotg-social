@@ -1,109 +1,123 @@
 import React, { useState, useEffect } from 'react';
+import styles from './index.module.css';
 
 const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId, onSearchChange }) => {
-  const [isMobile, setIsMobile] = useState(false); // State to track if the screen is mobile size
+  const [maxLength, setMaxLength] = useState(50);
 
   // Detect screen size (mobile or not)
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 780); // Check if window width is <= 780px
+      const screenWidth = window.innerWidth;
+  
+      // Calculate maxLength based on screen width and decrease proportionally
+      const calculatedMaxLength = Math.max(30, Math.floor(screenWidth / 40));
+      setMaxLength(calculatedMaxLength);
     };
-
-    handleResize(); // Initial check on mount
-    window.addEventListener('resize', handleResize); // Listen for screen resizing
-
-    return () => {
-      window.removeEventListener('resize', handleResize); // Cleanup on unmount
-    };
+  
+    handleResize(); // Set initial value
+    window.addEventListener("resize", handleResize); // Listen for resize
+  
+    return () => window.removeEventListener("resize", handleResize); // Cleanup listener
   }, []);
 
   return (
-    <div className={`p-4 border-r ${isMobile ? 'w-full' : 'w-1/3'} bg-gray-100`}>
+    <div className={styles.chatContainer}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold">Chat</h2>
-        <button
-          onClick={onOpenCreateChatroomModal} // Call parent's function to open modal
-          className="px-4 py-2 bg-[#c0392b] text-white rounded"
-        >
+      <div className={styles.header}>
+        <h2 className={styles.title}>Chats</h2>
+        {/*<button onClick={onOpenCreateChatroomModal} className={styles.newChatButton}>
           + New Chat
-        </button>
+        </button>*/}
+        <svg 
+          onClick={onOpenCreateChatroomModal} 
+          xmlns="http://www.w3.org/2000/svg" 
+          className={styles.newChatButton}
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke-width="1.5" 
+          stroke="currentColor" 
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
       </div>
 
       {/* Search */}
       <input
-          type="text"
-          placeholder="Search Name"
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
-          onChange={(e) => onSearchChange(e.target.value)} // Notify parent of search changes
+        type="text"
+        placeholder="Search Name"
+        className={styles.searchInput}
+        onChange={(e) => onSearchChange(e.target.value)}
       />
 
       {/* Chatrooms List */}
-      <ul className="space-y-4">
+      <ul className={styles.chatList}>
         {chatrooms?.length > 0 ? (
-          chatrooms.map(chat => {
-            return (
-              <li
-                key={chat.id}
-                className={`flex items-center justify-between p-2 cursor-pointer rounded ${
-                  chat.hasUnread ? 'font-bold' : 'hover:bg-gray-200'
-                }`}
-                onClick={() => onSelectChatroom(chat.id)}
-              >
-                <div className="flex items-center">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center mr-4"
-                    style={{
-                      backgroundColor: chat.avatar ? 'transparent' : '#c0392b',
-                    }}
-                  >
-                    {chat.avatar ? (
-                      <img
-                        src={chat.avatar}
-                        alt={chat.name}
-                        className="w-10 h-10 rounded-full"
-                      />
-                    ) : (
-                      <span className="text-white font-bold">
-                        {chat.Participants?.length <= 2
-                          ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
-                              .map((participant, index) => (
-                                <span key={index}>
-                                  {participant.user.user_fname.charAt(0).toUpperCase()}
-                                </span>
-                              ))
-                          : chat.name
-                          ? chat.name.charAt(0).toUpperCase()
-                          : 'A'}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-bold">
+          chatrooms.map(chat => (
+            <li
+              key={chat.id}
+              className={`${styles.chatItem} ${chat.hasUnread ? styles.unreadChat : ''}`}
+              onClick={() => onSelectChatroom(chat.id)}
+            >
+              <div className={styles.chatDetails}>
+                <div
+                  className={styles.chatAvatar}
+                  style={{
+                    backgroundColor: chat.avatar ? 'transparent' : '#c0392b',
+                  }}
+                >
+                  {chat.avatar ? (
+                    <img
+                      src={chat.avatar}
+                      alt={chat.name}
+                      className={styles.avatarImage}
+                    />
+                  ) : (
+                    <span className={styles.avatarText}>
                       {chat.Participants?.length <= 2
                         ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
                             .map((participant, index) => (
                               <span key={index}>
-                                {participant.user.user_fname} {participant.user.user_lname}
+                                {participant.user.user_fname.charAt(0).toUpperCase()}
                               </span>
                             ))
                         : chat.name
-                        ? chat.name
-                        : 'Unnamed Chat'}
-                    </p>
-                    <p className="text-sm text-gray-500">{chat.RecentMessage?.content}</p>
-                  </div>
-                </div>
-                {chat.unreadCount > 0 && (
-                    <span className="text-xs text-white bg-red-500 px-2 py-1 rounded-full">
-                        {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
+                        ? chat.name.charAt(0).toUpperCase()
+                        : 'A'}
                     </span>
-                )}
-              </li>
-            );
-          })
+                  )}
+                </div>
+                <div>
+                  <p className={styles.chatName}>
+                    {chat.Participants?.length <= 2
+                      ? chat.Participants.filter(
+                          (participant) => participant.user.id !== currentUserId
+                        ).map((participant, index) => (
+                          <span key={index} className={styles.chatParticipant}>
+                            {`${participant.user.user_fname} ${participant.user.user_lname}`.length > maxLength
+                              ? `${participant.user.user_fname} ${participant.user.user_lname}`.substring(0, maxLength) + "..."
+                              : `${participant.user.user_fname} ${participant.user.user_lname}`}
+                          </span>
+                        ))
+                      : chat.name?.length > maxLength
+                      ? `${chat.name.substring(0, maxLength)}...`
+                      : chat.name || "Unnamed Chat"}
+                  </p>
+                  <p className={styles.chatMessage}>
+                    {chat.RecentMessage?.content?.length > 100
+                      ? `${chat.RecentMessage.content.substring(0, maxLength)}...`
+                      : chat.RecentMessage?.content}
+                  </p>
+                </div>
+              </div>
+              {chat.unreadCount > 0 && (
+                <span className={styles.unreadBadge}>
+                  {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
+                </span>
+              )}
+            </li>
+          ))
         ) : (
-          <p className="text-gray-500 text-sm">No chatrooms available</p>
+          <p className={styles.noChatrooms}>No chatrooms available</p>
         )}
       </ul>
     </div>

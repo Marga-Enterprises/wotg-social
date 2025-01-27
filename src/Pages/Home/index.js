@@ -211,7 +211,9 @@ const Page = () => {
                     if (chatId) {
                         handleSelectChatroom(chatId);
                     } else {
-                        handleSelectChatroom(res.data[0].id);
+                        if (!searchQuery) {
+                            handleSelectChatroom(res.data[0].id);
+                        }
                     }
                 }
             }

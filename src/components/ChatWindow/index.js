@@ -9,8 +9,6 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  console.log('[[[[[[[[[[CHAT DEETS:]]]]]]]]]]', selectedChatroomDetails);
-
   // Reference for scrolling
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
 

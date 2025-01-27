@@ -228,11 +228,11 @@ const Page = () => {
     }, [fetchChatrooms, isAuthenticated]);
 
     // Fetch messages for the selected chatroom
-    const fetchMessages = useCallback(async () => {
+    const fetchMessages = useCallback(async (chatroomId) => {
         if (!selectedChatroom && !isAuthenticated) return;
 
         dispatch(common.ui.setLoading());
-        const res = await dispatch(wotgsocial.message.getMessagesByChatroomAction(selectedChatroom));
+        const res = await dispatch(wotgsocial.message.getMessagesByChatroomAction(chatroomId || selectedChatroom));
         dispatch(common.ui.clearLoading());
 
         if (res.success) {
@@ -297,8 +297,6 @@ const Page = () => {
     
         // Listen for new chatroom event
         socket.on('new_chatroom', (newChatroom) => {
-            console.log('New chatroom created:', newChatroom);
-    
             // Check if the current user is a participant in the new chatroom
             const isCurrentUserParticipant = newChatroom.Participants?.some(
                 (participant) => participant.userId.toString() === user?.id.toString()
@@ -331,7 +329,6 @@ const Page = () => {
 
         chatrooms.forEach((chatroom) => {
             socket.emit('join_room', chatroom.id); // Join each chatroom by its ID
-            console.log(`User ${user.id} joined room ${chatroom.id}`);
         });
 
         socket.emit('join_room', selectedChatroom);
@@ -344,7 +341,6 @@ const Page = () => {
 
     // Handle chatroom selection
     const handleSelectChatroom = async (chatroomId) => {
-        console.log('SELECT CHAT ROOM TRIGGERED', chatroomId);
         setSelectedChatroom(chatroomId); // Set the selected chatroom
         setIsChatVisible(true); // Show the chat window
     
@@ -363,7 +359,7 @@ const Page = () => {
         }
     
         // Fetch messages for the selected chatroom
-        await fetchMessages();
+        await fetchMessages(chatroomId);
     };
     
     
@@ -404,7 +400,7 @@ const Page = () => {
     }, [isAuthenticated]);
 
     return (
-        loading ? <LoadingSpinner /> :
+        /*loading ? <LoadingSpinner /> :*/
         <>
             <div className={styles.customLayoutContainer}>
                 {isAuthenticated && (isMobile ? !isChatVisible : true) && (

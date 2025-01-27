@@ -29,8 +29,6 @@ export const createChatroomAction = (payload) => async (dispatch) => {
     const res = await createChatroom(payload);
     const { success, data } = res;
 
-    console.log('RESPONSEEEE SA REDUX', res);
-
     if (success) {
       dispatch({
         type: types.CHATROOM_CREATE_SUCCESS,

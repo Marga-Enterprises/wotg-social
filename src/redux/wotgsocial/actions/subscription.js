@@ -5,7 +5,6 @@ import * as types from '../types';
 
 // Add Subscription
 export const addSubscriptionAction = (payload) => async (dispatch) => {
-  console.log('PELODDDD', payload);
   dispatch({ type: types.ADD_SUBSCRIPTION_REQUEST });
 
   return saveSubscription(payload).then((res) => {

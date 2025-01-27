@@ -3,16 +3,22 @@ import { useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
+import { useSelector } from 'react-redux';
 
 // Components
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
 import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
 import SuccessSnackbar from '../../components/SuccessSnackbar';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 
 const Page = () => {
     const dispatch = useDispatch();
+
+    const {
+      ui: { loading },
+    } = useSelector((state) => state.common);
 
     // Local state
     const [user, setUser] = useState(null);
@@ -398,38 +404,42 @@ const Page = () => {
     }, [isAuthenticated]);
 
     return (
-        <div className={styles.customLayoutContainer}>
-            {isAuthenticated && (isMobile ? !isChatVisible : true) && (
-                <ChatSidebar 
-                    chatrooms={chatrooms} 
-                    onSelectChatroom={handleSelectChatroom} 
-                    onOpenCreateChatroomModal={handleOpenCreateChatroomModal} 
-                    currentUserId={user?.id}
-                    onSearchChange={(query) => setSearchQuery(query)}
-                />
-            )}
-            {isAuthenticated && isChatVisible && (
-                <ChatWindow
-                    messages={messages}
-                    onSendMessage={handleSendMessage}
-                    selectedChatroom={selectedChatroom}
-                    selectedChatroomDetails={selectedChatroomDetails}
-                    userId={user?.id}
-                    className={isMobile ? styles.chatWindowVisible : ''} 
-                    onBackClick={handleBackClick}
-                    isMobile={isMobile}
-                />
-            )}
+        loading ? <LoadingSpinner /> :
+        <>
+            <div className={styles.customLayoutContainer}>
+                {isAuthenticated && (isMobile ? !isChatVisible : true) && (
+                    <ChatSidebar 
+                        chatrooms={chatrooms} 
+                        onSelectChatroom={handleSelectChatroom} 
+                        onOpenCreateChatroomModal={handleOpenCreateChatroomModal} 
+                        currentUserId={user?.id}
+                        onSearchChange={(query) => setSearchQuery(query)}
+                    />
+                )}
+                {isAuthenticated && isChatVisible && (
+                    <ChatWindow
+                        messages={messages}
+                        onSendMessage={handleSendMessage}
+                        selectedChatroom={selectedChatroom}
+                        selectedChatroomDetails={selectedChatroomDetails}
+                        userId={user?.id}
+                        className={isMobile ? styles.chatWindowVisible : ''} 
+                        onBackClick={handleBackClick}
+                        isMobile={isMobile}
+                    />
+                )}
 
-            {isModalOpen && (
-                <ChatRoomCreateForm
-                    onClose={handleCloseCreateChatroomModal}
-                    currentUserId={user?.id}
-                    fetchChatrooms={fetchChatrooms}
-                    socket={socket} // Pass socket to the child component
-                />
-            )}
-        </div>
+                {isModalOpen && (
+                    <ChatRoomCreateForm
+                        onClose={handleCloseCreateChatroomModal}
+                        currentUserId={user?.id}
+                        fetchChatrooms={fetchChatrooms}
+                        socket={socket} // Pass socket to the child component
+                    />
+                )}
+            </div>
+        </>
+
     );    
 };
 

@@ -38,6 +38,16 @@
   width : 3rem;
 }
 
+.headerIcon {
+  padding: 0;
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  border-radius: 100%;
+  cursor: pointer;
+  width : 1.8rem;
+}
+
 .newChatButton:hover {
   color: #e9adad;
 }
@@ -125,4 +135,28 @@
 .noChatrooms {
   color: #999;
   font-size: 14px;
+}
+
+.footer {
+    padding: 10px;
+  text-align: center;
+  border-top: 1px solid #ddd;
+  background-color: #f9f9f9;
+  font-size: 12px;
+  color: #555;
+}
+
+.footerLink {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  text-decoration: underline;
+}
+
+.headerContentLeft {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }

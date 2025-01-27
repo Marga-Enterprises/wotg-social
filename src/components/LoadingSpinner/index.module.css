@@ -1,0 +1,34 @@
+/* Centering the spinner */
+.spinnerContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to right, #c0392b, #d46a5e, #f88658);
+    z-index: 1000;
+  }
+  
+  /* Spinner animation */
+  .spinner {
+    border: 4px solid #fff; /* Light outer circle */
+    border-top: 4px solid #c0392b; /* Color of the spinner */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Animation keyframes */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  

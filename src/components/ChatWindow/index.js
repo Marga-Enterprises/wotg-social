@@ -49,18 +49,63 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   // Handle Send Message
   const handleSend = () => {
     if (message.trim() && selectedChatroom) {
-      onSendMessage(message); // Send the message through the parent handler
+      onSendMessage(message); // Send the message
       setMessage(''); // Clear the input field
+  
+      // Reset the textarea height to 1 row
+      const textarea = document.querySelector(`.${styles.messageTextarea}`);
+      if (textarea) {
+        textarea.style.height = 'auto'; // Force height reset
+      }
     }
+  };  
+
+  const renderMessageContent = (content) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to detect URLs
+    return content.split(urlRegex).map((part, index) =>
+      urlRegex.test(part) ? (
+        <a
+          key={index}
+          href={part}
+          target="_blank" // Open in a new tab
+          rel="noopener noreferrer" // Prevent security vulnerabilities
+          style={{ color: '#007bff', textDecoration: 'underline' }} // Optional link styling
+        >
+          {part}
+        </a>
+      ) : (
+        part
+      )
+    );
   };
+  
 
   // Handle Enter key press to send the message
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // Prevent form submission or other default actions
-      handleSend(); // Call the send function
+      if (e.shiftKey) {
+        // Shift + Enter: Allow new line
+        return;
+      } else {
+        // Enter: Submit the message
+        e.preventDefault();
+        handleSend();
+      }
     }
   };
+
+  const handleTextareaChange = (e) => {
+    const textarea = e.target;
+
+    // Dynamically adjust height
+    textarea.style.height = 'auto'; // Reset height to auto
+    const maxHeight = parseFloat(getComputedStyle(textarea).lineHeight) * 5; // Limit to 5 rows
+    textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+
+    setMessage(textarea.value); // Update the message state
+  };
+  
+  
 
   // Handle emoji selection
   const handleEmojiSelect = (emoji) => {
@@ -175,7 +220,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                         </p>
                       )}
                       <p className={styles.messageContent}>
-                        {msg?.content || 'No content available'}
+                        {msg?.content ? renderMessageContent(msg.content) : 'No content available'}
                       </p>
                     </div>
                   </div>
@@ -188,12 +233,14 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
         </div>
     
         <div className={styles.inputContainer}> 
-          <input
+          <textarea
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={handleTextareaChange}
             placeholder="Type a message..."
-            onKeyDown={handleKeyDown}>
-          </input>  
+            className={styles.messageTextarea}
+            rows={1}
+            onKeyDown={handleKeyDown}
+          ></textarea>
           <button
             className={styles.emojiButton}
             onClick={toggleEmojiPicker}

@@ -387,11 +387,7 @@ const Page = () => {
         // setMessages((prevMessages) => [...prevMessages]);
 
         // If you want to also update via API (or you can choose one):
-        dispatch(wotgsocial.message.sendMessageAction(message)).then((res) => {
-            if (res.success) {
-                console.log('Message sent via API:', res.data);
-            }
-        });
+        dispatch(wotgsocial.message.sendMessageAction(message));
     };
 
     // If the user is authenticated, subscribe them to push notifications

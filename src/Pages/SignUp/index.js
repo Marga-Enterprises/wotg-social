@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import { useNavigate } from 'react-router-dom';
-
 import Cookies from 'js-cookie';
+import styles from './index.module.css';
 
 const Page = () => {
     const dispatch = useDispatch();
@@ -33,18 +33,16 @@ const Page = () => {
         dispatch(wotgsocial.user.addUser(payload))
             .then((res) => {
                 if (res.success) {
-                    // Optionally save user data in cookies or redirect
                     window.location.replace('/login');
-                    // navigate('/login');
                 } else {
                     setOpenErrorSnackbar(true);
-                    setErrMsg(res.payload); // Set error message to display
+                    setErrMsg(res.payload);
                 }
             })
             .catch((error) => {
                 console.error('An error occurred during registration:', error);
                 setOpenErrorSnackbar(true);
-                setErrMsg('An unexpected error occurred. Please try again.'); // Set a generic error message
+                setErrMsg('An unexpected error occurred. Please try again.');
             })
             .finally(() => {
                 dispatch(common.ui.clearLoading());
@@ -52,13 +50,23 @@ const Page = () => {
     };
 
     return (
-        <div className="flex items-center justify-center mt-10">
-            <div className="w-full max-w-md p-12 bg-white rounded-lg shadow-2xl min-h-[600px] flex flex-col justify-center">
-                <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Register</h1>
-                <form className="space-y-6" onSubmit={handleSubmitSignUp}>
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div>
-                            <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+        <div className={styles.container}>
+            {/* Left Section */}
+            <div className={styles.leftSection}>
+                <h1 className={styles.largeText}>WOTG Community</h1>
+                <h2 className={styles.mediumText}>Grow Together in His Word.</h2>
+                <p className={styles.smallText}>
+                    Connect with others, share His love, and grow in faith together.
+                </p>
+            </div>
+
+            {/* Right Section (Sign-Up Form) */}
+            <div className={styles.rightSection}>
+                <div className={styles.formWrapper}>
+                    <h1 className={styles.heading}>Register</h1>
+                    <form className={styles.form} onSubmit={handleSubmitSignUp}>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="first-name" className={styles.label}>
                                 First Name
                             </label>
                             <input
@@ -67,12 +75,12 @@ const Page = () => {
                                 name="first-name"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-custom-blue sm:text-sm"
+                                className={styles.input}
                                 required
                             />
                         </div>
-                        <div>
-                            <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+                        <div className={styles.formGroup}>
+                            <label htmlFor="last-name" className={styles.label}>
                                 Last Name
                             </label>
                             <input
@@ -81,30 +89,28 @@ const Page = () => {
                                 name="last-name"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-custom-blue sm:text-sm"
+                                className={styles.input}
                                 required
                             />
                         </div>
-                    </div>
 
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email Address
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-custom-blue sm:text-sm"
-                            required
-                        />
-                    </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor="email" className={styles.label}>
+                                Email Address
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className={styles.input}
+                                required
+                            />
+                        </div>
 
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                        <div className={styles.formGroup}>
+                            <label htmlFor="password" className={styles.label}>
                                 Password
                             </label>
                             <input
@@ -113,12 +119,13 @@ const Page = () => {
                                 name="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-custom-blue sm:text-sm"
+                                className={styles.input}
                                 required
                             />
                         </div>
-                        <div>
-                            <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
+
+                        <div className={styles.formGroup}>
+                            <label htmlFor="gender" className={styles.label}>
                                 Gender
                             </label>
                             <select
@@ -126,7 +133,7 @@ const Page = () => {
                                 name="gender"
                                 value={gender}
                                 onChange={(e) => setGender(e.target.value)}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-custom-blue sm:text-sm"
+                                className={styles.input}
                                 required
                             >
                                 <option value="">Select Gender</option>
@@ -134,28 +141,28 @@ const Page = () => {
                                 <option value="female">Female</option>
                             </select>
                         </div>
-                    </div>
 
-                    <div>
-                        <button
-                            type="submit"
-                            className="w-full px-4 py-2 bg-custom-slight-light-blue text-white font-semibold rounded-md shadow-sm hover:bg-custom-blue focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Register
-                        </button>
-                    </div>
-                </form>
+                        <div>
+                            <button
+                                type="submit"
+                                className={styles.button}
+                            >
+                                Register
+                            </button>
+                        </div>
+                    </form>
 
-                {openErrorSnackbar && (
-                    <div className="mt-4 text-red-600 text-center">{errMsg}</div>
-                )}
+                    {openErrorSnackbar && (
+                        <div className={styles.errorMessage}>{errMsg}</div>
+                    )}
 
-                <p className="mt-4 text-center text-sm text-gray-600">
-                    Already have an account?{' '}
-                    <a href="/login" className="font-medium text-custom-slight-light-blue hover:font-medium text-custom-blue">
-                        Log In
-                    </a>
-                </p>
+                    <p className={styles.footerText}>
+                        Already have an account?{' '}
+                        <a href="/login" className={styles.link}>
+                            Log In
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     );

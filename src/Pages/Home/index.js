@@ -127,14 +127,26 @@ const Page = () => {
             // Check if a subscription already exists
             const existingSubscription = await registration.pushManager.getSubscription();
     
-            // If a subscription exists, do not proceed with dispatching or subscribing again
+            // If a subscription exists, log it and proceed
             if (existingSubscription) {
-                console.log('Existing subscription found, no need to subscribe again.');
-                return null; // Return early if the subscription already exists
+                console.log('Existing subscription found. No need to re-subscribe:', existingSubscription);
             }
     
+            // Generate a unique deviceId for this device
+            const getDeviceId = () => {
+                let deviceId = localStorage.getItem('deviceId');
+                if (!deviceId) {
+                    deviceId = crypto.randomUUID(); // Generate a unique UUID
+                    localStorage.setItem('deviceId', deviceId);
+                }
+                return deviceId;
+            };
+    
+            const deviceId = getDeviceId();
+            console.log('Device ID:', deviceId);
+    
             // Now subscribe with the correct applicationServerKey (VAPID public key)
-            const subscription = await registration.pushManager.subscribe({
+            const subscription = existingSubscription || await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: process.env.REACT_APP_VAPID_PUBLIC_KEY, // VAPID public key
             });
@@ -142,8 +154,6 @@ const Page = () => {
             console.log('New push notification subscription:', subscription);
     
             // Prepare subscription data
-    
-            // Function to convert ArrayBuffer to Base64 string
             const arrayBufferToBase64 = (buffer) => {
                 const binary = String.fromCharCode(...new Uint8Array(buffer));  // Convert ArrayBuffer to binary string
                 return window.btoa(binary);  // Convert binary string to base64
@@ -159,6 +169,7 @@ const Page = () => {
     
             const subscriptionData = {
                 userId: user.id,  // Assuming the user object contains an ID field
+                deviceId,         // Include the unique device ID
                 subscription: {
                     endpoint: subscription.endpoint,
                     keys: {
@@ -168,22 +179,21 @@ const Page = () => {
                 }
             };
     
-            // Log the subscription data
             console.log('Subscription Data:', subscriptionData);
     
-            // Now you can send the subscriptionData to the backend
+            // Now send the subscriptionData to the backend
             try {
-                // Attempt to dispatch subscription to Redux for storing it in your backend
                 console.log('Attempting to subscribe:', subscriptionData);
+    
+                // Dispatch subscription to backend
                 const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
     
-                // Check if the response indicates an error (e.g., subscription already exists in backend)
+                // Handle backend response
                 if (res.error && res.error.status === 400) {
-                    console.log('Subscription already exists in the backend. No need to subscribe again.');
+                    console.log('Subscription already exists in the backend for this device.');
                     return null; // Return null if the subscription already exists in the backend
                 }
     
-                // If successful, log the response (successfully saved to the backend)
                 console.log('Subscription successfully saved:', res);
             } catch (error) {
                 console.error('Error occurred while subscribing:', error);
@@ -191,6 +201,7 @@ const Page = () => {
             }
         }
     };
+    
     
 
     // Fetch chatrooms

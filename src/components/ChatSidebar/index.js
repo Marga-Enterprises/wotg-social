@@ -6,7 +6,7 @@ import { wotgsocial } from '../../redux/combineActions';
 const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId, onSearchChange }) => {
   const dispatch = useDispatch();
 
-  const [maxLength, setMaxLength] = useState(50);
+  const [maxLength, setMaxLength] = useState(40);
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout())
@@ -18,8 +18,8 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
       const screenWidth = window.innerWidth;
   
       // Calculate maxLength based on screen width and decrease proportionally
-      const calculatedMaxLength = Math.max(30, Math.floor(screenWidth / 40));
-      setMaxLength(calculatedMaxLength);
+      const calculatedMaxLength = Math.max(30, Math.floor(screenWidth / 60));
+      setMaxLength(calculatedMaxLength);  
     };
   
     handleResize(); // Set initial value
@@ -125,7 +125,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
                         : chat.name || "Unnamed Chat"}
                     </p>
                     <p className={styles.chatMessage}>
-                      {chat.RecentMessage?.content?.length > 100
+                      {chat.RecentMessage?.content?.length > maxLength
                         ? `${chat.RecentMessage.content.substring(0, maxLength)}...`
                         : chat.RecentMessage?.content}
                     </p>

@@ -234,21 +234,24 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
         )}
       </div>
 
-      <div className={styles.inputContainer}> 
-        <textarea
-          value={message}
-          onChange={handleTextareaChange}
-          placeholder="Type a message..."
-          className={styles.messageTextarea}
-          rows={1}
-          onKeyDown={handleKeyDown}
-        ></textarea>
-        <button
-          className={styles.emojiButton}
-          onClick={toggleEmojiPicker}
-        >
-          😊
-        </button>
+      <div className={styles.inputContainer}>
+        <div className={styles.textareaWrapper}> {/* Wrapper for positioning */}
+          <textarea
+            value={message}
+            onChange={handleTextareaChange}
+            placeholder="Type a message..."
+            className={styles.messageTextarea}
+            rows={1}
+            onKeyDown={handleKeyDown}
+          ></textarea>
+
+          <button
+            className={styles.emojiButton}
+            onClick={toggleEmojiPicker}
+          >
+            😊
+          </button>
+        </div>
 
         {showEmojiPicker && (
           <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
@@ -259,10 +262,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           </div>
         )}
 
-        <button
-          className={styles.sendButton}
-          onClick={handleSend}
-        >
+        <button className={styles.sendButton} onClick={handleSend}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

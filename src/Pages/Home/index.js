@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 // Components
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
+import ProfileSidebar from '../../components/ProfileSidebar';
 import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
 import SuccessSnackbar from '../../components/SuccessSnackbar';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -419,13 +420,16 @@ const Page = () => {
         <>
             <div className={styles.customLayoutContainer}>
                 {isAuthenticated && (isMobile ? !isChatVisible : true) && (
-                    <ChatSidebar 
-                        chatrooms={chatrooms} 
-                        onSelectChatroom={handleSelectChatroom} 
-                        onOpenCreateChatroomModal={handleOpenCreateChatroomModal} 
-                        currentUserId={user?.id}
-                        onSearchChange={(query) => setSearchQuery(query)}
-                    />
+                    <>
+                        <ProfileSidebar/>
+                        <ChatSidebar 
+                            chatrooms={chatrooms} 
+                            onSelectChatroom={handleSelectChatroom} 
+                            onOpenCreateChatroomModal={handleOpenCreateChatroomModal} 
+                            currentUserId={user?.id}
+                            onSearchChange={(query) => setSearchQuery(query)}
+                        />
+                    </>
                 )}
                 {isAuthenticated && isChatVisible && (
                     <ChatWindow

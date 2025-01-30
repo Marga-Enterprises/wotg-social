@@ -5,6 +5,7 @@
   width: 100%;;
   max-width: 100%;
   overflow-y: auto;
+  border-radius: 1rem;
 }
 
 .messageContainer {
@@ -151,7 +152,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #c0392b; /* Light gray background */
+  background-color: #ce4637; /* Light gray background */
   margin-bottom: 1rem;
   gap: 1rem;
   padding: 1rem;

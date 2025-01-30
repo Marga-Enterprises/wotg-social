@@ -1,13 +1,12 @@
 .chatContainer {
   padding: 16px;
-  border-right: 1px solid #e0e0e0;
   background: linear-gradient(to left, #c95c50, #db8178, #f8a271);
   width: 100%;
   max-width: 450px; /* Constrain the width of the container */
-  height: 100svh; /* Adjust height based on your layout */
   display: flex;
   flex-direction: column; /* Allows child elements to stack vertically */
   box-sizing: border-box; /* Include padding and border in width/height calculation */
+  border-radius: 1rem;
 }
 
 .chatList {

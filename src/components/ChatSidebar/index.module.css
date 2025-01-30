@@ -4,9 +4,19 @@
   background: linear-gradient(to left, #c95c50, #db8178, #f8a271);
   width: 100%;
   max-width: 450px; /* Constrain the width of the container */
-  overflow-y: auto; /* Allow vertical scrolling */
-  word-wrap: break-word; /* Break long words to prevent overflow */
+  height: 100svh; /* Adjust height based on your layout */
+  display: flex;
+  flex-direction: column; /* Allows child elements to stack vertically */
   box-sizing: border-box; /* Include padding and border in width/height calculation */
+}
+
+.chatList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto; /* Enable scrolling inside */
+  max-height: calc(100vh - 100px); /* Adjust height based on parent */
+  flex-grow: 1; /* Makes it take up remaining space */
 }
 
 @media (min-width: 950px) {
@@ -58,12 +68,6 @@
   margin-bottom: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
-}
-
-.chatList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
 }
 
 .chatItem {

@@ -72,7 +72,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
         />
 
         {/* Chatrooms List */}
-        <ul className={styles.chatList}>
+        <div className={styles.chatList}>
           {chatrooms?.length > 0 ? (
             chatrooms.map(chat => (
               <li
@@ -141,7 +141,7 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
           ) : (
             <p className={styles.noChatrooms}>No chatrooms available</p>
           )}
-        </ul>
+        </div>
       </div>
     </>
   );

@@ -212,11 +212,15 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                     className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
                   >
                     { !isSender && (
-                      <p className={styles.senderName}>
-                        {msg?.sender?.user_fname && msg?.sender?.user_lname
-                          ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
-                          : 'Unknown User'}
-                      </p>
+                      <>
+                        { selectedChatroomDetails?.Participants?.length > 2 && (
+                          <p className={styles.senderName}>
+                            {msg?.sender?.user_fname && msg?.sender?.user_lname
+                              ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
+                              : 'Unknown User'}
+                          </p>
+                        )}
+                      </>
                     )}
                     <p className={styles.messageContent}>
                       {msg?.content ? renderMessageContent(msg.content) : 'No content available'}

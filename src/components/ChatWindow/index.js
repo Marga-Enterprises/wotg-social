@@ -23,9 +23,9 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   // Scroll to the bottom when component mounts or when new messages are added (initially)
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'auto' }); // No smooth scroll, jump straight to bottom
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto' }); 
     }
-  }, [realtimeMessages]); // Trigger scroll when messages are updated
+  }, [realtimeMessages,]); // Trigger scroll when messages are updated
 
   // Listen for real-time messages
   useEffect(() => {
@@ -34,10 +34,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     socket.on('new_message', (newMessage) => {
       if (newMessage.chatroomId === selectedChatroom) {
         // Avoid duplicate messages for the same chatroom
-        setRealtimeMessages((prev) => {
-          const isDuplicate = prev.some((msg) => msg.id === newMessage.id);
-          return isDuplicate ? prev : [...prev, newMessage];
-        });
+        setRealtimeMessages((prev) => [...prev, newMessage]);
       }
     });
 
@@ -133,154 +130,152 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   }, []);
 
   return (
-    <>
-      <div className={styles.chatContainer}>
-        <div className={styles.chatHeader}>
-          {isMobile && onBackClick && (
-              <div className={styles.backButtonContainer}>
-                <button
-                  className={styles.backButton}
-                  onClick={onBackClick}
-                  aria-label="Back to chatrooms"
+    <div className={styles.chatContainer}>
+      <div className={styles.chatHeader}>
+        {isMobile && onBackClick && (
+            <div className={styles.backButtonContainer}>
+              <button
+                className={styles.backButton}
+                onClick={onBackClick}
+                aria-label="Back to chatrooms"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  strokeWidth="3.0" 
+                  stroke="currentColor" 
+                  className={styles.backIcon}
                 >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    strokeWidth="3.0" 
-                    stroke="currentColor" 
-                    className={styles.backIcon}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                  </svg>
-                </button>
-              </div>
-            )}
-            { selectedChatroomDetails && (
-              <div className={styles.participantDetails}>
-                <div
-                  className={styles.chatAvatar}
-                  style={{
-                    backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#fff',
-                  }}
-                >
-                  {selectedChatroomDetails?.avatar ? (
-                    <img
-                      src={selectedChatroomDetails.avatar}
-                      alt={selectedChatroomDetails?.name || 'Chat Avatar'}
-                      className={styles.avatarImage}
-                    />
-                  ) : (
-                    <span className={styles.avatarText}>
-                      {selectedChatroomDetails?.Participants?.length <= 2
-                        ? selectedChatroomDetails?.Participants?.filter(
-                            (participant) => participant?.user.id !== userId
-                          ).map((participant, index) => (
-                            <span key={index}>
-                              {participant?.user?.user_fname?.charAt(0).toUpperCase()}
-                            </span>
-                          ))
-                        : selectedChatroomDetails?.name
-                        ? selectedChatroomDetails.name.charAt(0).toUpperCase()
-                        : 'A'}
-                    </span>
-                  )}
-                </div>
-                <p className={styles.chatNameHeader}>
-                  {selectedChatroomDetails?.Participants?.length <= 2
-                    ? selectedChatroomDetails?.Participants?.filter(
-                        (participant) => participant?.user.id !== userId
-                      ).map((participant, index) => (
-                        <span key={index}>
-                          {`${participant?.user.user_fname} ${participant?.user.user_lname}`}
-                        </span>
-                      ))
-                    : selectedChatroomDetails?.name || ''}
-                </p>
-              </div>
-            )}
-        </div>
-        <div className={styles.messageContainer}>
-          {realtimeMessages && realtimeMessages.length > 0 ? (
-            realtimeMessages
-              .filter((msg) => msg.chatroomId === selectedChatroom)
-              .map((msg, index) => {
-                const isSender = msg.senderId === userId;
-                return (
-                  <div
-                    key={index}
-                    className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
-                  >
-                    <div
-                      className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
-                    >
-                      { !isSender && (
-                        <p className={styles.senderName}>
-                          {msg?.sender?.user_fname && msg?.sender?.user_lname
-                            ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
-                            : 'Unknown User'}
-                        </p>
-                      )}
-                      <p className={styles.messageContent}>
-                        {msg?.content ? renderMessageContent(msg.content) : 'No content available'}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })
-          ) : (
-            <p className={styles.noMessages}>Say hi so you can connect to each other.</p>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-    
-        <div className={styles.inputContainer}> 
-          <textarea
-            value={message}
-            onChange={handleTextareaChange}
-            placeholder="Type a message..."
-            className={styles.messageTextarea}
-            rows={1}
-            onKeyDown={handleKeyDown}
-          ></textarea>
-          <button
-            className={styles.emojiButton}
-            onClick={toggleEmojiPicker}
-          >
-            😊
-          </button>
-    
-          {showEmojiPicker && (
-            <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
-              <Picker 
-                data={data} 
-                onEmojiSelect={handleEmojiSelect} 
-              />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+              </button>
             </div>
           )}
-    
-          <button
-            className={styles.sendButton}
-            onClick={handleSend}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className={styles.sendIcon}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-              />
-            </svg>
-          </button>
-        </div>
+          { selectedChatroomDetails && (
+            <div className={styles.participantDetails}>
+              <div
+                className={styles.chatAvatar}
+                style={{
+                  backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#fff',
+                }}
+              >
+                {selectedChatroomDetails?.avatar ? (
+                  <img
+                    src={selectedChatroomDetails.avatar}
+                    alt={selectedChatroomDetails?.name || 'Chat Avatar'}
+                    className={styles.avatarImage}
+                  />
+                ) : (
+                  <span className={styles.avatarText}>
+                    {selectedChatroomDetails?.Participants?.length <= 2
+                      ? selectedChatroomDetails?.Participants?.filter(
+                          (participant) => participant?.user.id !== userId
+                        ).map((participant, index) => (
+                          <span key={index}>
+                            {participant?.user?.user_fname?.charAt(0).toUpperCase()}
+                          </span>
+                        ))
+                      : selectedChatroomDetails?.name
+                      ? selectedChatroomDetails.name.charAt(0).toUpperCase()
+                      : 'A'}
+                  </span>
+                )}
+              </div>
+              <p className={styles.chatNameHeader}>
+                {selectedChatroomDetails?.Participants?.length <= 2
+                  ? selectedChatroomDetails?.Participants?.filter(
+                      (participant) => participant?.user.id !== userId
+                    ).map((participant, index) => (
+                      <span key={index}>
+                        {`${participant?.user.user_fname} ${participant?.user.user_lname}`}
+                      </span>
+                    ))
+                  : selectedChatroomDetails?.name || ''}
+              </p>
+            </div>
+          )}
       </div>
-    </>
+      <div ref={messagesEndRef} />
+      <div className={styles.messageContainer}>
+        {realtimeMessages && realtimeMessages.length > 0 ? (
+          realtimeMessages
+            .filter((msg) => msg.chatroomId === selectedChatroom)
+            .map((msg, index) => {
+              const isSender = msg.senderId === userId;
+              return (
+                <div
+                  key={index}
+                  className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
+                >
+                  <div
+                    className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
+                  >
+                    { !isSender && (
+                      <p className={styles.senderName}>
+                        {msg?.sender?.user_fname && msg?.sender?.user_lname
+                          ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
+                          : 'Unknown User'}
+                      </p>
+                    )}
+                    <p className={styles.messageContent}>
+                      {msg?.content ? renderMessageContent(msg.content) : 'No content available'}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+        ) : (
+          <p className={styles.noMessages}>Say hi so you can connect to each other.</p>
+        )}
+      </div>
+
+      <div className={styles.inputContainer}> 
+        <textarea
+          value={message}
+          onChange={handleTextareaChange}
+          placeholder="Type a message..."
+          className={styles.messageTextarea}
+          rows={1}
+          onKeyDown={handleKeyDown}
+        ></textarea>
+        <button
+          className={styles.emojiButton}
+          onClick={toggleEmojiPicker}
+        >
+          😊
+        </button>
+
+        {showEmojiPicker && (
+          <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
+            <Picker 
+              data={data} 
+              onEmojiSelect={handleEmojiSelect} 
+            />
+          </div>
+        )}
+
+        <button
+          className={styles.sendButton}
+          onClick={handleSend}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className={styles.sendIcon}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
   );
    
 };

@@ -4,19 +4,21 @@
   background-color: #ffe7cb; /* Matches Tailwind's bg-gray-50 */
   width: 100%;;
   max-width: 100%;
-  height: 100%; /* Ensure it spans the full height */
+  overflow-y: auto;
 }
 
 .messageContainer {
-  /*flex-grow: 1;  Allows it to expand */
+  flex: 1 1 auto;
   overflow-y: auto;
   padding: 0.5rem 1rem;
   margin-bottom: 16px;
   height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  flex-direction: column-reverse; /* Reverse message order */
+  justify-content: flex-start; /* Ensure messages stay at the bottom */
 }
+
+
 
 .messageSender {
   display: flex;

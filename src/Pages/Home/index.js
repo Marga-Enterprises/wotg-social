@@ -271,7 +271,12 @@ const Page = () => {
             // Update the messages state with the new message
             setMessages((prevMessages) => {
                 const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
-                return isDuplicate ? prevMessages : [...prevMessages, message];
+                if (isDuplicate) return prevMessages;
+    
+                const updatedMessages = [message, ...prevMessages];
+                // Sort messages in descending order based on createdAt timestamp
+                updatedMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                return updatedMessages;
             });
     
             // Update chatrooms with the new message
@@ -304,6 +309,7 @@ const Page = () => {
             socket.off('new_message'); // Cleanup the listener
         };
     }, [socket, user?.id]);
+    
 
     useEffect(() => {
         if (!socket) return;

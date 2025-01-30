@@ -156,47 +156,49 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                 </button>
               </div>
             )}
-            <div className={styles.participantDetails}>
-              <div
-                className={styles.chatAvatar}
-                style={{
-                  backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#fff',
-                }}
-              >
-                {selectedChatroomDetails?.avatar ? (
-                  <img
-                    src={selectedChatroomDetails.avatar}
-                    alt={selectedChatroomDetails?.name || 'Chat Avatar'}
-                    className={styles.avatarImage}
-                  />
-                ) : (
-                  <span className={styles.avatarText}>
-                    {selectedChatroomDetails?.Participants?.length <= 2
-                      ? selectedChatroomDetails?.Participants?.filter(
-                          (participant) => participant?.user.id !== userId
-                        ).map((participant, index) => (
-                          <span key={index}>
-                            {participant?.user?.user_fname?.charAt(0).toUpperCase()}
-                          </span>
-                        ))
-                      : selectedChatroomDetails?.name
-                      ? selectedChatroomDetails.name.charAt(0).toUpperCase()
-                      : 'A'}
-                  </span>
-                )}
+            { selectedChatroomDetails && (
+              <div className={styles.participantDetails}>
+                <div
+                  className={styles.chatAvatar}
+                  style={{
+                    backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#fff',
+                  }}
+                >
+                  {selectedChatroomDetails?.avatar ? (
+                    <img
+                      src={selectedChatroomDetails.avatar}
+                      alt={selectedChatroomDetails?.name || 'Chat Avatar'}
+                      className={styles.avatarImage}
+                    />
+                  ) : (
+                    <span className={styles.avatarText}>
+                      {selectedChatroomDetails?.Participants?.length <= 2
+                        ? selectedChatroomDetails?.Participants?.filter(
+                            (participant) => participant?.user.id !== userId
+                          ).map((participant, index) => (
+                            <span key={index}>
+                              {participant?.user?.user_fname?.charAt(0).toUpperCase()}
+                            </span>
+                          ))
+                        : selectedChatroomDetails?.name
+                        ? selectedChatroomDetails.name.charAt(0).toUpperCase()
+                        : 'A'}
+                    </span>
+                  )}
+                </div>
+                <p className={styles.chatNameHeader}>
+                  {selectedChatroomDetails?.Participants?.length <= 2
+                    ? selectedChatroomDetails?.Participants?.filter(
+                        (participant) => participant?.user.id !== userId
+                      ).map((participant, index) => (
+                        <span key={index}>
+                          {`${participant?.user.user_fname} ${participant?.user.user_lname}`}
+                        </span>
+                      ))
+                    : selectedChatroomDetails?.name || ''}
+                </p>
               </div>
-              <p className={styles.chatNameHeader}>
-                {selectedChatroomDetails?.Participants?.length <= 2
-                  ? selectedChatroomDetails?.Participants?.filter(
-                      (participant) => participant?.user.id !== userId
-                    ).map((participant, index) => (
-                      <span key={index}>
-                        {`${participant?.user.user_fname} ${participant?.user.user_lname}`}
-                      </span>
-                    ))
-                  : selectedChatroomDetails?.name || ''}
-              </p>
-            </div>
+            )}
         </div>
         <div className={styles.messageContainer}>
           {realtimeMessages && realtimeMessages.length > 0 ? (
@@ -227,7 +229,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                 );
               })
           ) : (
-            <p className={styles.noMessages}>No messages in this chatroom yet.</p>
+            <p className={styles.noMessages}>Say hi so you can connect to each other.</p>
           )}
           <div ref={messagesEndRef} />
         </div>

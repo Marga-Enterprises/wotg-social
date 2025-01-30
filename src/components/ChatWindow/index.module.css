@@ -10,8 +10,12 @@
 .messageContainer {
   /*flex-grow: 1;  Allows it to expand */
   overflow-y: auto;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
   margin-bottom: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .messageSender {

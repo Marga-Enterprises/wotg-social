@@ -3,7 +3,7 @@ import styles from './index.module.css';
 
 const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId, onSearchChange }) => {
 
-  const [maxLength, setMaxLength] = useState(40);
+  const [maxLength, setMaxLength] = useState(100);
 
   // Detect screen size (mobile or not)
   useEffect(() => {
@@ -11,15 +11,17 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
       const screenWidth = window.innerWidth;
   
       // Calculate maxLength based on screen width and decrease proportionally
-      const calculatedMaxLength = Math.max(30, Math.floor(screenWidth / 60));
+      const calculatedMaxLength = Math.max(10, Math.floor(screenWidth / 100));
       setMaxLength(calculatedMaxLength);  
     };
-  
+
     handleResize(); // Set initial value
     window.addEventListener("resize", handleResize); // Listen for resize
   
     return () => window.removeEventListener("resize", handleResize); // Cleanup listener
   }, []);
+
+  console.log("ChatSidebar -> maxLength", maxLength);
 
   return (
     <>
@@ -63,32 +65,34 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
                 onClick={() => onSelectChatroom(chat.id)}
               >
                 <div className={styles.chatDetails}>
-                  <div
-                    className={styles.chatAvatar}
-                    style={{
-                      backgroundColor: chat.avatar ? 'transparent' : '#c0392b',
-                    }}
-                  >
-                    {chat.avatar ? (
-                      <img
-                        src={chat.avatar}
-                        alt={chat.name}
-                        className={styles.avatarImage}
-                      />
-                    ) : (
-                      <span className={styles.avatarText}>
-                        {chat.Participants?.length <= 2
-                          ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
-                              .map((participant, index) => (
-                                <span key={index}>
-                                  {participant.user.user_fname.charAt(0).toUpperCase()}
-                                </span>
-                              ))
-                          : chat.name
-                          ? chat.name.charAt(0).toUpperCase()
-                          : 'A'}
-                      </span>
-                    )}
+                  <div className={styles.chatAvatarContainer}>
+                    <div
+                      className={styles.chatAvatar}
+                      style={{
+                        backgroundColor: chat.avatar ? 'transparent' : '#c0392b',
+                      }}
+                    >
+                      {chat.avatar ? (
+                        <img
+                          src={chat.avatar}
+                          alt={chat.name}
+                          className={styles.avatarImage}
+                        />
+                      ) : (
+                        <span className={styles.avatarText}>
+                          {chat.Participants?.length <= 2
+                            ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
+                                .map((participant, index) => (
+                                  <span key={index}>
+                                    {participant.user.user_fname.charAt(0).toUpperCase()}
+                                  </span>
+                                ))
+                            : chat.name
+                            ? chat.name.charAt(0).toUpperCase()
+                            : 'A'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <p className={styles.chatName}>

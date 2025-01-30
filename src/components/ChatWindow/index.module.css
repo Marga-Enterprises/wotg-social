@@ -8,6 +8,12 @@
   border-radius: 1rem;
 }
 
+@media (max-width: 780px) {
+  .chatContainer {
+    border-radius: 0rem;
+  }
+}
+
 .messageContainer {
   flex: 1 1 auto;
   overflow-y: auto;

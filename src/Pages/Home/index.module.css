@@ -40,5 +40,10 @@
     .chatWindowHidden {
       display: block;
     }
+
+    .customLayoutContainer {
+        padding: 0rem;
+        gap: 0rem;
+    }
 }
   

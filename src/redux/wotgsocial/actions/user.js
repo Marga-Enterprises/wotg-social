@@ -1,6 +1,6 @@
 //api
 import { loginFunc,
-registerFunc, getAllUsers } from '../../../services/api/user';
+registerFunc, getAllUsers, updateUser, getUser } from '../../../services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -11,6 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 import * as types from '../types';
 
 export const getAllUsersAction = (payload) => async (dispatch) => {
+    console.log('PAYLOAD USER ACTION', payload);
     return getAllUsers(payload).then((res) => {
         if (res.success) {
             dispatch({
@@ -25,7 +26,44 @@ export const getAllUsersAction = (payload) => async (dispatch) => {
         }
 
         return res; 
-        });
+    });
+};
+
+export const updateUserAction = (payload) => async (dispatch) => {
+    console.log('[[[[[[[[[[[[PAYLOAD USER ACTION]]]]]]]]]]]]', payload);
+    return updateUser(payload).then((res) => {
+        if (res.success) {
+            dispatch({
+            type: types.USER_UPDATE_SUCCESS,
+            payload: res.data,
+            });
+        } else {
+            dispatch({
+            type: types.USER_UPDATE_FAIL,
+            payload: res.msg,
+            });
+        }
+
+        return res; 
+    });
+};
+
+export const getUserAction = (payload) => async (dispatch) => {
+    return getUser(payload).then((res) => {
+        if (res.success) {
+            dispatch({
+            type: types.USER_GET_SUCCESS,
+            payload: res.data,
+            });
+        } else {
+            dispatch({
+            type: types.USER_GET_FAIL,
+            payload: res.msg,
+            });
+        }
+
+        return res; 
+    });
 };
 
 export const setAuthorizationHeader = (token) => {

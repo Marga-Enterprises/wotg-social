@@ -4,25 +4,28 @@ import { useDispatch } from 'react-redux';
 import Cookies from 'js-cookie';
 import { wotgsocial } from '../../redux/combineActions';
 
-const ProfileSidebar = () => {
+const ProfileSidebar = ({ onOpenProfileModal }) => {
   const dispatch = useDispatch();
+  const storedAccount = Cookies.get('account'); 
+
   const [profilePicture, setProfilePicture] = useState(null);
   const [userInitials, setUserInitials] = useState('');
 
+  const backendUrl = 
+  process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://community.wotgonline.com/api';
+
   useEffect(() => {
-    // Get "account" from cookies
-    const storedAccount = Cookies.get('account'); 
     if (storedAccount) {
       const accountData = JSON.parse(storedAccount);
-
-      // Set profile picture if available
-      if (accountData.picture) {
-        setProfilePicture(accountData.picture);
+  
+      // Check if user has a profile picture
+      if (accountData.user_profile_picture) {
+        setProfilePicture(`${backendUrl}/uploads/${accountData.user_profile_picture}`);
       } else {
         // Generate initials from first and last name
         const firstName = accountData.user_fname || '';
         const lastName = accountData.user_lname || '';
-
+  
         if (firstName && lastName) {
           setUserInitials(`${firstName[0]}${lastName[0]}`.toUpperCase()); // "JD"
         } else {
@@ -30,7 +33,7 @@ const ProfileSidebar = () => {
         }
       }
     }
-  }, []);
+  }, [storedAccount]);
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());
@@ -41,9 +44,9 @@ const ProfileSidebar = () => {
   return (
     <div className={styles.chatContainer}>
       {profilePicture ? (
-        <img src={profilePicture} alt="Profile" className={styles.profilePicture} />
+        <img onClick={onOpenProfileModal} src={profilePicture} alt="Profile" className={styles.profilePicture} />
       ) : (
-        <div className={styles.fallbackAvatar}>{userInitials}</div>
+        <div className={styles.fallbackAvatar} onClick={onOpenProfileModal}>{userInitials}</div>
       )}
       <svg 
         xmlns="http://www.w3.org/2000/svg" 

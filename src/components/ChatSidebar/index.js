@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import styles from './index.module.css';
 
-const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, currentUserId, onSearchChange }) => {
-
+const ChatSidebar = ({ 
+  chatrooms, 
+  onSelectChatroom, 
+  onOpenCreateChatroomModal,
+  currentUserId, 
+  onSearchChange 
+}) => {
   const [maxLength, setMaxLength] = useState(100);
+
+  const backendUrl =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000'
+    : 'https://community.wotgonline.com/api';
 
   // Detect screen size (mobile or not)
   useEffect(() => {
@@ -72,24 +82,31 @@ const ChatSidebar = ({ chatrooms, onSelectChatroom, onOpenCreateChatroomModal, c
                         backgroundColor: chat.avatar ? 'transparent' : '#c0392b',
                       }}
                     >
-                      {chat.avatar ? (
-                        <img
-                          src={chat.avatar}
-                          alt={chat.name}
-                          className={styles.avatarImage}
-                        />
+                      {chat.Participants?.length === 2 ? (
+                        // Find the receiver (the participant who is NOT the current user)
+                        chat.Participants.filter(participant => participant.user.id !== currentUserId)
+                          .map((participant, index) => {
+                            if (participant.user.user_profile_picture) {
+                              return (
+                                <img
+                                  key={index}
+                                  src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
+                                  alt={participant.user.user_fname}
+                                  className={styles.avatarImage}
+                                />
+                              );
+                            } else {
+                              return (
+                                <span key={index} className={styles.avatarText}>
+                                  {participant.user.user_fname.charAt(0).toUpperCase()}
+                                </span>
+                              );
+                            }
+                          })
                       ) : (
+                        // If it's a group chat (more than 2 participants), show the chat name's first letter
                         <span className={styles.avatarText}>
-                          {chat.Participants?.length <= 2
-                            ? chat.Participants.filter(participant => participant.user.id !== currentUserId)
-                                .map((participant, index) => (
-                                  <span key={index}>
-                                    {participant.user.user_fname.charAt(0).toUpperCase()}
-                                  </span>
-                                ))
-                            : chat.name
-                            ? chat.name.charAt(0).toUpperCase()
-                            : 'A'}
+                          {chat.name ? chat.name.charAt(0).toUpperCase() : 'A'}
                         </span>
                       )}
                     </div>

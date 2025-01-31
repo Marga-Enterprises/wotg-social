@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
 import ProfileSidebar from '../../components/ProfileSidebar';
+import ProfileModal from '../../components/ProfileModal';
 import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
 import SuccessSnackbar from '../../components/SuccessSnackbar';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -32,6 +33,7 @@ const Page = () => {
     const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 780px or below
     const [isChatVisible, setIsChatVisible] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
 
 
@@ -89,10 +91,15 @@ const Page = () => {
     const handleOpenCreateChatroomModal = () => {
         setIsModalOpen(true);
     };
+
+    const handleOpenProfileModal = () => {
+        setIsProfileModalOpen(true);
+    };
     
     // Function to close the modal
     const handleCloseCreateChatroomModal = () => {
         setIsModalOpen(false);
+        setIsProfileModalOpen(false);
     };
 
     
@@ -421,11 +428,11 @@ const Page = () => {
             <div className={styles.customLayoutContainer}>
                 {isAuthenticated && (isMobile ? !isChatVisible : true) && (
                     <>
-                        <ProfileSidebar/>
+                        <ProfileSidebar onOpenProfileModal={handleOpenProfileModal}/>
                         <ChatSidebar 
                             chatrooms={chatrooms} 
                             onSelectChatroom={handleSelectChatroom} 
-                            onOpenCreateChatroomModal={handleOpenCreateChatroomModal} 
+                            onOpenCreateChatroomModal={handleOpenCreateChatroomModal}
                             currentUserId={user?.id}
                             onSearchChange={(query) => setSearchQuery(query)}
                         />
@@ -451,6 +458,10 @@ const Page = () => {
                         fetchChatrooms={fetchChatrooms}
                         socket={socket} // Pass socket to the child component
                     />
+                )}
+
+                {isProfileModalOpen && (
+                    <ProfileModal onClose={handleCloseCreateChatroomModal} />
                 )}
             </div>
         </>

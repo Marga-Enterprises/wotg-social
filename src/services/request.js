@@ -31,7 +31,9 @@ const requestMethod = (url, options = {}) => {
     case 'POST':
       return axios.post(baseUrl + url, option);
     case 'POST_FORM_DATA':
-      return axios.post(baseUrl + url, option.data);
+      return axios.post(baseUrl + url, option.formData);
+    case 'PUT_FORM_DATA':
+      return axios.put(baseUrl + url, option.formData);
     case 'PUT':
       return axios.put(baseUrl + url, option);
     case 'DELETE':
@@ -122,6 +124,14 @@ export const POST = (url, options) => fetch(url, { ...options, method: 'POST' })
  */
 export const POST_FORM_DATA = (url, options) =>
   fetch(url, { ...options, method: 'POST_FORM_DATA' });
+
+/**
+ * handle POST request
+ * @param url
+ * @param options
+ * @constructor
+ */
+export const PUT_FORM_DATA = (url, options) => fetch(url, { ...options, method: 'PUT_FORM_DATA' });
 
 /**
  * handle PUT request

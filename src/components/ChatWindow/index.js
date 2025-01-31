@@ -5,6 +5,11 @@ import Picker from '@emoji-mart/react'
 import styles from './index.module.css';
 
 const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile, selectedChatroomDetails }) => {
+  const backendUrl =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000'
+    : 'https://community.wotgonline.com/api';
+    
   const [message, setMessage] = useState('');
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -132,7 +137,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   return (
     <div className={styles.chatContainer}>
       <div className={styles.chatHeader}>
-        {isMobile && onBackClick && (
+        {isMobile && onBackClick && selectedChatroomDetails && (
             <div className={styles.backButtonContainer}>
               <button
                 className={styles.backButton}
@@ -160,35 +165,42 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                   backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#fff',
                 }}
               >
-                {selectedChatroomDetails?.avatar ? (
-                  <img
-                    src={selectedChatroomDetails.avatar}
-                    alt={selectedChatroomDetails?.name || 'Chat Avatar'}
-                    className={styles.avatarImage}
-                  />
+                {selectedChatroomDetails?.Participants?.length === 2 ? (
+                  // Find the receiver (the participant who is NOT the current user)
+                  selectedChatroomDetails.Participants.filter(participant => participant?.user.id !== userId)
+                    .map((participant, index) => {
+                      console.log("🔍 Checking participant:", participant.user);
+
+                      return participant.user.user_profile_picture ? (
+                        <img
+                          key={index}
+                          src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
+                          alt={participant.user.user_fname}
+                          className={styles.avatarImage}
+                        />
+                      ) : (
+                        <span key={index} className={styles.avatarText}>
+                          {participant.user.user_fname.charAt(0).toUpperCase()}
+                        </span>
+                      );
+                    })
                 ) : (
+                  // If it's a group chat (more than 2 participants), show the chat name's first letter
                   <span className={styles.avatarText}>
-                    {selectedChatroomDetails?.Participants?.length <= 2
-                      ? selectedChatroomDetails?.Participants?.filter(
-                          (participant) => participant?.user.id !== userId
-                        ).map((participant, index) => (
-                          <span key={index}>
-                            {participant?.user?.user_fname?.charAt(0).toUpperCase()}
-                          </span>
-                        ))
-                      : selectedChatroomDetails?.name
-                      ? selectedChatroomDetails.name.charAt(0).toUpperCase()
-                      : 'A'}
+                    {console.log("👥 Group Chat Detected:", selectedChatroomDetails?.name)}
+                    {selectedChatroomDetails?.name ? selectedChatroomDetails.name.charAt(0).toUpperCase() : 'A'}
                   </span>
                 )}
               </div>
+
+              {/* Chat Name Display */}
               <p className={styles.chatNameHeader}>
-                {selectedChatroomDetails?.Participants?.length <= 2
-                  ? selectedChatroomDetails?.Participants?.filter(
+                {selectedChatroomDetails?.Participants?.length === 2
+                  ? selectedChatroomDetails.Participants.filter(
                       (participant) => participant?.user.id !== userId
                     ).map((participant, index) => (
                       <span key={index}>
-                        {`${participant?.user.user_fname} ${participant?.user.user_lname}`}
+                        {`${participant.user.user_fname} ${participant.user.user_lname}`}
                       </span>
                     ))
                   : selectedChatroomDetails?.name || ''}

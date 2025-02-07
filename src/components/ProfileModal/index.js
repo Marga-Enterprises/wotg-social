@@ -8,7 +8,7 @@ import LoadingSpinner from '../LoadingSpinner';
 const BACKEND_URL =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
-    : 'https://community.wotgonline.com/api';
+    : 'https://chat.wotgonline.com/api';
 
 const Profile = ({ onClose }) => {
     const dispatch = useDispatch();

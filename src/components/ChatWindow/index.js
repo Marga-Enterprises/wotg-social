@@ -8,7 +8,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
-    : 'https://community.wotgonline.com/api';
+    : 'https://chat.wotgonline.com/api';
     
   const [message, setMessage] = useState('');
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);

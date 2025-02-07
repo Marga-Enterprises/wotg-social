@@ -1,11 +1,10 @@
 .chatContainer {
   display: flex;
   flex-direction: column;
-  background-color: #ffe7cb; /* Matches Tailwind's bg-gray-50 */
+  background-color: #ece9e9; /* Matches Tailwind's bg-gray-50 */
   width: 100%;;
   max-width: 100%;
   overflow-y: auto;
-  border-radius: 1rem;
 }
 
 @media (max-width: 780px) {
@@ -49,7 +48,7 @@
 }
 
 .senderBubble {
-  background: linear-gradient(to right, #c0392b, #d46a5e, #f88658);
+  background: #17bfdd;
   color: #fff;
 }
 
@@ -70,7 +69,7 @@
 
 
 .noMessages {
-  color: #999; /* Matches Tailwind's text-gray-500 */
+  color: #818181; /* Matches Tailwind's text-gray-500 */
   text-align: center;
 }
 
@@ -151,18 +150,20 @@
 .sendIcon {
   width: 24px;
   height: 24px;
-  color: #c0392b;
+  color: #17bfdd;
 }
 
 .chatHeader {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ce4637; /* Light gray background */
+  background-color: #fff; /* Light gray background */
   margin-bottom: 1rem;
   gap: 1rem;
   padding: 1rem;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow at the bottom */
 }
+
 
 .participantDetails {
   display: flex;
@@ -185,13 +186,13 @@
 .backIcon {
   width: 24px;
   height: 24px;
-  color: #fff;
+  color: #17bfdd;
 }
 
 .chatNameHeader {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  color: #fff; /* Dark gray text */
+  color: #000; /* Dark gray text */
   margin: 0;
   width: 100%;
 }
@@ -204,7 +205,6 @@
 
 .chatName span {
   display: inline-block;
-  margin-right: 4px; /* Space between inline elements */
 }
 
 .chatHeader .actions {
@@ -226,13 +226,14 @@
 }
 
 .chatAvatar {
-  width: 3rem;
-  height: 3rem;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 100%;
-  margin-right: 16px;
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .avatarImage {
@@ -240,9 +241,10 @@
   height: 100%;
   border-radius: 100%;
   object-fit: cover;
+  border: 1px solid #dddada;
 }
 
 .avatarText {
-  color: #c0392b;
+  color: #fff;
   font-weight: bold;
 }

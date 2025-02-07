@@ -1,5 +1,5 @@
 import { getAllChatrooms,
-    createChatroom   } from '../../../services/api/chatroom';
+    createChatroom, addParticipantsInChatroom } from '../../../services/api/chatroom';
 
 //types
 import * as types from '../types';
@@ -42,6 +42,32 @@ export const createChatroomAction = (payload) => async (dispatch) => {
     return dispatch({
       type: types.CHATROOM_CREATE_FAIL,
       payload: err.response.data.msg,
+    });
+  }
+};
+
+export const addParticipantsInChatroomAction = (payload) => async (dispatch) => {
+  try {
+    const res = await addParticipantsInChatroom(payload);
+    const { success, data } = res;
+
+    if (success) {
+      dispatch({
+        type: types.ADD_PARTICIPANTS_SUCCESS,
+        payload: data,
+      });
+    } else {
+      dispatch({
+        type: types.ADD_PARTICIPANTS_FAIL,
+        payload: res.msg,
+      });
+    }
+
+    return res;
+  } catch (err) {
+    return dispatch({
+      type: types.ADD_PARTICIPANTS_FAIL,
+      payload: err.response?.data?.msg || "Failed to add participants.",
     });
   }
 };

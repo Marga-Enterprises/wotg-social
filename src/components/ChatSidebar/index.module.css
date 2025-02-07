@@ -1,13 +1,14 @@
 .chatContainer {
   padding: 16px;
-  background: linear-gradient(to left, #c95c50, #db8178, #f8a271);
+  background: #fff;
   width: 100%;
-  max-width: 450px; /* Constrain the width of the container */
+  max-width: 550px; /* Constrain the width of the container */
   display: flex;
   flex-direction: column; /* Allows child elements to stack vertically */
   box-sizing: border-box; /* Include padding and border in width/height calculation */
-  border-radius: 1rem;
+  border-right: .1px solid rgb(218, 215, 215); /* Adds a 2px gray border only on the right side */
 }
+
 
 @media (max-width: 780px) {
   .chatContainer {
@@ -38,15 +39,15 @@
 }
 
 .title {
-  font-size: 30px;
-  color: #fff;
+  font-size: 18px;
+  color: #000;
   font-weight: bolder;
 }
 
 .newChatButton {
   padding: 8px;
   background-color: transparent;
-  color: #fff;
+  color: #17bfdd;
   border: none;
   border-radius: 100%;
   cursor: pointer;
@@ -56,7 +57,7 @@
 .headerIcon {
   padding: 0;
   background-color: transparent;
-  color: #fff;
+  color: #000;
   border: none;
   border-radius: 100%;
   cursor: pointer;
@@ -64,15 +65,21 @@
 }
 
 .newChatButton:hover {
-  color: #e9adad;
+  color: #1298af;
 }
 
 .searchInput {
   width: 100%;
-  padding: 8px;
+  padding: 5px;
   margin-bottom: 16px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 10px;
+  margin-top: -1rem;
+  height: 2.2rem;
+}
+
+.searchInput:focus {
+  border: 1px solid #000000;
 }
 
 .chatItem {
@@ -85,7 +92,7 @@
 }
 
 .chatItem:hover {
-  background-color: #e9adad;
+  background-color: #e2e2e2;
 }
 
 .unreadChat {
@@ -98,12 +105,13 @@
 }
 
 .chatAvatar {
-  width: 35px;
-  height: 35px;
+  width: 45px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+  border: 1px solid rgb(182, 182, 182);
 }
 
 .chatAvatarContainer{
@@ -127,20 +135,23 @@
   font-weight: bold;
 }
 
+.selectedChat {
+  background-color: #5ad9f0; /* Light blue background */
+}
+
 .chatName {
+  color: #000;
+  font-size: 14px;
+}
+
+.selectedChatName {
   color: #fff;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
 }
 
 .chatMessage {
-  font-size: 14px;
-  color: #fff;
-}
-
-.chatParticipant {
-  font-size: 1rem;
-  color: #fff;
+  font-size: 12px;
+  color: #8f8f8f;
 }
 
 .unreadBadge {

@@ -4,7 +4,7 @@ import Picker from '@emoji-mart/react'
 
 import styles from './index.module.css';
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile, selectedChatroomDetails }) => {
+const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal }) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
@@ -162,32 +162,34 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               <div
                 className={styles.chatAvatar}
                 style={{
-                  backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#fff',
+                  backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#c0392b',
                 }}
               >
                 {selectedChatroomDetails?.Participants?.length === 2 ? (
                   // Find the receiver (the participant who is NOT the current user)
                   selectedChatroomDetails.Participants.filter(participant => participant?.user.id !== userId)
                     .map((participant, index) => {
-                      console.log("🔍 Checking participant:", participant.user);
-
                       return participant.user.user_profile_picture ? (
                         <img
                           key={index}
+                          onClick={onOpenAddParticipantModal}
                           src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
                           alt={participant.user.user_fname}
                           className={styles.avatarImage}
                         />
                       ) : (
-                        <span key={index} className={styles.avatarText}>
-                          {participant.user.user_fname.charAt(0).toUpperCase()}
-                        </span>
+                        <img
+                          key={index}
+                          onClick={onOpenAddParticipantModal}
+                          src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
+                          alt={participant.user.user_fname}
+                          className={styles.avatarImage}
+                        />
                       );
                     })
                 ) : (
                   // If it's a group chat (more than 2 participants), show the chat name's first letter
-                  <span className={styles.avatarText}>
-                    {console.log("👥 Group Chat Detected:", selectedChatroomDetails?.name)}
+                  <span onClick={onOpenAddParticipantModal} className={styles.avatarText}>
                     {selectedChatroomDetails?.name ? selectedChatroomDetails.name.charAt(0).toUpperCase() : 'A'}
                   </span>
                 )}
@@ -242,7 +244,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               );
             })
         ) : (
-          <p className={styles.noMessages}>Say hi so you can connect to each other.</p>
+          <p className={styles.noMessages}>Say 'hi' and start messaging</p>
         )}
       </div>
 

@@ -6,8 +6,10 @@ const ChatSidebar = ({
   onSelectChatroom, 
   onOpenCreateChatroomModal,
   currentUserId, 
-  onSearchChange 
+  onSearchChange,
+  selectedChatroom
 }) => {
+
   const [maxLength, setMaxLength] = useState(100);
 
   const backendUrl =
@@ -31,7 +33,10 @@ const ChatSidebar = ({
     return () => window.removeEventListener("resize", handleResize); // Cleanup listener
   }, []);
 
-  console.log("ChatSidebar -> maxLength", maxLength);
+  const handleChatSelection = (chatId) => {
+    onSelectChatroom(chatId);
+  };
+  
 
   return (
     <>
@@ -39,7 +44,7 @@ const ChatSidebar = ({
         {/* Header */}
         <div className={styles.header}>
           <div header className={styles.headerContentLeft}>
-            <h2 className={styles.title}>Chats</h2>
+            <h2 className={styles.title}>MESSAGES</h2>
           </div>
           {/*<button onClick={onOpenCreateChatroomModal} className={styles.newChatButton}>
             + New Chat
@@ -71,8 +76,10 @@ const ChatSidebar = ({
             chatrooms.map(chat => (
               <li
                 key={chat.id}
-                className={`${styles.chatItem} ${chat.hasUnread ? styles.unreadChat : ''}`}
-                onClick={() => onSelectChatroom(chat.id)}
+                className={`${styles.chatItem} 
+                            ${chat.hasUnread ? styles.unreadChat : ''} 
+                            ${selectedChatroom === chat.id ? styles.selectedChat : ''}`}
+                onClick={() => handleChatSelection(chat.id)}
               >
                 <div className={styles.chatDetails}>
                   <div className={styles.chatAvatarContainer}>
@@ -97,9 +104,12 @@ const ChatSidebar = ({
                               );
                             } else {
                               return (
-                                <span key={index} className={styles.avatarText}>
-                                  {participant.user.user_fname.charAt(0).toUpperCase()}
-                                </span>
+                                <img
+                                  key={index}
+                                  src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
+                                  alt={participant.user.user_fname}
+                                  className={styles.avatarImage}
+                                />
                               );
                             }
                           })
@@ -112,12 +122,16 @@ const ChatSidebar = ({
                     </div>
                   </div>
                   <div>
-                    <p className={styles.chatName}>
+                    <p 
+                      className={`${styles.chatName} ${
+                        selectedChatroom === chat.id ? styles.selectedChatName : ''
+                      }`}
+                    >
                       {chat.Participants?.length <= 2
                         ? chat.Participants.filter(
                             (participant) => participant.user.id !== currentUserId
                           ).map((participant, index) => (
-                            <span key={index} className={styles.chatParticipant}>
+                            <span key={index}>
                               {`${participant.user.user_fname} ${participant.user.user_lname}`.length > maxLength
                                 ? `${participant.user.user_fname} ${participant.user.user_lname}`.substring(0, maxLength) + "..."
                                 : `${participant.user.user_fname} ${participant.user.user_lname}`}
@@ -128,9 +142,17 @@ const ChatSidebar = ({
                         : chat.name || "Unnamed Chat"}
                     </p>
                     <p className={styles.chatMessage}>
-                      {chat.RecentMessage?.content?.length > maxLength
-                        ? `${chat.RecentMessage.content.substring(0, maxLength)}...`
-                        : chat.RecentMessage?.content}
+                      {chat.RecentMessage
+                        ? chat.RecentMessage.senderId === currentUserId
+                          ? `You: ${
+                              chat.RecentMessage.content.length > maxLength
+                                ? `${chat.RecentMessage.content.substring(0, maxLength)}...`
+                                : chat.RecentMessage.content
+                            }`
+                          : chat.RecentMessage.content.length > maxLength
+                          ? `${chat.RecentMessage.content.substring(0, maxLength)}...`
+                          : chat.RecentMessage.content
+                        : ""}
                     </p>
                   </div>
                 </div>

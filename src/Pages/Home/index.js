@@ -14,6 +14,7 @@ import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
 import SuccessSnackbar from '../../components/SuccessSnackbar';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
+import AddParticipantsInChatroomForm from '../../components/AddParticpantsInChatroomForm';
 
 const Page = () => {
     const dispatch = useDispatch();
@@ -33,6 +34,7 @@ const Page = () => {
     const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 780px or below
     const [isChatVisible, setIsChatVisible] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+    const [isModalOpenForAddParticipant, setIsModalOpenForAddParticipant] = useState(false); // State to manage modal visibility
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
 
@@ -92,6 +94,10 @@ const Page = () => {
         setIsModalOpen(true);
     };
 
+    const handleOpenAddParticipantModal = () => {
+        setIsModalOpenForAddParticipant(true);
+    };
+
     const handleOpenProfileModal = () => {
         setIsProfileModalOpen(true);
     };
@@ -100,6 +106,7 @@ const Page = () => {
     const handleCloseCreateChatroomModal = () => {
         setIsModalOpen(false);
         setIsProfileModalOpen(false);
+        setIsModalOpenForAddParticipant(false);
     };
 
     
@@ -348,8 +355,41 @@ const Page = () => {
         return () => {
             socket.off('new_chatroom');
         };
-    }, [socket, user?.id]);      
-      
+    }, [socket, user?.id]);
+
+    useEffect(() => {
+        if (!socket || !user) return;
+    
+        socket.on('new_participants', (updatedChatroom) => {
+            console.log("New participant added, updating sidebar:", updatedChatroom);
+    
+            // Check if the current user is in the updated chatroom
+            const isCurrentUserParticipant = updatedChatroom.Participants?.some(
+                (participant) => participant.userId.toString() === user.id.toString()
+            );
+    
+            if (isCurrentUserParticipant) {
+                setChatrooms((prevChatrooms) => {
+                    // Check if the chatroom already exists in state
+                    const chatroomExists = prevChatrooms.some(chat => chat.id === updatedChatroom.id);
+    
+                    if (!chatroomExists) {
+                        console.log("Adding new chatroom to sidebar:", updatedChatroom);
+                        return [...prevChatrooms, updatedChatroom]; // Add chatroom to the sidebar
+                    }
+    
+                    return prevChatrooms.map(chat =>
+                        chat.id === updatedChatroom.id ? updatedChatroom : chat
+                    ); // Update existing chatroom
+                });
+            }
+        });
+    
+        return () => {
+            socket.off('new_participants');
+        };
+    }, [socket, user]);    
+       
     
     useEffect(() => {
         if (!socket || !selectedChatroom) return;
@@ -435,6 +475,7 @@ const Page = () => {
                             onOpenCreateChatroomModal={handleOpenCreateChatroomModal}
                             currentUserId={user?.id}
                             onSearchChange={(query) => setSearchQuery(query)}
+                            selectedChatroom={selectedChatroom}
                         />
                     </>
                 )}
@@ -448,6 +489,7 @@ const Page = () => {
                         className={isMobile ? styles.chatWindowVisible : ''} 
                         onBackClick={handleBackClick}
                         isMobile={isMobile}
+                        onOpenAddParticipantModal={handleOpenAddParticipantModal}
                     />
                 )}
 
@@ -462,6 +504,14 @@ const Page = () => {
 
                 {isProfileModalOpen && (
                     <ProfileModal onClose={handleCloseCreateChatroomModal} />
+                )}
+
+                {isModalOpenForAddParticipant && (
+                    <AddParticipantsInChatroomForm 
+                        onClose={handleCloseCreateChatroomModal}
+                        fetchChatroomDetails={selectedChatroomDetails}
+                        socket={socket}
+                    />
                 )}
             </div>
         </>

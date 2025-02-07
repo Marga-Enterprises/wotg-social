@@ -1,13 +1,13 @@
 .chatContainer {
-  background: #9e382f;
+  background: #fff;
   width: 100%;
   max-width: 70px; /* Constrain the width of the container */
   display: flex;
   flex-direction: column; /* Allows child elements to stack vertically */
   align-items: center;
-  border-radius: 1rem;
   padding: .5rem;
   gap: 1rem;
+  border-right: .1px solid rgb(218, 215, 215); /* Adds a 2px gray border only on the right side */
   justify-content: space-between;
 }
 
@@ -43,9 +43,13 @@
 .headerIcon {
   padding: 0;
   background-color: transparent;
-  color: #fff;
+  color: #17bfdd;
   border: none;
   border-radius: 100%;
   cursor: pointer;
   width : 2rem;
+}
+
+.headerIcon:hover {
+  color: #1298af;
 }

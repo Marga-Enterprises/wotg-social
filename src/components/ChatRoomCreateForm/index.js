@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { wotgsocial, common } from '../../redux/combineActions'; // Ensure you have the correct import for the action
-import { formatUserName } from '../../utils/methods'; // Ensure you have the correct import for the action
-import styles from './index.module.css'; // Import the modal styles
+import { wotgsocial, common } from '../../redux/combineActions';
+import { formatUserName } from '../../utils/methods';
+import styles from './index.module.css';
 import ErrorSnackbar from '../ErrorSnackbar';
 import SuccessSnackbar from '../SuccessSnackbar';
 
-const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  }) => {
+const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket }) => {
   const dispatch = useDispatch();
-  const [chatroomName, setChatroomName] = useState(''); // Track chatroom name
-  const [users, setUsers] = useState([]); 
+  const [chatroomName, setChatroomName] = useState('');
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState([currentUserId]);
+  const [selectedUsers, setSelectedUsers] = useState([]); // Don't manually add currentUserId to UI
   const [showChatroomNameField, setShowChatroomNameField] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
   const [showError, setShowError] = useState(false);
@@ -19,74 +19,61 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
   const [showSuccess, setShowSuccess] = useState(false);
 
   const fetchUsers = useCallback(async () => {
-    const payload = {
-      search,
-    };
+    const payload = { search };
     dispatch(common.ui.setLoading());
     const res = await dispatch(wotgsocial.user.getAllUsersAction(payload));
     dispatch(common.ui.clearLoading());
 
     if (res.success) {
-      setUsers(res.data); // Set the fetched users
+      // Filter out the currentUserId so they do not appear in the list
+      setUsers(res.data.filter((user) => user.id !== currentUserId));
     }
-  }, [dispatch, search]);
+  }, [dispatch, search, currentUserId]);
 
-  // Fetch users on component mount
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  useEffect(() => { 
-    if (selectedUsers.length > 2) {
+  useEffect(() => {
+    if (selectedUsers.length > 1) { // More than 1 (excluding current user)
       setChatroomName('');
       setShowChatroomNameField(true);
     } else {
-      console.log(selectedUsers);
       setShowChatroomNameField(false);
-      // setChatroomName('Private');
     }
   }, [selectedUsers]);
 
-  // Handle the submission of the form
+  const handleUserSelection = (user) => {
+    setSelectedUsers((prevSelected) => {
+      const isAlreadySelected = prevSelected.some((u) => u.id === user.id);
+      return isAlreadySelected
+        ? prevSelected.filter((u) => u.id !== user.id) // Remove user if already selected
+        : [...prevSelected, user]; // Add user if not selected
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // if (!chatroomName) return;
-
     const payload = {
-        name: chatroomName,
-        participants: selectedUsers,
+      name: chatroomName,
+      participants: [currentUserId, ...selectedUsers.map((user) => user.id)], // Auto-add current user
     };
 
-    // Dispatch the action to create the chatroom
     const res = await dispatch(wotgsocial.chatroom.createChatroomAction(payload));
 
     if (res.success) {
-        setTimeout(() => {
-          onClose(); 
+      setTimeout(() => {
+        onClose();
       }, 2000);
-        fetchChatrooms(res.data.id); // Fetch updated chatrooms
-        setSuccessMsg('Chatroom created successfully');
-        setShowSuccess(true);
-        // Emit the new chatroom event via socket
-        socket.emit('new_chatroom', res.data);  // Emit event to the server
+      fetchChatrooms(res.data.id);
+      setSuccessMsg('Chatroom created successfully');
+      setShowSuccess(true);
+      socket.emit('new_chatroom', res.data);
     } else {
-        setErrorMsg(res.payload);
-        setShowError(true);
+      setErrorMsg(res.payload);
+      setShowError(true);
     }
-  };
-
-  // Handle selecting/deselecting users
-  const handleUserSelection = (userId) => {
-    setSelectedUsers((prevSelected) => {
-      if (prevSelected.includes(userId)) {
-        // Deselect if already selected
-        return prevSelected.filter((id) => id !== userId);
-      } else {
-        // Add to the list if not selected
-        return [...prevSelected, userId];
-      }
-    });
   };
 
   return (
@@ -97,7 +84,7 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
           {showSuccess && <SuccessSnackbar message={successMsg} onClose={() => setShowSuccess(false)} />}
           <h2>Create a New Chatroom</h2>
           <form onSubmit={handleSubmit}>
-            { showChatroomNameField && ( 
+            {showChatroomNameField && (
               <div>
                 <label htmlFor="chatroomName">Chatroom Name</label>
                 <input
@@ -112,6 +99,17 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
             )}
 
             <div>
+              <label>Selected Participants</label>
+              <div className={styles.selectedUsers}>
+                {selectedUsers.map((user) => (
+                  <span key={user.id} className={styles.selectedUser} onClick={() => handleUserSelection(user)}>
+                    {formatUserName(user.user_fname, user.user_lname)} ✖
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <label>Search Participants</label>
               <input
                 type="text"
@@ -122,27 +120,26 @@ const ChatRoomCreateForm = ({ onClose, fetchChatrooms, currentUserId, socket  })
               />
               <div className={styles.userList}>
                 {users.map((user) => (
-                  user.id !== currentUserId && ( // Exclude the current user from the list
-                    <div key={user.id} className={styles.checkboxContainer}>
-                      <input
-                        type="checkbox"
-                        id={`user-${user.id}`}
-                        value={user.id}
-                        checked={selectedUsers.includes(user.id)}
-                        onChange={() => handleUserSelection(user.id)}
-                      />
-                      <label htmlFor={`user-${user.id}`}>
-                        {formatUserName(user.user_fname, user.user_lname)}
-                      </label>
-                    </div>
-                  )
+                  <div
+                    key={user.id}
+                    className={`${styles.userItem} ${
+                      selectedUsers.some((u) => u.id === user.id) ? styles.selected : ''
+                    }`}
+                    onClick={() => handleUserSelection(user)}
+                  >
+                    {formatUserName(user.user_fname, user.user_lname)}
+                  </div>
                 ))}
               </div>
             </div>
 
             <div className={styles.modalActions}>
-              <button type="submit" className={styles.submitButton}>Create</button>
-              <button type="button" className={styles.cancelButton} onClick={onClose}>Cancel</button>
+              <button type="submit" className={styles.submitButton}>
+                Create
+              </button>
+              <button type="button" className={styles.cancelButton} onClick={onClose}>
+                Cancel
+              </button>
             </div>
           </form>
         </div>

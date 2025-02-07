@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFaceSmile, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+
 
 import styles from './index.module.css';
 
@@ -244,7 +247,9 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               );
             })
         ) : (
-          <p className={styles.noMessages}>Say 'hi' and start messaging</p>
+          <div className={styles.noMessages}>
+            <p>Say 'hi' and start messaging</p>
+          </div>
         )}
       </div>
 
@@ -260,10 +265,9 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           ></textarea>
 
           <button
-            className={styles.emojiButton}
-            onClick={toggleEmojiPicker}
+            className={styles.emojiButton}  
           >
-            😊
+            <FontAwesomeIcon onClick={toggleEmojiPicker} icon={faFaceSmile} className={styles.sendIcon}/>
           </button>
         </div>
 
@@ -276,21 +280,8 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           </div>
         )}
 
-        <button className={styles.sendButton} onClick={handleSend}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className={styles.sendIcon}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-            />
-          </svg>
+        <button className={styles.sendButton}>
+          <FontAwesomeIcon onClick={handleSend} icon={faPaperPlane} className={styles.sendIcon} />
         </button>
       </div>
     </div>

@@ -511,6 +511,7 @@ const Page = () => {
                         onClose={handleCloseCreateChatroomModal}
                         fetchChatroomDetails={selectedChatroomDetails}
                         socket={socket}
+                        currentUserId={user?.id}
                     />
                 )}
             </div>

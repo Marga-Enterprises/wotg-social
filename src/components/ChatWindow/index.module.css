@@ -69,8 +69,13 @@
 
 
 .noMessages {
-  color: #818181; /* Matches Tailwind's text-gray-500 */
+  color: #757474; /* Matches Tailwind's text-gray-500 */
   text-align: center;
+  border: .5px solid;
+  border-color: #757474;
+  background-color: #f5f1e3;
+  border-radius: 1rem;
+  padding: 5px;
 }
 
 .inputContainer {
@@ -91,7 +96,7 @@
 .messageTextarea {
   width: 100%;
   padding: 10px 40px 10px 10px; /* Add right padding for emoji button */
-  border-radius: 20px;
+  border-radius: 10px;
   border: 1px solid #ccc;
   font-size: 16px;
   resize: none;
@@ -116,7 +121,7 @@
 .emojiButton {
   position: absolute;
   right: 10px; /* Position it inside the textarea */
-  top: 40%;
+  top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;

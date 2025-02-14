@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { io } from "socket.io-client";
 import { wotgsocial } from "../../redux/combineActions"; // Redux actions
 import styles from "./index.module.css";
@@ -8,10 +8,9 @@ const LivePage = () => {
     const dispatch = useDispatch();
     const [socket, setSocket] = useState(null);
     const [stream, setStream] = useState(null);
+    const [streamStatus, setStreamStatus] = useState("stopped"); // Local state for stream status
     const videoRef = useRef(null);
     const mediaRecorderRef = useRef(null);
-
-    const streamStatus = useSelector((state) => state.stream.streamStatus);
 
     // Initialize Socket.IO Connection
     useEffect(() => {
@@ -23,14 +22,14 @@ const LivePage = () => {
         setSocket(newSocket);
 
         newSocket.on("stream_status", (data) => {
-            dispatch(wotgsocial.stream.updateStreamStatus(data.status));
+            setStreamStatus(data.status); // ✅ Update local state instead of Redux
             console.log("Stream status updated:", data.status);
         });
 
         return () => {
             newSocket.disconnect();
         };
-    }, [dispatch]);
+    }, []);
 
     // Start Streaming with Screen Selection
     const handleStartStream = async () => {
@@ -85,7 +84,7 @@ const LivePage = () => {
     return (
         <div className={styles.container}>
             <h2>Live Stream</h2>
-            <p>Status: <strong>{streamStatus}</strong></p>
+            <p>Status: <strong>{streamStatus}</strong></p>  {/* ✅ Now using local state */}
 
             <button onClick={handleStartStream} className={styles.startBtn}>Start Streaming</button>
             <button onClick={handleStopStream} className={styles.stopBtn}>Stop Streaming</button>

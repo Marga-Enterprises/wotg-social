@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './Pages/Home';
 import SignIn from './Pages/SignIn';
 import SignUp from './Pages/SignUp';
+import Live from './Pages/Live';
 // import Meeting from './Pages/Meeting';
 
 // COMPONENTS
@@ -20,6 +21,7 @@ function App() {
         </header>*/}
         <main> {/* Add top padding to the main content */}
           <Routes>
+            <Route path="/live" exact element={<AuthRouter><Live /></AuthRouter>} />
             <Route path="/" exact element={<AuthRouter><Home /></AuthRouter>} />
             {/*<Route path="/meeting" exact element={<Meeting />} />*/}
             <Route path="/login" exact element={<SignIn />} />

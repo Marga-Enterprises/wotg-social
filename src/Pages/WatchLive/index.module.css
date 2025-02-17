@@ -19,7 +19,6 @@
 
 .videoWrapper {
     position: relative;
-    max-width: 800px;
     width: 100%;
     background: black;
     border-radius: 10px;

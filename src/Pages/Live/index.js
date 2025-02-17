@@ -51,15 +51,14 @@ const LivePage = () => {
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
     
-            // ✅ Extract `rtpParameters` from WebRTC offer
-            const rtpParameters = offer.sdp;
+            // ✅ Extract rtpParameters from WebRTC offer (Fix)
+            const rtpParameters = { codecs: router.rtpCapabilities.codecs }; // Ensure codecs are extracted
     
             socket.emit("start_webrtc_stream", { rtpParameters }); // ✅ Send correct data
         } catch (error) {
             console.error("❌ Error starting stream:", error);
         }
-    };
-    
+    };    
 
     // ✅ Stop WebRTC Streaming
     const handleStopStream = async () => {

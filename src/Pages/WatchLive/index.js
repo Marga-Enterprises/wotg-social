@@ -9,26 +9,26 @@ const WatchLive = () => {
 
     useEffect(() => {
         if (Hls.isSupported()) {
-            const hls = new Hls({
-                lowLatencyMode: true, // ✅ Enable Low Latency HLS
-                backBufferLength: 1, // ✅ Reduce buffer size to 1 second
-            });
-    
+            const hls = new Hls();
             hls.loadSource(hlsUrl);
             hls.attachMedia(videoRef.current);
-    
+
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                setIsLoading(false);
+                setIsLoading(false); // Hide loader when video is ready
             });
-    
+
             hls.on(Hls.Events.ERROR, (event, data) => {
                 console.error("HLS Error:", data);
             });
-    
-            return () => hls.destroy();
+
+            return () => hls.destroy(); // Cleanup on unmount
+        } else if (videoRef.current.canPlayType("application/vnd.apple.mpegurl")) {
+            videoRef.current.src = hlsUrl;
+            videoRef.current.addEventListener("loadedmetadata", () => {
+                setIsLoading(false);
+            });
         }
     }, [hlsUrl]);
-    
 
     return (
         <div className={styles.container}>

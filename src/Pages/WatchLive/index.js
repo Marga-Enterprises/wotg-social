@@ -1,70 +1,49 @@
 import React, { useEffect, useRef, useState } from "react";
-import Hls from "hls.js";
-import styles from "./index.module.css"; // Import CSS module
+import { io } from "socket.io-client";
+import styles from "./index.module.css";
 
 const WatchLive = () => {
     const videoRef = useRef(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const hlsUrl = "https://live.wotgonline.com/hls/teststream.m3u8"; // Update with your HLS stream URL
+    const [socket, setSocket] = useState(null);
+    const peerConnectionRef = useRef(null);
 
     useEffect(() => {
-        if (Hls.isSupported()) {
-            const hls = new Hls({
-                lowLatencyMode: false,  // ✅ Disables ultra-low latency mode (prevents buffering spikes)
-                liveSyncDuration: 2,    // ✅ Keeps the stream ~2 seconds behind real-time
-                liveMaxLatencyDuration: 4, // ✅ Allows a small buffer (avoids sudden lag)
-                backBufferLength: 1,    // ✅ Store only 1 second of past video (prevents seeking)
-                maxBufferLength: 3,     // ✅ Limits buffer size for stable playback
-                maxMaxBufferLength: 4,  // ✅ Prevents excessive buffering
-            });
+        const socketUrl = process.env.NODE_ENV === "development"
+            ? "http://localhost:5000"
+            : "https://chat.wotgonline.com";
 
-            hls.loadSource(hlsUrl);
-            hls.attachMedia(videoRef.current);
+        const newSocket = io(socketUrl, { transports: ["websocket", "polling"] });
+        setSocket(newSocket);
 
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                setIsLoading(false);
-            });
+        newSocket.on("stream_started", async ({ sdp }) => {
+            try {
+                const peerConnection = new RTCPeerConnection({
+                    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+                });
 
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                console.error("HLS Error:", data);
-                if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                    console.log("🔄 Stream stopped, reloading...");
-                    setTimeout(() => hls.loadSource(hlsUrl), 2000); // ✅ Auto-reload if stream stops
-                }
-            });
+                peerConnection.ontrack = (event) => {
+                    videoRef.current.srcObject = event.streams[0];
+                };
 
-            return () => hls.destroy();
-        }
-    }, [hlsUrl]);
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
 
-    // ✅ Prevent Play/Pause & Disable Controls
-    useEffect(() => {
-        const video = videoRef.current;
-        if (video) {
-            video.controls = false; // ❌ Remove default controls
-            video.setAttribute("controlsList", "nodownload nofullscreen noremoteplayback");
-            video.addEventListener("contextmenu", (e) => e.preventDefault()); // ❌ Disable right-click (prevents download)
-        }
+                newSocket.emit("join_webrtc_stream", { sdp: answer });
+
+                peerConnectionRef.current = peerConnection;
+            } catch (error) {
+                console.error("❌ Error connecting to WebRTC stream:", error);
+            }
+        });
+
+        return () => newSocket.disconnect();
     }, []);
 
     return (
         <div className={styles.container}>
             <h2 className={styles.title}>🎥 Watch Live Stream</h2>
-
-            <div className={styles.videoWrapper}>
-                {isLoading && <div className={styles.loader}>🔴 Loading Live Stream...</div>}
-                <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
-                    className={styles.videoPlayer} 
-                    disablePictureInPicture 
-                    controls={false} // ❌ Disable Play/Pause & Seek
-                    onPlay={(e) => e.preventDefault()} // ❌ Prevent Play/Pause actions
-                />
-            </div>
-
-            <p className={styles.info}>Live stream from WOTG Online. Stay connected! ✨</p>
+            <video ref={videoRef} autoPlay playsInline className={styles.videoPlayer} />
         </div>
     );
 };

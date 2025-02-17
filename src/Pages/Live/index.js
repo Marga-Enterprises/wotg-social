@@ -8,11 +8,11 @@ const LivePage = () => {
     const dispatch = useDispatch();
     const [socket, setSocket] = useState(null);
     const [stream, setStream] = useState(null);
-    const [streamStatus, setStreamStatus] = useState("stopped"); // Local state for stream status
+    const [streamStatus, setStreamStatus] = useState("stopped");
     const videoRef = useRef(null);
-    const mediaRecorderRef = useRef(null);
+    const peerConnectionRef = useRef(null);
 
-    // Initialize Socket.IO Connection
+    // ✅ Initialize Socket.IO Connection
     useEffect(() => {
         const socketUrl = process.env.NODE_ENV === "development"
             ? "http://localhost:5000"
@@ -22,7 +22,7 @@ const LivePage = () => {
         setSocket(newSocket);
 
         newSocket.on("stream_status", (data) => {
-            setStreamStatus(data.status); // ✅ Update local state instead of Redux
+            setStreamStatus(data.status);
             console.log("Stream status updated:", data.status);
         });
 
@@ -31,13 +31,12 @@ const LivePage = () => {
         };
     }, []);
 
-    // Start Streaming with Screen Selection (No Mic, Only System Audio)
+    // ✅ Start WebRTC Streaming (Screen + System Audio)
     const handleStartStream = async () => {
         try {
-            // ✅ Capture screen + system audio only (NO microphone)
             const captureStream = await navigator.mediaDevices.getDisplayMedia({
                 video: { mediaSource: "screen" },
-                audio: { // ✅ Only capture system audio
+                audio: {
                     echoCancellation: false,
                     noiseSuppression: false,
                     autoGainControl: false,
@@ -45,57 +44,50 @@ const LivePage = () => {
                 }
             });
 
-            // ✅ Create final stream (Only Video + System Audio)
-            const finalStream = new MediaStream([
-                ...captureStream.getVideoTracks(), 
-                ...captureStream.getAudioTracks() // ✅ Use only system audio
-            ]);
+            videoRef.current.srcObject = captureStream;
+            setStream(captureStream);
 
-            videoRef.current.srcObject = finalStream;
-            setStream(finalStream);
+            const peerConnection = new RTCPeerConnection({
+                iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+            });
+
+            captureStream.getTracks().forEach(track => peerConnection.addTrack(track, captureStream));
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            socket.emit("start_webrtc_stream", { sdp: offer });
+
+            peerConnectionRef.current = peerConnection;
+
+            // ✅ Trigger Redux API Call
             dispatch(wotgsocial.stream.startStreamAction());
-
-            if (socket) {
-                const mediaRecorder = new MediaRecorder(finalStream, {
-                    mimeType: "video/webm; codecs=vp8,opus" // ✅ Opus for better system audio quality
-                });
-
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        socket.emit("stream_data", event.data); // ✅ Send both video & system audio
-                    }
-                };
-
-                mediaRecorder.start(1000); // ✅ Send chunks every 1s for stable streaming
-                mediaRecorderRef.current = mediaRecorder;
-            }
         } catch (error) {
-            console.error("Error starting screen share:", error);
+            console.error("❌ Error starting stream:", error);
         }
     };
 
-    // Stop Streaming
+    // ✅ Stop WebRTC Streaming
     const handleStopStream = async () => {
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
             setStream(null);
         }
 
-        if (mediaRecorderRef.current) {
-            mediaRecorderRef.current.stop();
+        if (peerConnectionRef.current) {
+            peerConnectionRef.current.close();
         }
 
+        socket.emit("stop_webrtc_stream");
+
+        // ✅ Trigger Redux API Call
         dispatch(wotgsocial.stream.stopStreamAction());
-
-        if (socket) {
-            socket.emit("stop_stream");
-        }
     };
 
     return (
         <div className={styles.container}>
-            <h2>Live Stream</h2>
-            <p>Status: <strong>{streamStatus}</strong></p>  {/* ✅ Now using local state */}
+            <h2>🎥 Live Stream</h2>
+            <p>Status: <strong>{streamStatus}</strong></p>
 
             <button onClick={handleStartStream} className={styles.startBtn}>Start Streaming</button>
             <button onClick={handleStopStream} className={styles.stopBtn}>Stop Streaming</button>

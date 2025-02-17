@@ -12,12 +12,12 @@ const LivePage = () => {
     const videoRef = useRef(null);
     const peerConnectionRef = useRef(null);
 
+    const socketUrl = process.env.NODE_ENV === "development"
+        ? "http://localhost:5000"
+        : "https://chat.wotgonline.com";
+
     // ✅ Initialize Socket.IO Connection
     useEffect(() => {
-        const socketUrl = process.env.NODE_ENV === "development"
-            ? "http://localhost:5000"
-            : "https://chat.wotgonline.com";
-
         const newSocket = io(socketUrl, { transports: ["websocket", "polling"] });
         setSocket(newSocket);
 
@@ -34,6 +34,16 @@ const LivePage = () => {
     // ✅ Start WebRTC Streaming (Screen + System Audio)
     const handleStartStream = async () => {
         try {
+            // ✅ Step 1: Fetch RTP Capabilities from Backend
+            const response = await fetch(`${socketUrl}/stream/rtpCapabilities`);
+            const { success, rtpCapabilities } = await response.json();
+    
+            if (!success || !rtpCapabilities) {
+                console.error("❌ Failed to get RTP capabilities from server.");
+                return;
+            }
+    
+            // ✅ Step 2: Start Capture (Screen + System Audio)
             const captureStream = await navigator.mediaDevices.getDisplayMedia({
                 video: { mediaSource: "screen" },
                 audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
@@ -51,17 +61,54 @@ const LivePage = () => {
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
     
-            // ✅ Correctly extract `rtpParameters` from the sender
+            // ✅ Step 3: Extract `rtpParameters` and ensure `encodings` include `ssrc`
             const senders = peerConnection.getSenders();
-            const rtpParameters = senders.map(sender => sender.getParameters());
+            const rtpParameters = senders.map(sender => {
+                const params = sender.getParameters();
     
-            console.log("✅ Sending valid rtpParameters:", rtpParameters);
+                // ✅ Ensure `payloadType` is present & map `RTX` codecs correctly
+                params.codecs = rtpCapabilities.codecs.map(codec => {
+                    const mappedCodec = {
+                        mimeType: codec.mimeType,
+                        clockRate: codec.clockRate,
+                        channels: codec.channels || 1,
+                        payloadType: codec.preferredPayloadType, // ✅ Ensure payloadType is included
+                        rtcpFeedback: codec.rtcpFeedback || [],
+                        parameters: codec.parameters || {} // ✅ Ensure parameters are passed
+                    };
     
-            socket.emit("start_webrtc_stream", { rtpParameters }); // ✅ Send correct data
+                    // ✅ If it's an RTX codec, make sure it references the correct payloadType (VP8 or H264)
+                    if (mappedCodec.mimeType === "video/rtx") {
+                        const primaryCodec = params.codecs.find(c => c.mimeType === "video/VP8" || c.mimeType === "video/H264");
+                        if (primaryCodec) {
+                            mappedCodec.parameters.apt = primaryCodec.payloadType; // ✅ Correctly reference primary codec
+                        }
+                    }
+    
+                    return mappedCodec;
+                });
+    
+                // ✅ Fix: Ensure `encodings` include `ssrc`
+                params.encodings = [
+                    {
+                        ssrc: Math.floor(Math.random() * 10000000), // ✅ Generate a random SSRC
+                        scalabilityMode: "S1T3",
+                        maxBitrate: 3000000 // ✅ Adjust bitrate if needed
+                    }
+                ];
+    
+                return params;
+            });
+    
+            console.log("✅ Sending valid rtpParameters:", JSON.stringify(rtpParameters, null, 2));
+    
+            // ✅ Step 4: Send `rtpParameters` to Backend
+            socket.emit("start_webrtc_stream", { rtpParameters });
         } catch (error) {
             console.error("❌ Error starting stream:", error);
         }
-    };      
+    };
+    
 
     // ✅ Stop WebRTC Streaming
     const handleStopStream = async () => {

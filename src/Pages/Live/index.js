@@ -6,11 +6,11 @@ import styles from "./index.module.css";
 
 const LivePage = () => {
     const dispatch = useDispatch();
-    const [socket, setSocket] = useState(null);
-    const [stream, setStream] = useState(null);
-    const [streamStatus, setStreamStatus] = useState("stopped");
     const videoRef = useRef(null);
     const peerConnectionRef = useRef(null);
+    const [socket, setSocket] = useState(null);
+    const [streamStatus, setStreamStatus] = useState("stopped");
+    const [rtpCapabilities, setRtpCapabilities] = useState(null); // ✅ Local state for capabilities
 
     const backendUrl = process.env.NODE_ENV === "development"
         ? "http://localhost:5000"
@@ -20,7 +20,7 @@ const LivePage = () => {
         ? "http://localhost:5000"
         : "https://chat.wotgonline.com";
 
-    // ✅ Initialize Socket.IO Connection
+    // ✅ Initialize Socket.IO
     useEffect(() => {
         const newSocket = io(socketUrl, { transports: ["websocket", "polling"] });
         setSocket(newSocket);
@@ -35,104 +35,114 @@ const LivePage = () => {
         };
     }, []);
 
-    // ✅ Start WebRTC Streaming (Screen + System Audio)
-    const handleStartStream = async () => {
+    // ✅ Fetch RTP Capabilities Before Starting the Stream
+    const fetchRtpCapabilities = async () => {
         try {
-            // ✅ Step 1: Dispatch API Call to Start Stream
-            dispatch(wotgsocial.stream.startStreamAction());
-    
-            // ✅ Step 2: Fetch RTP Capabilities from Backend
+            console.log("🔍 Fetching RTP Capabilities...");
             const response = await fetch(`${backendUrl}/stream/rtpCapabilities`);
-            const { success, rtpCapabilities } = await response.json();
+            const data = await response.json();
+            
+            console.log("📡 API Response for RTP Capabilities:", data); // ✅ Debug Log
     
-            if (!success || !rtpCapabilities) {
-                console.error("❌ Failed to get RTP capabilities from server.");
-                return;
+            if (data.success && data.rtpCapabilities) {
+                setRtpCapabilities(data.rtpCapabilities);
+                console.log("✅ RTP Capabilities Set in State:", data.rtpCapabilities);
+            } else {
+                console.error("❌ RTP Capabilities missing in response:", data);
             }
-    
-            // ✅ Step 3: Start Capture (Screen + System Audio)
-            const captureStream = await navigator.mediaDevices.getDisplayMedia({
-                video: { mediaSource: "screen" },
-                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-            });
-    
-            videoRef.current.srcObject = captureStream;
-            setStream(captureStream);
-    
-            const peerConnection = new RTCPeerConnection({
-                iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-            });
-    
-            captureStream.getTracks().forEach(track => peerConnection.addTrack(track, captureStream));
-    
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-    
-            // ✅ Step 4: Extract `rtpParameters` and ensure `encodings` include `ssrc`
-            const senders = peerConnection.getSenders();
-            const rtpParameters = senders.map(sender => {
-                const params = sender.getParameters();
-    
-                // ✅ Ensure `payloadType` is present & map `RTX` codecs correctly
-                params.codecs = rtpCapabilities.codecs.map(codec => {
-                    const mappedCodec = {
-                        mimeType: codec.mimeType,
-                        clockRate: codec.clockRate,
-                        channels: codec.channels || 1,
-                        payloadType: codec.preferredPayloadType, // ✅ Ensure payloadType is included
-                        rtcpFeedback: codec.rtcpFeedback || [],
-                        parameters: codec.parameters || {} // ✅ Ensure parameters are passed
-                    };
-    
-                    // ✅ If it's an RTX codec, make sure it references the correct payloadType (VP8 or H264)
-                    if (mappedCodec.mimeType === "video/rtx") {
-                        const primaryCodec = params.codecs.find(c => c.mimeType === "video/VP8" || c.mimeType === "video/H264");
-                        if (primaryCodec) {
-                            mappedCodec.parameters.apt = primaryCodec.payloadType; // ✅ Correctly reference primary codec
-                        }
-                    }
-    
-                    return mappedCodec;
-                });
-    
-                // ✅ Fix: Ensure `encodings` include `ssrc`
-                params.encodings = [
-                    {
-                        ssrc: Math.floor(Math.random() * 10000000), // ✅ Generate a random SSRC
-                        scalabilityMode: "S1T3",
-                        maxBitrate: 3000000 // ✅ Adjust bitrate if needed
-                    }
-                ];
-    
-                return params;
-            });
-    
-            console.log("✅ Sending valid rtpParameters:", JSON.stringify(rtpParameters, null, 2));
-    
-            // ✅ Step 5: Send `rtpParameters` to Backend
-            socket.emit("start_webrtc_stream", { rtpParameters });
         } catch (error) {
-            console.error("❌ Error starting stream:", error);
+            console.error("❌ Error fetching RTP Capabilities:", error);
         }
     };
     
-    
+
+    // ✅ Start WebRTC Streaming
+    const handleStartStream = async () => {
+        try {
+            dispatch(wotgsocial.stream.startStreamAction());
+
+            // ✅ Fetch RTP Capabilities First
+            await fetchRtpCapabilities();
+
+            if (!rtpCapabilities) {
+                console.error("❌ RTP Capabilities not available. Aborting.");
+                return;
+            }
+
+            // ✅ Stop Any Existing Stream Before Starting a New One
+            if (videoRef.current.srcObject) {
+                videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+            }
+
+            // ✅ Step 1: Prompt User to Select Screen/Tab
+            const captureStream = await navigator.mediaDevices.getDisplayMedia({
+                video: { mediaSource: "screen" }, // ✅ Browser will prompt the user
+                audio: { // ✅ Captures system audio
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            });
+
+            videoRef.current.srcObject = captureStream; // ✅ Show preview in video tag
+
+            // ✅ Step 2: Create Producer Transport
+            const transportRes = await dispatch(wotgsocial.stream.createProducerTransportAction());
+            const producerTransport = transportRes.payload;
+
+            // ✅ Step 3: Setup WebRTC Connection
+            const peerConnection = new RTCPeerConnection({
+                iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+            });
+
+            captureStream.getTracks().forEach(track => peerConnection.addTrack(track, captureStream));
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    socket.emit("webrtc_ice_candidate", event.candidate);
+                }
+            };
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            // ✅ Step 4: Connect Producer Transport
+            await dispatch(wotgsocial.stream.connectProducerTransportAction(producerTransport.id, producerTransport.dtlsParameters));
+
+            // ✅ Step 5: Ensure `rtpCapabilities` are present
+            if (!rtpCapabilities) {
+                console.error("❌ RTP Capabilities are missing!");
+                return;
+            }
+
+            const senders = peerConnection.getSenders();
+            const rtpParameters = senders.map(sender => sender.getParameters());
+
+            // ✅ Step 6: Start Producing Video & Audio
+            await dispatch(wotgsocial.stream.produceAction(producerTransport.id, "video", rtpParameters[0]));
+
+            peerConnectionRef.current = peerConnection;
+
+        } catch (error) {
+            if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+                console.error("❌ User denied screen sharing permission.");
+            } else {
+                console.error("❌ Error starting stream:", error);
+            }
+        }
+    };
 
     // ✅ Stop WebRTC Streaming
     const handleStopStream = async () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            setStream(null);
-        }
+        dispatch(wotgsocial.stream.stopStreamAction());
 
         if (peerConnectionRef.current) {
             peerConnectionRef.current.close();
         }
 
-        socket.emit("stop_webrtc_stream");
-
-        // ✅ Trigger Redux API Call
-        dispatch(wotgsocial.stream.stopStreamAction());
+        if (videoRef.current.srcObject) {
+            videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+        }
     };
 
     return (

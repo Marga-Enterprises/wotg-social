@@ -7,6 +7,7 @@ const WatchLive = () => {
     const peerConnectionRef = useRef(null);
     const [socket, setSocket] = useState(null);
     const [isStreaming, setIsStreaming] = useState(false);
+    const [rtpCapabilities, setRtpCapabilities] = useState(null);
 
     useEffect(() => {
         const socketUrl = process.env.NODE_ENV === "development"
@@ -16,22 +17,16 @@ const WatchLive = () => {
         const newSocket = io(socketUrl, { transports: ["websocket", "polling"] });
         setSocket(newSocket);
 
-        // ✅ Debug WebSocket Connection
         newSocket.on("connect", () => console.log("✅ WebSocket connected"));
         newSocket.on("disconnect", () => console.log("🔴 WebSocket disconnected"));
 
-        // ✅ Request Stream Status (for late viewers)
         newSocket.emit("check_stream_status", {}, (data) => {
-            console.log("🔍 Checking if stream is running:", data);
             if (data.isLive) {
-                console.log("🎥 Stream is already live! Joining now...");
                 setupWebRTC(newSocket);
             }
         });
 
-        // ✅ If the stream starts while this page is open, join automatically
         newSocket.on("stream_started", () => {
-            console.log("📡 Live stream started! Joining now...");
             setupWebRTC(newSocket);
         });
 
@@ -43,71 +38,93 @@ const WatchLive = () => {
         };
     }, []);
 
-    // ✅ Setup WebRTC for Viewer (Mediasoup Consumer)
+    const fetchRtpCapabilities = async () => {
+        try {
+            const response = await fetch("/stream/rtpCapabilities");
+            const data = await response.json();
+
+            if (data.success && data.rtpCapabilities) {
+                setRtpCapabilities(data.rtpCapabilities);
+                console.log("✅ Received RTP Capabilities:", data.rtpCapabilities);
+            } else {
+                console.error("❌ Failed to get RTP Capabilities:", data);
+            }
+        } catch (error) {
+            console.error("❌ Error fetching RTP Capabilities:", error);
+        }
+    };
+
     const setupWebRTC = async (socket) => {
         try {
             console.log("📡 Setting up WebRTC for viewer...");
 
-            const peerConnection = new RTCPeerConnection({
-                iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-            });
+            await fetchRtpCapabilities();
+            if (!rtpCapabilities) {
+                console.error("❌ RTP Capabilities not available.");
+                return;
+            }
 
-            // ✅ Receive Video/Audio Stream
-            peerConnection.ontrack = (event) => {
-                console.log("🎥 Receiving video/audio stream...");
-                if (videoRef.current) {
+            // Create Consumer Transport
+            socket.emit("create_consumer_transport", {}, (transportInfo) => {
+                if (!transportInfo || !transportInfo.id) {
+                    console.error("❌ Consumer Transport Info missing.");
+                    return;
+                }
+
+                const peerConnection = new RTCPeerConnection({
+                    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+                });
+
+                peerConnectionRef.current = peerConnection;
+
+                peerConnection.ontrack = (event) => {
+                    console.log("🎥 Receiving video/audio stream...");
                     videoRef.current.srcObject = event.streams[0];
-                    console.log("✅ Video Stream Set!");
-                }
-            };
+                };
 
-            // ✅ Send ICE Candidate to Server
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    console.log("📡 Sending ICE candidate:", event.candidate);
-                    socket.emit("webrtc_ice_candidate", event.candidate);
-                }
-            };
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        socket.emit("webrtc_ice_candidate", event.candidate);
+                    }
+                };
 
-            // ✅ Request RTP Capabilities
-            socket.emit("request_rtp_capabilities", {}, async (rtpCapabilities) => {
-                console.log("📡 Received RTP Capabilities:", rtpCapabilities);
-
-                // ✅ Create Consumer Transport
-                socket.emit("create_consumer_transport", {}, async (transportInfo) => {
-                    console.log("📡 Received Consumer Transport Info:", transportInfo);
-
-                    if (!transportInfo.id || !transportInfo.dtlsParameters) {
-                        console.error("❌ Consumer Transport Info is missing critical data!");
+                // Connect Consumer Transport
+                socket.emit("connect_consumer_transport", {
+                    transportId: transportInfo.id,
+                    dtlsParameters: peerConnection.localDescription
+                }, async (connectResponse) => {
+                    if (!connectResponse.success) {
+                        console.error("❌ Failed to connect Consumer Transport.");
                         return;
                     }
 
-                    // ✅ Set Remote Description (Mediasoup doesn't use SDP, we map RTP)
-                    const offer = {
-                        type: "offer",
-                        sdp: JSON.stringify(rtpCapabilities)
-                    };
+                    // Start Consuming Media
+                    socket.emit("consume", { transportId: transportInfo.id, rtpCapabilities }, (consumeResponse) => {
+                        if (!consumeResponse || !consumeResponse.id) {
+                            console.error("❌ Failed to start consuming media.");
+                            return;
+                        }
 
-                    await peerConnection.setRemoteDescription(offer);
-                    const answer = await peerConnection.createAnswer();
-                    await peerConnection.setLocalDescription(answer);
+                        const remoteDescription = new RTCSessionDescription({
+                            type: 'offer',
+                            sdp: consumeResponse.sdp
+                        });
 
-                    console.log("✅ Local SDP Set, sending answer to server...");
-                    socket.emit("webrtc_transport_answer", { id: transportInfo.id, sdp: answer });
-
-                    // ✅ Handle ICE Candidates from Server
-                    socket.on("webrtc_ice_candidate", (candidate) => {
-                        console.log("✅ Adding received ICE candidate...");
-                        peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                        peerConnection.setRemoteDescription(remoteDescription)
+                            .then(() => peerConnection.createAnswer())
+                            .then(answer => peerConnection.setLocalDescription(answer))
+                            .then(() => {
+                                socket.emit("consumer_answer", {
+                                    sdp: peerConnection.localDescription.sdp
+                                });
+                                setIsStreaming(true);
+                            })
+                            .catch(console.error);
                     });
-
-                    peerConnectionRef.current = peerConnection;
-                    setIsStreaming(true);
                 });
             });
-
         } catch (error) {
-            console.error("❌ Error connecting to WebRTC stream:", error);
+            console.error("❌ Error setting up WebRTC viewer:", error);
         }
     };
 

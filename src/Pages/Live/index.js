@@ -31,62 +31,48 @@ const LivePage = () => {
         };
     }, []);
 
-    // Start Streaming with Screen Selection
+    // Start Streaming with Screen Selection (No Mic, Only System Audio)
     const handleStartStream = async () => {
         try {
-            // ✅ Capture screen + system audio
+            // ✅ Capture screen + system audio only (NO microphone)
             const captureStream = await navigator.mediaDevices.getDisplayMedia({
                 video: { mediaSource: "screen" },
-                audio: {
+                audio: { // ✅ Only capture system audio
                     echoCancellation: false,
                     noiseSuppression: false,
                     autoGainControl: false,
-                    sampleRate: 44100,
+                    sampleRate: 44100, 
                 }
             });
-    
-            // ✅ Capture microphone separately
-            const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    
-            // ✅ Combine system & mic audio
-            const audioContext = new AudioContext();
-            const destination = audioContext.createMediaStreamDestination();
-            const screenAudio = audioContext.createMediaStreamSource(captureStream);
-            const micAudio = audioContext.createMediaStreamSource(micStream);
-    
-            screenAudio.connect(destination);
-            micAudio.connect(destination);
-    
-            // ✅ Create final stream (video + both audio)
+
+            // ✅ Create final stream (Only Video + System Audio)
             const finalStream = new MediaStream([
-                ...captureStream.getVideoTracks(),
-                ...destination.stream.getAudioTracks()
+                ...captureStream.getVideoTracks(), 
+                ...captureStream.getAudioTracks() // ✅ Use only system audio
             ]);
-    
+
             videoRef.current.srcObject = finalStream;
             setStream(finalStream);
-    
             dispatch(wotgsocial.stream.startStreamAction());
-    
+
             if (socket) {
                 const mediaRecorder = new MediaRecorder(finalStream, {
-                    mimeType: "video/webm; codecs=vp8,opus" // ✅ Opus for better audio quality
+                    mimeType: "video/webm; codecs=vp8,opus" // ✅ Opus for better system audio quality
                 });
-    
+
                 mediaRecorder.ondataavailable = (event) => {
                     if (event.data.size > 0) {
-                        socket.emit("stream_data", event.data); // ✅ Send both audio & video
+                        socket.emit("stream_data", event.data); // ✅ Send both video & system audio
                     }
                 };
-    
-                mediaRecorder.start(1000); // ✅ Send chunks every 1 second for stable streaming
+
+                mediaRecorder.start(1000); // ✅ Send chunks every 1s for stable streaming
                 mediaRecorderRef.current = mediaRecorder;
             }
         } catch (error) {
             console.error("Error starting screen share:", error);
         }
     };
-    
 
     // Stop Streaming
     const handleStopStream = async () => {

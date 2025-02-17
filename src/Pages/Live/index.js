@@ -36,36 +36,30 @@ const LivePage = () => {
         try {
             const captureStream = await navigator.mediaDevices.getDisplayMedia({
                 video: { mediaSource: "screen" },
-                audio: {
-                    echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false,
-                    sampleRate: 44100, 
-                }
+                audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
             });
-
+    
             videoRef.current.srcObject = captureStream;
             setStream(captureStream);
-
+    
             const peerConnection = new RTCPeerConnection({
                 iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
             });
-
+    
             captureStream.getTracks().forEach(track => peerConnection.addTrack(track, captureStream));
-
+    
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
-
-            socket.emit("start_webrtc_stream", { sdp: offer });
-
-            peerConnectionRef.current = peerConnection;
-
-            // ✅ Trigger Redux API Call
-            dispatch(wotgsocial.stream.startStreamAction());
+    
+            // ✅ Extract `rtpParameters` from WebRTC offer
+            const rtpParameters = offer.sdp;
+    
+            socket.emit("start_webrtc_stream", { rtpParameters }); // ✅ Send correct data
         } catch (error) {
             console.error("❌ Error starting stream:", error);
         }
     };
+    
 
     // ✅ Stop WebRTC Streaming
     const handleStopStream = async () => {

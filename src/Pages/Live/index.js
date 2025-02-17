@@ -12,6 +12,10 @@ const LivePage = () => {
     const videoRef = useRef(null);
     const peerConnectionRef = useRef(null);
 
+    const backendUrl = process.env.NODE_ENV === "development"
+        ? "http://localhost:5000"
+        : "https://chat.wotgonline.com/api";
+
     const socketUrl = process.env.NODE_ENV === "development"
         ? "http://localhost:5000"
         : "https://chat.wotgonline.com";
@@ -35,7 +39,7 @@ const LivePage = () => {
     const handleStartStream = async () => {
         try {
             // ✅ Step 1: Fetch RTP Capabilities from Backend
-            const response = await fetch(`${socketUrl}/stream/rtpCapabilities`);
+            const response = await fetch(`${backendUrl}/stream/rtpCapabilities`);
             const { success, rtpCapabilities } = await response.json();
     
             if (!success || !rtpCapabilities) {

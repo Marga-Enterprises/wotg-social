@@ -38,7 +38,10 @@ const LivePage = () => {
     // ✅ Start WebRTC Streaming (Screen + System Audio)
     const handleStartStream = async () => {
         try {
-            // ✅ Step 1: Fetch RTP Capabilities from Backend
+            // ✅ Step 1: Dispatch API Call to Start Stream
+            dispatch(wotgsocial.stream.startStreamAction());
+    
+            // ✅ Step 2: Fetch RTP Capabilities from Backend
             const response = await fetch(`${backendUrl}/stream/rtpCapabilities`);
             const { success, rtpCapabilities } = await response.json();
     
@@ -47,7 +50,7 @@ const LivePage = () => {
                 return;
             }
     
-            // ✅ Step 2: Start Capture (Screen + System Audio)
+            // ✅ Step 3: Start Capture (Screen + System Audio)
             const captureStream = await navigator.mediaDevices.getDisplayMedia({
                 video: { mediaSource: "screen" },
                 audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
@@ -65,7 +68,7 @@ const LivePage = () => {
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
     
-            // ✅ Step 3: Extract `rtpParameters` and ensure `encodings` include `ssrc`
+            // ✅ Step 4: Extract `rtpParameters` and ensure `encodings` include `ssrc`
             const senders = peerConnection.getSenders();
             const rtpParameters = senders.map(sender => {
                 const params = sender.getParameters();
@@ -106,12 +109,13 @@ const LivePage = () => {
     
             console.log("✅ Sending valid rtpParameters:", JSON.stringify(rtpParameters, null, 2));
     
-            // ✅ Step 4: Send `rtpParameters` to Backend
+            // ✅ Step 5: Send `rtpParameters` to Backend
             socket.emit("start_webrtc_stream", { rtpParameters });
         } catch (error) {
             console.error("❌ Error starting stream:", error);
         }
     };
+    
     
 
     // ✅ Stop WebRTC Streaming

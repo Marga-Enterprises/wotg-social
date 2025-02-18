@@ -65,7 +65,7 @@ const Viewer = () => {
 
         // ✅ Consume Stream
         const consumeResponse = await dispatch(
-            wotgsocial.stream.consumeStreamAction({ rtpCapabilities: newDevice.rtpCapabilities })
+            wotgsocial.stream.consumeStreamAction({ rtpCapabilities: newDevice.rtpCapabilities, dtlsParameters, role: "consumer" })
         );
 
         if (!consumeResponse || !consumeResponse.payload) {

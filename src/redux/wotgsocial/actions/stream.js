@@ -79,22 +79,32 @@ export const connectTransportAction = (payload) => async (dispatch) => {
 // ✅ Consume Stream Action (Viewer)
 export const consumeStreamAction = (payload) => async (dispatch) => {
   try {
-    console.log('payloaddd consume', payload)
+    console.log('🔍 PAYLOAD TO CONSUME:', payload);
+
     dispatch({ type: types.CONSUME_STREAM_REQUEST });
 
     const res = await consumeStream(payload);
 
+    console.log('📡 SERVER RESPONSE:', res);
+
     if (res.success) {
+      console.log('✅ STREAM CONSUMED SUCCESSFULLY:', res.data);
+      
       dispatch({ type: types.CONSUME_STREAM_SUCCESS, payload: res.data });
 
       return res.data;
     } else {
+      console.error('❌ CONSUME STREAM FAILED:', res.error || "Failed to consume stream");
+      
       dispatch({ type: types.CONSUME_STREAM_FAIL, payload: res.error || "Failed to consume stream" });
     }
   } catch (error) {
+    console.error('❌ ERROR IN CONSUME STREAM ACTION:', error.message, error.stack);
+    
     dispatch({ type: types.CONSUME_STREAM_FAIL, payload: error.message });
   }
 };
+
 
 export const stopStreamAction = () => async (dispatch) => {
   try {

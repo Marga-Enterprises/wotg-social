@@ -63,9 +63,12 @@ const Viewer = () => {
             callback();
         });
 
-        // ✅ Consume Stream
+        // ✅ Consume Stream (Now includes DTLS Parameters)
         const consumeResponse = await dispatch(
-            wotgsocial.stream.consumeStreamAction({ rtpCapabilities: newDevice.rtpCapabilities, dtlsParameters, role: "consumer" })
+            wotgsocial.stream.consumeStreamAction({ 
+                rtpCapabilities: newDevice.rtpCapabilities,
+                dtlsParameters: transportResponse.dtlsParameters // ✅ Pass DTLS parameters
+            })
         );
 
         if (!consumeResponse || !consumeResponse.payload) {
@@ -86,6 +89,7 @@ const Viewer = () => {
         setStatusMessage("No Livestream");
     }
   };
+
 
   useEffect(() => {
     checkLiveStream();

@@ -77,11 +77,14 @@ const Viewer = () => {
             })
         );
 
-        if (!consumeResponse || !consumeResponse.payload) {
+        console.log('CONSUME RES', consumeResponse);
+        console.log('CONSUME RES', consumeResponse.payload);
+
+        /*if (!consumeResponse || !consumeResponse.payload) {
             console.error("❌ Failed to consume stream", consumeResponse);
             setStatusMessage("No Livestream");
             return;
-        }
+        }*/
 
         console.log("✅ Stream Consumed:", consumeResponse.payload);
 

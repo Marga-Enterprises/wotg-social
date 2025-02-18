@@ -86,10 +86,10 @@ const Viewer = () => {
             return;
         }*/
 
-        console.log("✅ Stream Consumed:", consumeResponse.payload);
+        console.log("✅ Stream Consumed:", consumeResponse);
 
         const stream = new MediaStream();
-        stream.addTrack(consumeResponse.payload.track);
+        stream.addTrack(consumeResponse.track);
 
         console.log("🎥 MediaStream Created:", stream);
 

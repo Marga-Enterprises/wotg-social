@@ -1,47 +1,32 @@
 // utils
-import { POST, GET } from '../request'; // Import HTTP request functions
+import { POST, GET } from "../request"; // Import HTTP request functions
 
-// ✅ Start Live Streaming
-export async function startStream() {
-  return POST('/stream/start'); // No payload needed
+// ✅ Create WebRTC Transport
+export async function createTransport(payload) {
+  return POST("/stream/create-transport", payload);
 }
 
-// ✅ Stop Live Streaming
+// ✅ Connect WebRTC Transport
+export async function connectTransport(payload) {
+  return POST("/stream/connect-transport", payload);
+}
+
+// ✅ Start Live Streaming (Broadcaster sends video/audio)
+export async function startStream(payload) {
+  return POST("/stream/produce", payload);
+}
+
+// ✅ Watch Live Stream (Viewer receives video/audio)
+export async function consumeStream(payload) {
+  return POST("/stream/consume", payload);
+}
+
+// ✅ Stop Live Streaming (Broadcaster stops streaming)
 export async function stopStream() {
-  return POST('/stream/stop'); // No payload needed
+  return POST("/stream/stop");
 }
 
-// ✅ Get Mediasoup RTP Capabilities
-export async function getRtpCapabilities() {
-  return GET('/stream/rtpCapabilities'); // Fetch available video/audio formats
-}
-
-// ✅ Create Producer Transport (for Broadcaster)
-export async function createProducerTransport() {
-  return POST('/stream/createProducerTransport'); // No payload needed
-}
-
-// ✅ Connect Producer Transport (Broadcaster sends media)
-export async function connectProducerTransport(transportId, dtlsParameters) {
-  return POST('/stream/connectProducerTransport', { transportId, dtlsParameters });
-}
-
-// ✅ Produce Media (Broadcaster starts sending audio/video)
-export async function produce(transportId, kind, rtpParameters) {
-  return POST('/stream/produce', { transportId, kind, rtpParameters });
-}
-
-// ✅ Create Consumer Transport (for Viewer)
-export async function createConsumerTransport() {
-  return POST('/stream/createConsumerTransport'); // No payload needed
-}
-
-// ✅ Connect Consumer Transport (Viewer connects)
-export async function connectConsumerTransport(transportId, dtlsParameters) {
-  return POST('/stream/connectConsumerTransport', { transportId, dtlsParameters });
-}
-
-// ✅ Consume Stream (Viewer receives audio/video)
-export async function consume(transportId, rtpCapabilities) {
-  return POST('/stream/consume', { transportId, rtpCapabilities });
+// ✅ Check if a live stream is active (Viewer auto-detect)
+export async function checkStreamStatus() {
+  return GET("/stream/status");
 }

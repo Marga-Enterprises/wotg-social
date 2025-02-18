@@ -1,44 +1,108 @@
 import {
-  stopStream,
+  createTransport,
+  connectTransport,
   startStream,
-  getRtpCapabilities,
-  createProducerTransport,
-  connectProducerTransport,
-  produce,
-  createConsumerTransport,
-  connectConsumerTransport,
-  consume,
-} from '../../../services/api/stream';
+  consumeStream,
+  stopStream,
+  checkStreamStatus,
+} from "../../../services/api/stream";
+import * as types from "../types";
 
-// Types
-import * as types from '../types';
+let isStartingStream = false;
 
-// ✅ Start Stream Action
-export const startStreamAction = () => async (dispatch) => {
+// ✅ Start Stream Action (Broadcaster)
+export const startStreamAction = (payload) => async (dispatch) => {
   try {
     dispatch({ type: types.START_STREAM_REQUEST });
-
-    const res = await startStream();
+    console.log('START STREAM TRIGGERED')
+    const res = await startStream(payload);
 
     if (res.success) {
+      
       dispatch({ type: types.START_STREAM_SUCCESS, payload: res.message });
+
+      return res.message; 
     } else {
       dispatch({ type: types.START_STREAM_FAIL, payload: res.error || "Failed to start stream" });
+
+      return null;
     }
   } catch (error) {
     dispatch({ type: types.START_STREAM_FAIL, payload: error.message });
+
+    return null;
   }
 };
 
-// ✅ Stop Stream Action
+// ✅ Create WebRTC Transport Action
+export const createTransportAction = (payload) => async (dispatch) => {
+  try {
+    dispatch({ type: types.CREATE_TRANSPORT_REQUEST });
+
+    const res = await createTransport(payload);
+
+    if (res.success) {
+      console.log('✅ PEILOAD RESPONSE:', res.data); // Debugging
+      dispatch({ type: types.CREATE_TRANSPORT_SUCCESS, payload: res.data });
+
+      return res.data; // ✅ RETURN the transport data
+    } else {
+      dispatch({ type: types.CREATE_TRANSPORT_FAIL, payload: res.error || "Failed to create transport" });
+      return null; // ❌ Return `null` if transport creation fails
+    }
+  } catch (error) {
+    dispatch({ type: types.CREATE_TRANSPORT_FAIL, payload: error.message });
+    return null; // ❌ Handle API failure
+  }
+};
+
+
+// ✅ Connect WebRTC Transport Action
+export const connectTransportAction = (payload) => async (dispatch) => {
+  try {
+    dispatch({ type: types.CONNECT_TRANSPORT_REQUEST });
+
+    const res = await connectTransport(payload);
+
+    if (res.success) {
+      dispatch({ type: types.CONNECT_TRANSPORT_SUCCESS, payload: res.message });
+
+      return res.message;
+    } else {
+      dispatch({ type: types.CONNECT_TRANSPORT_FAIL, payload: res.error || "Failed to connect transport" });
+    }
+  } catch (error) {
+    dispatch({ type: types.CONNECT_TRANSPORT_FAIL, payload: error.message });
+  }
+};
+
+// ✅ Consume Stream Action (Viewer)
+export const consumeStreamAction = (payload) => async (dispatch) => {
+  try {
+    dispatch({ type: types.CONSUME_STREAM_REQUEST });
+
+    const res = await consumeStream(payload);
+
+    if (res.success) {
+      dispatch({ type: types.CONSUME_STREAM_SUCCESS, payload: res.data });
+
+      return res.data;
+    } else {
+      dispatch({ type: types.CONSUME_STREAM_FAIL, payload: res.error || "Failed to consume stream" });
+    }
+  } catch (error) {
+    dispatch({ type: types.CONSUME_STREAM_FAIL, payload: error.message });
+  }
+};
+
 export const stopStreamAction = () => async (dispatch) => {
   try {
     dispatch({ type: types.STOP_STREAM_REQUEST });
 
-    const res = await stopStream();
+    const res = await stopStream(); // Call API to stop the stream
 
     if (res.success) {
-      dispatch({ type: types.STOP_STREAM_SUCCESS, payload: res.message });
+      dispatch({ type: types.STOP_STREAM_SUCCESS });
     } else {
       dispatch({ type: types.STOP_STREAM_FAIL, payload: res.error || "Failed to stop stream" });
     }
@@ -47,121 +111,22 @@ export const stopStreamAction = () => async (dispatch) => {
   }
 };
 
-// ✅ Fetch WebRTC Capabilities Action
-export const getRtpCapabilitiesAction = () => async (dispatch) => {
+export const checkStreamStatusAction = () => async (dispatch) => {
   try {
-    dispatch({ type: types.GET_RTP_CAPABILITIES_REQUEST });
+    dispatch({ type: types.CHECK_STREAM_STATUS_REQUEST });
 
-    const res = await getRtpCapabilities();
+    const res = await checkStreamStatus(); // ✅ Call the API directly
 
     if (res.success) {
-      dispatch({ type: types.GET_RTP_CAPABILITIES_SUCCESS, payload: res.rtpCapabilities });
+      dispatch({ type: types.CHECK_STREAM_STATUS_SUCCESS, payload: res.data });
+      return res.data; // ✅ Return isLive status directly
     } else {
-      dispatch({ type: types.GET_RTP_CAPABILITIES_FAIL, payload: res.error || "Failed to fetch RTP capabilities" });
+      dispatch({ type: types.CHECK_STREAM_STATUS_FAIL, payload: "No active stream found." });
+      return { isLive: false }; // ✅ Ensure it returns a boolean object
     }
   } catch (error) {
-    dispatch({ type: types.GET_RTP_CAPABILITIES_FAIL, payload: error.message });
+    dispatch({ type: types.CHECK_STREAM_STATUS_FAIL, payload: error.message });
+    return { isLive: false }; // ✅ Handle errors safely
   }
 };
 
-// ✅ Create Producer Transport (Broadcaster)
-export const createProducerTransportAction = () => async (dispatch) => {
-  try {
-    dispatch({ type: types.CREATE_PRODUCER_TRANSPORT_REQUEST });
-
-    const res = await createProducerTransport();
-
-    if (res.id) {
-      dispatch({ type: types.CREATE_PRODUCER_TRANSPORT_SUCCESS, payload: res });
-    } else {
-      dispatch({ type: types.CREATE_PRODUCER_TRANSPORT_FAIL, payload: "Failed to create producer transport" });
-    }
-  } catch (error) {
-    dispatch({ type: types.CREATE_PRODUCER_TRANSPORT_FAIL, payload: error.message });
-  }
-};
-
-// ✅ Connect Producer Transport
-export const connectProducerTransportAction = (transportId, dtlsParameters) => async (dispatch) => {
-  try {
-    dispatch({ type: types.CONNECT_PRODUCER_TRANSPORT_REQUEST });
-
-    const res = await connectProducerTransport(transportId, dtlsParameters);
-
-    if (res.success) {
-      dispatch({ type: types.CONNECT_PRODUCER_TRANSPORT_SUCCESS });
-    } else {
-      dispatch({ type: types.CONNECT_PRODUCER_TRANSPORT_FAIL, payload: "Failed to connect producer transport" });
-    }
-  } catch (error) {
-    dispatch({ type: types.CONNECT_PRODUCER_TRANSPORT_FAIL, payload: error.message });
-  }
-};
-
-// ✅ Produce (Broadcaster starts sending media)
-export const produceAction = (transportId, kind, rtpParameters) => async (dispatch) => {
-  try {
-    dispatch({ type: types.PRODUCE_REQUEST });
-
-    const res = await produce(transportId, kind, rtpParameters);
-
-    if (res.id) {
-      dispatch({ type: types.PRODUCE_SUCCESS, payload: res });
-    } else {
-      dispatch({ type: types.PRODUCE_FAIL, payload: "Failed to produce media" });
-    }
-  } catch (error) {
-    dispatch({ type: types.PRODUCE_FAIL, payload: error.message });
-  }
-};
-
-// ✅ Create Consumer Transport (Viewer)
-export const createConsumerTransportAction = () => async (dispatch) => {
-  try {
-    dispatch({ type: types.CREATE_CONSUMER_TRANSPORT_REQUEST });
-
-    const res = await createConsumerTransport();
-
-    if (res.id) {
-      dispatch({ type: types.CREATE_CONSUMER_TRANSPORT_SUCCESS, payload: res });
-    } else {
-      dispatch({ type: types.CREATE_CONSUMER_TRANSPORT_FAIL, payload: "Failed to create consumer transport" });
-    }
-  } catch (error) {
-    dispatch({ type: types.CREATE_CONSUMER_TRANSPORT_FAIL, payload: error.message });
-  }
-};
-
-// ✅ Connect Consumer Transport (Viewer)
-export const connectConsumerTransportAction = (transportId, dtlsParameters) => async (dispatch) => {
-  try {
-    dispatch({ type: types.CONNECT_CONSUMER_TRANSPORT_REQUEST });
-
-    const res = await connectConsumerTransport(transportId, dtlsParameters);
-
-    if (res.success) {
-      dispatch({ type: types.CONNECT_CONSUMER_TRANSPORT_SUCCESS });
-    } else {
-      dispatch({ type: types.CONNECT_CONSUMER_TRANSPORT_FAIL, payload: "Failed to connect consumer transport" });
-    }
-  } catch (error) {
-    dispatch({ type: types.CONNECT_CONSUMER_TRANSPORT_FAIL, payload: error.message });
-  }
-};
-
-// ✅ Consume Stream (Viewer receives media)
-export const consumeAction = (transportId, rtpCapabilities) => async (dispatch) => {
-  try {
-    dispatch({ type: types.CONSUME_REQUEST });
-
-    const res = await consume(transportId, rtpCapabilities);
-
-    if (res.id) {
-      dispatch({ type: types.CONSUME_SUCCESS, payload: res });
-    } else {
-      dispatch({ type: types.CONSUME_FAIL, payload: "Failed to consume media" });
-    }
-  } catch (error) {
-    dispatch({ type: types.CONSUME_FAIL, payload: error.message });
-  }
-};

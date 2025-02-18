@@ -14,12 +14,13 @@ const Viewer = () => {
     try {
       setStatusMessage("Checking for live stream...");
       const res = await dispatch(wotgsocial.stream.checkStreamStatusAction());
-
+      console.log('CHECK STREAM TRIGGERED', res);
       if (res && res.isLive) {
         console.log("✅ Live stream detected, starting viewer...");
         setIsStreaming(true);
         startWatching();
       } else {
+        console.log("❌ No Live stream detected");
         setStatusMessage("No Livestream");
       }
     } catch (error) {

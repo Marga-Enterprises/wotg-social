@@ -12,41 +12,45 @@ const Viewer = () => {
 
   const checkLiveStream = async () => {
     try {
-      setStatusMessage("Checking for live stream...");
-      const res = await dispatch(wotgsocial.stream.checkStreamStatusAction());
-      console.log('CHECK STREAM TRIGGERED', res);
-      if (res && res.isLive) {
-        console.log("✅ Live stream detected, starting viewer...");
-        setIsStreaming(true);
-        startWatching();
-      } else {
-        console.log("❌ No Live stream detected");
-        setStatusMessage("No Livestream");
-      }
+        setStatusMessage("Checking for live stream...");
+        const res = await dispatch(wotgsocial.stream.checkStreamStatusAction());
+
+        console.log("CHECK STREAM RESPONSE:", res);
+
+        if (res && res.isLive && res.rtpCapabilities) {
+            console.log("✅ Live stream detected, fetching rtpCapabilities...");
+            startWatching(res.rtpCapabilities);
+            setIsStreaming(true);
+        } else {
+            console.log("❌ No Live stream detected");
+            setStatusMessage("No Livestream");
+        }
     } catch (error) {
-      console.error("❌ Error checking live stream:", error);
-      setStatusMessage("No Livestream");
+        console.error("❌ Error checking live stream:", error);
+        setStatusMessage("No Livestream");
     }
   };
 
-  const startWatching = async () => {
-    setStatusMessage("Waiting for broadcaster...");
+  const startWatching = async (rtpCapabilities) => {
+      setStatusMessage("Waiting for broadcaster...");
 
-    dispatch(wotgsocial.stream.consumeStreamAction()).then(res => {
-      if (!res || !res.payload) {
-        setStatusMessage("No Livestream");
-        return;
-      }
+      dispatch(wotgsocial.stream.consumeStreamAction({ rtpCapabilities }))
+          .then(res => {
+              if (!res || !res.payload) {
+                  setStatusMessage("No Livestream");
+                  return;
+              }
 
-      const stream = new MediaStream();
-      stream.addTrack(res.payload.track);
-      videoRef.current.srcObject = stream;
+              const stream = new MediaStream();
+              stream.addTrack(res.payload.track);
+              videoRef.current.srcObject = stream;
 
-      setStatusMessage("🟢 Live Stream Started!");
-    }).catch(error => {
-      console.error("❌ Error consuming stream:", error);
-      setStatusMessage("No Livestream");
-    });
+              setStatusMessage("🟢 Live Stream Started!");
+          })
+          .catch(error => {
+              console.error("❌ Error consuming stream:", error);
+              setStatusMessage("No Livestream");
+          });
   };
 
   useEffect(() => {

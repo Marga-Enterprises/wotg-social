@@ -79,6 +79,7 @@ export const connectTransportAction = (payload) => async (dispatch) => {
 // ✅ Consume Stream Action (Viewer)
 export const consumeStreamAction = (payload) => async (dispatch) => {
   try {
+    console.log('payloaddd consume', payload)
     dispatch({ type: types.CONSUME_STREAM_REQUEST });
 
     const res = await consumeStream(payload);

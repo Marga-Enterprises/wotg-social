@@ -100,7 +100,7 @@ const Viewer = () => {
 
         console.log('✅ Stream Consumption Response:', consumeResponse);
 
-        // **🎥 Create Consumer**
+        // **🎥 Create Consumer (Generate Track in Client)**
         const consumer = await transport.consume({
           id: consumeResponse.id,
           producerId: consumeResponse.producerId,

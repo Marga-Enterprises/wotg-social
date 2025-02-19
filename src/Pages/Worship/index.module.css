@@ -1,0 +1,48 @@
+/* Full-screen container */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100svh;
+  background-color: #121212; /* Dark mode background */
+}
+
+/* Video section at the top */
+.streamSection {
+  height: 50svh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+  border-bottom:solid white;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Chat section at the bottom */
+.chatSection {
+  background-color: #181818;
+  display: flex;
+  height: 50svh;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+  .container {
+    height: 100svh;
+  }
+
+  .streamSection {
+    flex: 2;
+  }
+
+  .chatSection {
+    flex: 1;
+  }
+}

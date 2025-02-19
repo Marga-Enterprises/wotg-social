@@ -1,113 +1,135 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import * as mediasoupClient from "mediasoup-client";
-import { wotgsocial } from "../../redux/combineActions";
-import styles from "./index.module.css"; // Import CSS
+import React, { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import * as mediasoupClient from 'mediasoup-client';
+import { wotgsocial } from '../../redux/combineActions';
+import styles from './index.module.css';
 
 const Viewer = () => {
   const dispatch = useDispatch();
   const videoRef = useRef(null);
-  const [statusMessage, setStatusMessage] = useState("Checking for live stream...");
+  const [statusMessage, setStatusMessage] = useState('Checking for live stream...');
   const [isStreaming, setIsStreaming] = useState(false);
   const [device, setDevice] = useState(null);
+  const [consumerTransport, setConsumerTransport] = useState(null);
 
-  const checkLiveStream = async () => {
-    try {
-        setStatusMessage("Checking for live stream...");
-        console.log("🔍 Checking live stream status...");
+  useEffect(() => {
+    const checkLiveStream = async () => {
+      try {
+        setStatusMessage('Checking for live stream...');
+        console.log('🔍 Checking live stream status...');
 
         const res = await dispatch(wotgsocial.stream.checkStreamStatusAction());
 
-        console.log("✅ CHECK STREAM RESPONSE:", res);
-
         if (res && res.isLive && res.rtpCapabilities) {
-            console.log("✅ Live stream detected, initializing viewer...");
-            startWatching(res.rtpCapabilities);
-            setIsStreaming(true);
+          console.log('✅ Live stream detected, initializing viewer...');
+          await initializeDevice(res.rtpCapabilities);
+          setIsStreaming(true);
         } else {
-            console.warn("❌ No Live stream detected");
-            setStatusMessage("No Livestream");
+          console.warn('❌ No live stream detected');
+          setStatusMessage('No Livestream');
         }
-    } catch (error) {
-        console.error("❌ Error checking live stream:", error);
-        setStatusMessage("No Livestream");
-    }
-  };
+      } catch (error) {
+        console.error('❌ Error checking live stream:', error);
+        setStatusMessage('No Livestream');
+      }
+    };
 
-  const startWatching = async (rtpCapabilities) => {
-    try {
-        setStatusMessage("Initializing viewer...");
-        console.log("🔄 Initializing Mediasoup Device...");
-
-        // ✅ Initialize Mediasoup Device
+    const initializeDevice = async (routerRtpCapabilities) => {
+      try {
+        console.log('🔄 Initializing Mediasoup Device...');
         const newDevice = new mediasoupClient.Device();
-        await newDevice.load({ routerRtpCapabilities: rtpCapabilities });
+        await newDevice.load({ routerRtpCapabilities });
         setDevice(newDevice);
+        console.log('✅ Mediasoup Device Initialized');
+        await createConsumerTransport(newDevice);
+      } catch (error) {
+        console.error('❌ Error initializing device:', error);
+        setStatusMessage('No Livestream');
+      }
+    };
 
-        console.log("✅ Mediasoup Device Initialized", newDevice.rtpCapabilities);
-
-        // ✅ Create Transport
-        console.log("🔄 Requesting Consumer Transport...");
-        const transportResponse = await dispatch(wotgsocial.stream.createTransportAction({ role: "consumer" }));
+    const createConsumerTransport = async (device) => {
+      try {
+        console.log('🔄 Requesting Consumer Transport...');
+        const transportResponse = await dispatch(wotgsocial.stream.createTransportAction({ role: 'consumer' }));
 
         if (!transportResponse || !transportResponse.id) {
-            console.error("❌ Failed to create transport", transportResponse);
-            setStatusMessage("No Livestream");
-            return;
+          console.error('❌ Failed to create transport', transportResponse);
+          setStatusMessage('No Livestream');
+          return;
         }
 
-        console.log("✅ Consumer Transport Created:", transportResponse);
+        console.log('✅ Consumer Transport Created:', transportResponse);
 
-        const consumerTransport = newDevice.createRecvTransport(transportResponse);
+        const transport = device.createRecvTransport(transportResponse);
+        setConsumerTransport(transport);
 
-        // ✅ Connect Transport
-        consumerTransport.on("connect", async ({ dtlsParameters }, callback) => {
-            console.log("🔄 Connecting Consumer Transport...");
-            await dispatch(wotgsocial.stream.connectTransportAction({ dtlsParameters, role: "consumer" }));
-            console.log("✅ Consumer Transport Connected");
+        transport.on('connect', async ({ dtlsParameters }, callback, errback) => {
+          try {
+            console.log('🔄 Connecting Consumer Transport...');
+            await dispatch(wotgsocial.stream.connectTransportAction({
+              dtlsParameters,
+              role: 'consumer',
+            }));
+            console.log('✅ Consumer Transport Connected');
             callback();
+            await consumeStream(device, transport);
+          } catch (error) {
+            console.error('❌ Error connecting transport:', error);
+            errback(error);
+          }
+        });
+      } catch (error) {
+        console.error('❌ Error creating consumer transport:', error);
+        setStatusMessage('No Livestream');
+      }
+    };
+
+    const consumeStream = async (device, transport) => {
+      try {
+        console.log('🔄 Requesting to consume stream...');
+        const consumeResponse = await dispatch(wotgsocial.stream.consumeStreamAction({
+          rtpCapabilities: device.rtpCapabilities,
+        }));
+
+        if (!consumeResponse || !consumeResponse.id) {
+          console.error('❌ Failed to consume stream', consumeResponse);
+          setStatusMessage('No Livestream');
+          return;
+        }
+
+        console.log('✅ Stream Consumption Response:', consumeResponse);
+
+        // **🎥 Create Consumer**
+        const consumer = await transport.consume({
+          id: consumeResponse.id,
+          producerId: consumeResponse.producerId,
+          kind: consumeResponse.kind,
+          rtpParameters: consumeResponse.rtpParameters,
+          paused: false, // Start consuming immediately
         });
 
-        // ✅ Consume Stream (Now includes DTLS Parameters)
-        console.log("🔄 Requesting to consume stream...");
-        const consumeResponse = await dispatch(
-            wotgsocial.stream.consumeStreamAction({ 
-                rtpCapabilities: newDevice.rtpCapabilities,
-                dtlsParameters: transportResponse.dtlsParameters // ✅ Pass DTLS parameters
-            })
-        );
-
-        console.log('CONSUME RES', consumeResponse);
-        console.log('CONSUME RES', consumeResponse.payload);
-
-        /*if (!consumeResponse || !consumeResponse.payload) {
-            console.error("❌ Failed to consume stream", consumeResponse);
-            setStatusMessage("No Livestream");
-            return;
-        }*/
-
-        console.log("✅ Stream Consumed:", consumeResponse);
+        console.log(`🎥 Consumer Created: ${consumer.id} | Kind: ${consumer.kind}`);
 
         const stream = new MediaStream();
-        stream.addTrack(consumeResponse.track);
+        stream.addTrack(consumer.track); // ✅ FIXED: Now using `consumer.track` correctly
 
-        console.log("🎥 MediaStream Created:", stream);
+        console.log('🎥 MediaStream Created:', stream);
 
         videoRef.current.srcObject = stream;
         videoRef.current.play()
-            .then(() => console.log("✅ Video Playback Started"))
-            .catch(error => console.error("❌ Video Play Error:", error));
+          .then(() => console.log('✅ Video Playback Started'))
+          .catch(error => console.error('❌ Video Play Error:', error));
 
-        setStatusMessage("🟢 Live Stream Started!");
-    } catch (error) {
-        console.error("❌ Error consuming stream:", error);
-        setStatusMessage("No Livestream");
-    }
-  };
+        setStatusMessage('🟢 Live Stream Started!');
+      } catch (error) {
+        console.error('❌ Error consuming stream:', error);
+        setStatusMessage('No Livestream');
+      }
+    };
 
-  useEffect(() => {
     checkLiveStream();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className={styles.container}>

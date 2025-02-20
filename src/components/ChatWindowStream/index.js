@@ -139,7 +139,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
   return (
     <div className={styles.chatContainer}>
-      <div className={styles.chatHeader}>
+      {/*<div className={styles.chatHeader}>
         {isMobile && onBackClick && selectedChatroomDetails && (
             <div className={styles.backButtonContainer}>
               <button
@@ -198,7 +198,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                 )}
               </div>
 
-              {/* Chat Name Display */}
+
               <p className={styles.chatNameHeader}>
                 {selectedChatroomDetails?.Participants?.length === 2
                   ? selectedChatroomDetails.Participants.filter(
@@ -212,7 +212,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               </p>
             </div>
           )}
-      </div>
+      </div>*/}
       <div ref={messagesEndRef} />
       <div className={styles.messageContainer}>
         {realtimeMessages && realtimeMessages.length > 0 ? (

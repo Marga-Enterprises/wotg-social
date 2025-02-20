@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import { wotgsocial, common } from '../../redux/combineActions';
@@ -13,6 +13,7 @@ const Page = () => {
   const { ui: { loading } } = useSelector((state) => state.common);
 
   let wotglivechatroom = process.env.NODE_ENV === 'development' ? 40 : 7;
+  const userRole = Cookies.get('role');
 
   // Local state
   const [messages, setMessages] = useState([]);
@@ -22,8 +23,8 @@ const Page = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [socket, setSocket] = useState(null);
   const [user, setUser] = useState(null);
-
-
+  const [videoId, setVideoId] = useState(''); // YouTube video ID
+  const [newVideoId, setNewVideoId] = useState('');
 
   // Fetch user authentication details
   useEffect(() => {
@@ -71,6 +72,19 @@ const Page = () => {
     }
   }, [dispatch, isAuthenticated]);
 
+  const handleUpdateWorship = async () => {
+    if (!newVideoId) return;
+
+    dispatch(common.ui.setLoading());
+    const res = await dispatch(wotgsocial.worship.createWorshipServiceAction(newVideoId));
+
+    dispatch(common.ui.clearLoading());
+    if (res.success) {
+      setVideoId(newVideoId);
+      setNewVideoId('');
+    }
+  };
+
   // Fetch Messages
   const fetchMessages = useCallback(async (chatroomId) => {
     if (!chatroomId || !isAuthenticated) return;
@@ -91,6 +105,17 @@ const Page = () => {
       fetchChatrooms();
     }
   }, [fetchChatrooms, isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(wotgsocial.worship.getWorshipServiceAction()).then((res) => {
+        if (res.success) {
+          setVideoId(res.data.videoId); // Store video ID dynamically
+        }
+      });
+    }
+  }, [dispatch, isAuthenticated]);
+  
 
   // Fetch messages when chatroom changes
   useEffect(() => {
@@ -179,21 +204,23 @@ const Page = () => {
     };
   }, [socket, selectedChatroom]);
 
+  console.log('userRole:', userRole);
+
   return (
     <div className={styles.container}>
       {/* Livestream at the top */}
       <div className={styles.streamSection}>
-        <iframe
-          className={styles.video}
-          src="https://www.youtube.com/embed/gTJLjDQ9jhs?si=VwwpL27BgxfxtHGb"
-          title="WOTG Live Stream"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
+        <iframe 
+            width="100%" 
+            height="100%" 
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1`}
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
         />
       </div>
-
+      <div className={styles.overlay}/>
       {/* Chat Window at the bottom */}
       {isAuthenticated && selectedChatroom && (
         <div className={styles.chatSection}>
@@ -204,6 +231,18 @@ const Page = () => {
             selectedChatroomDetails={selectedChatroomDetails}
             userId={user?.id}
           />
+        </div>
+      )}
+
+      { (userRole === 'admin' || userRole === 'owner') && (
+        <div className={styles.adminPanel}>
+          <input
+            type="text"
+            placeholder="Enter new YouTube Video ID"
+            value={newVideoId}
+            onChange={(e) => setNewVideoId(e.target.value)}
+          />
+          <button onClick={handleUpdateWorship}>Update</button>
         </div>
       )}
     </div>

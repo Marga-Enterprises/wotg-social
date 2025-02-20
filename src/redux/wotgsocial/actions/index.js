@@ -4,6 +4,7 @@ import * as message from './message';
 import * as subscription from './subscription';
 import * as meetingroom from './meetingroom';
 import * as stream from './stream';
+import * as worship from './worship';
 
 export {
   user,
@@ -11,5 +12,6 @@ export {
   message,
   subscription,
   meetingroom,
-  stream
+  stream,
+  worship
 };

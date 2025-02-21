@@ -12,7 +12,7 @@ const ProfileSidebar = ({ onOpenProfileModal }) => {
   const [userInitials, setUserInitials] = useState('');
 
   const backendUrl = 
-  process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://chat.wotgonline.com/api';
+  process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://community.wotgonline.com/api';
 
   useEffect(() => {
     if (storedAccount) {

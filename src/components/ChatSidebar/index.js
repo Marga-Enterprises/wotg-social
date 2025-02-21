@@ -15,7 +15,7 @@ const ChatSidebar = ({
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
-    : 'https://chat.wotgonline.com/api';
+    : 'https://community.wotgonline.com/api';
 
   // Detect screen size (mobile or not)
   useEffect(() => {

@@ -70,7 +70,7 @@ const Page = () => {
     useEffect(() => {
         const socketUrl = process.env.NODE_ENV === 'development' 
             ? 'http://localhost:5000' 
-            : 'https://chat.wotgonline.com';
+            : 'https://community.wotgonline.com';
 
         const newSocket = io(socketUrl); // Adjust to your backend server
         setSocket(newSocket);

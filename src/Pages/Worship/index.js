@@ -46,7 +46,7 @@ const Page = () => {
 
     const socketUrl = process.env.NODE_ENV === 'development' 
       ? 'http://localhost:5000' 
-      : 'https://chat.wotgonline.com';
+      : 'https://community.wotgonline.com';
 
     const newSocket = io(socketUrl, { transports: ['websocket'] });
     setSocket(newSocket);

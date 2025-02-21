@@ -28,7 +28,7 @@ const Page = () => {
         dispatch(wotgsocial.user.loginFunction(payload))
             .then((res) => {
                 if (res.success) {
-                    window.location.replace('/worship');
+                    window.location.replace('/menu');
                 } else {
                     setOpenErrorSnackbar(true);
                     setErrMsg(res.payload);
@@ -47,7 +47,7 @@ const Page = () => {
     useEffect(() => {
         const token = Cookies.get('token');
         if (token) {
-            navigate('/worship');
+            navigate('/menu');
         }
     }, [navigate]);
 

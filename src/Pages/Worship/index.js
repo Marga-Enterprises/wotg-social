@@ -5,7 +5,7 @@ import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 import styles from './index.module.css';
 import ChatWindowStream from '../../components/ChatWindowStream';
-import ProfileSidebarStream from '../../components/ProfileSidebarStream';
+import wotgLogo from './wotgLogo.jpg';
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -209,18 +209,29 @@ const Page = () => {
 
   return (
     <div className={styles.container}>
-      {/* Left Column */}
-      <div className={styles.leftColumn}>
-        <ProfileSidebarStream />
-      </div>
-
       {/* Right Column */}
       <div className={styles.rightColumn}>
+
+        {/* Navbar at the Top */}
+        <div className={styles.navbar}>
+          {/* Logo on the Left */}
+          <div className={styles.logo}>
+            <img src={wotgLogo} alt="WOTG Logo"/>
+          </div>
+
+          {/* Links on the Right */}
+          <div className={styles.navLinks}>
+            <a href="/chat" className={styles.navLink}>Chat</a>
+            <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
+          </div>
+        </div>
+
+        {/* Livestream Section */}
         <div className={styles.streamSection}>
           <iframe 
               width="100%" 
               height="100%" 
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&cc_load_policy=0&rel=0&modestbranding=1&controls=0`} 
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&cc_load_policy=0&rel=0&modestbranding=1&controls=0&iv_load_policy=3&disablekb=1`} 
               title="YouTube video player" 
               frameBorder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -228,8 +239,10 @@ const Page = () => {
               allowFullScreen
           />
         </div>
+
         <div className={styles.overlay}/>
-        {/* Chat Window at the bottom */}
+
+        {/* Chat Window at the Bottom */}
         {isAuthenticated && selectedChatroom && (
           <div className={styles.chatSection}>
             <ChatWindowStream
@@ -242,6 +255,7 @@ const Page = () => {
           </div>
         )}
 
+        {/* Admin Panel for Updating Livestream (Admin Only) */}
         { (userRole === 'admin' || userRole === 'owner') && (
           <div className={styles.adminPanel}>
             <input
@@ -254,6 +268,7 @@ const Page = () => {
           </div>
         )}
       </div>
+
     </div>
   );
 };

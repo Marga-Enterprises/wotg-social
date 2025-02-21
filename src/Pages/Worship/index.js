@@ -5,6 +5,7 @@ import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 import styles from './index.module.css';
 import ChatWindowStream from '../../components/ChatWindowStream';
+import ProfileSidebarStream from '../../components/ProfileSidebarStream';
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -208,44 +209,51 @@ const Page = () => {
 
   return (
     <div className={styles.container}>
-      {/* Livestream at the top */}
-      <div className={styles.streamSection}>
-        <iframe 
-            width="100%" 
-            height="100%" 
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&cc_load_policy=0&rel=0&modestbranding=1&controls=0`} 
-            title="YouTube video player" 
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerPolicy="strict-origin-when-cross-origin" 
-            allowFullScreen
-        />
+      {/* Left Column */}
+      <div className={styles.leftColumn}>
+        <ProfileSidebarStream />
       </div>
-      <div className={styles.overlay}/>
-      {/* Chat Window at the bottom */}
-      {isAuthenticated && selectedChatroom && (
-        <div className={styles.chatSection}>
-          <ChatWindowStream
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            selectedChatroom={selectedChatroom}
-            selectedChatroomDetails={selectedChatroomDetails}
-            userId={user?.id}
-          />
-        </div>
-      )}
 
-      { (userRole === 'admin' || userRole === 'owner') && (
-        <div className={styles.adminPanel}>
-          <input
-            type="text"
-            placeholder="Enter new YouTube Video ID"
-            value={newVideoId}
-            onChange={(e) => setNewVideoId(e.target.value)}
+      {/* Right Column */}
+      <div className={styles.rightColumn}>
+        <div className={styles.streamSection}>
+          <iframe 
+              width="100%" 
+              height="100%" 
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&cc_load_policy=0&rel=0&modestbranding=1&controls=0`} 
+              title="YouTube video player" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              referrerPolicy="strict-origin-when-cross-origin" 
+              allowFullScreen
           />
-          <button onClick={handleUpdateWorship}>Update</button>
         </div>
-      )}
+        <div className={styles.overlay}/>
+        {/* Chat Window at the bottom */}
+        {isAuthenticated && selectedChatroom && (
+          <div className={styles.chatSection}>
+            <ChatWindowStream
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              selectedChatroom={selectedChatroom}
+              selectedChatroomDetails={selectedChatroomDetails}
+              userId={user?.id}
+            />
+          </div>
+        )}
+
+        { (userRole === 'admin' || userRole === 'owner') && (
+          <div className={styles.adminPanel}>
+            <input
+              type="text"
+              placeholder="Enter new YouTube Video ID"
+              value={newVideoId}
+              onChange={(e) => setNewVideoId(e.target.value)}
+            />
+            <button onClick={handleUpdateWorship}>Update</button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

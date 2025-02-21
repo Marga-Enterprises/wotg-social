@@ -1,6 +1,13 @@
 /* Full-screen container */
 .container {
   display: flex;
+  width: 100%;
+  height: 100svh;
+  background-color: #121212; /* Dark mode background */
+}
+
+.rightColumn {
+  display: flex;
   flex-direction: column;
   width: 100%;
   height: 100svh;
@@ -33,10 +40,9 @@
 }
 
 .overlay {
-  margin-top: -3rem;
+  margin-top: -2.6rem;
   width: 100%;
-  height: 30px;
-  background-color: #ece9e9; /* Slight transparency */
+  background-color: #000; /* Slight transparency */
 }
 
 .video {

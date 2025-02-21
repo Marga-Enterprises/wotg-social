@@ -213,11 +213,12 @@ const Page = () => {
         <iframe 
             width="100%" 
             height="100%" 
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1`}
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&cc_load_policy=0&rel=0&modestbranding=1&controls=0`} 
             title="YouTube video player" 
-            frameborder="0" 
+            frameBorder="0" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerpolicy="strict-origin-when-cross-origin" 
+            referrerPolicy="strict-origin-when-cross-origin" 
+            allowFullScreen
         />
       </div>
       <div className={styles.overlay}/>

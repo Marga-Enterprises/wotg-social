@@ -28,7 +28,7 @@ const Page = () => {
   const [user, setUser] = useState(null);
   const [videoId, setVideoId] = useState(''); // YouTube video ID
   const [newVideoId, setNewVideoId] = useState('');
-  const [viewersCount, setViewersCount] = useState(0);
+  const [viewersCount, setViewersCount] = useState(1);
 
   // Fetch user authentication details
   useEffect(() => {

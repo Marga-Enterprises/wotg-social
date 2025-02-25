@@ -230,10 +230,12 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                     key={index}
                     className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
                   >
-                    {!isSender && receiver?.user?.user_profile_picture && (
+                    {!isSender && (
                       <img
-                        src={`${backendUrl}/uploads/${receiver.user.user_profile_picture}`}
-                        alt={receiver.user.user_fname}
+                        src={receiver?.user?.user_profile_picture 
+                          ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
+                          : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
+                        alt={receiver?.user?.user_fname || "User Avatar"}
                         className={styles.receiverAvatar}
                       />
                     )}

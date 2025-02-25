@@ -215,42 +215,50 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
       </div>*/}
       <div ref={messagesEndRef} />
       <div className={styles.messageContainer}>
-        {realtimeMessages && realtimeMessages.length > 0 ? (
-          realtimeMessages
-            .filter((msg) => msg.chatroomId === selectedChatroom)
-            .map((msg, index) => {
-              const isSender = msg.senderId === userId;
-              return (
-                <div
-                  key={index}
-                  className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
-                >
+        {realtimeMessages &&
+          realtimeMessages.length > 0 ? (
+            realtimeMessages
+              .filter((msg) => msg.chatroomId === selectedChatroom)
+              .map((msg, index) => {
+                const isSender = msg.senderId === userId;
+                const receiver = selectedChatroomDetails?.Participants?.find(
+                  (participant) => participant.user.id === msg.senderId
+                );
+
+                return (
                   <div
-                    className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
+                    key={index}
+                    className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
                   >
-                    { !isSender && (
-                      <>
-                        { selectedChatroomDetails?.Participants?.length > 2 && (
-                          <p className={styles.senderName}>
-                            {msg?.sender?.user_fname && msg?.sender?.user_lname
-                              ? `${msg.sender.user_fname} ${msg.sender.user_lname}`
-                              : 'Unknown User'}
-                          </p>
-                        )}
-                      </>
+                    {!isSender && receiver?.user?.user_profile_picture && (
+                      <img
+                        src={`${backendUrl}/uploads/${receiver.user.user_profile_picture}`}
+                        alt={receiver.user.user_fname}
+                        className={styles.receiverAvatar}
+                      />
                     )}
-                    <p className={styles.messageContent}>
-                      {msg?.content ? renderMessageContent(msg.content) : 'No content available'}
-                    </p>
+
+                    <div
+                      className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
+                    >
+                      {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
+                        <p className={styles.senderName}>
+                          {msg?.sender?.user_fname} {msg?.sender?.user_lname}
+                        </p>
+                      )}
+
+                      <p className={styles.messageContent}>
+                        {msg?.content ? renderMessageContent(msg.content) : 'No content available'}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              );
-            })
-        ) : (
-          <div className={styles.noMessages}>
-            <p>Say 'hi' and start messaging</p>
-          </div>
-        )}
+                );
+              })
+          ) : (
+            <div className={styles.noMessages}>
+              <p>Say 'hi' and start messaging</p>
+            </div>
+          )}
       </div>
 
       <div className={styles.inputContainer}>

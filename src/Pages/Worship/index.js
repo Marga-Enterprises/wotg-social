@@ -221,7 +221,7 @@ const Page = () => {
 
           {/* Links on the Right */}
           <div className={styles.navLinks}>
-            <a href="/chat" className={styles.navLink}>Chat</a>
+            <a href="/" className={styles.navLink}>Chat</a>
             <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
           </div>
         </div>
@@ -240,7 +240,7 @@ const Page = () => {
           />
         </div>
 
-        <div className={styles.overlay}/>
+        {/*<div className={styles.overlay}/>*/}
 
         {/* Chat Window at the Bottom */}
         {isAuthenticated && selectedChatroom && (

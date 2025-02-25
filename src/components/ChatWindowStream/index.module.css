@@ -254,3 +254,12 @@
   color: #fff;
   font-weight: bold;
 }
+
+.receiverAvatar {
+  width: 40px; /* Adjust size as needed */
+  height: 40px;
+  border-radius: 50%; /* Makes it a circle */
+  object-fit: cover; /* Ensures image fits without distortion */
+  margin-right: 10px; /* Spacing between the avatar and message */
+  border: 2px solid #ddd; /* Optional: Adds a subtle border */
+}

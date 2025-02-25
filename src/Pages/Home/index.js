@@ -225,28 +225,33 @@ const Page = () => {
             dispatch(common.ui.setLoading());
     
             const res = await dispatch(
-                wotgsocial.chatroom.getAllChatroomsAction({ search: searchQuery }) // Pass the search query here
+                wotgsocial.chatroom.getAllChatroomsAction({ search: searchQuery }) // Pass the search query
             );
     
             dispatch(common.ui.clearLoading());
     
             if (res.success) {
-                setChatrooms(res.data);
+                // Determine the chatroom ID to hide based on the environment
+                const hiddenChatroomId = process.env.NODE_ENV === "development" ? 40 : 7;
     
-                if (res.data.length > 0) {
+                // Filter out the chatroom ID to be hidden
+                const filteredChatrooms = res.data.filter(chat => chat.id !== hiddenChatroomId);
+    
+                setChatrooms(filteredChatrooms);
+    
+                if (filteredChatrooms.length > 0) {
                     if (chatId) {
                         handleSelectChatroom(chatId);
                     } else {
                         if (!searchQuery) {
-                            handleSelectChatroom(res.data[0].id);
+                            handleSelectChatroom(filteredChatrooms[0].id);
                         }
                     }
                 }
             }
         },
         [dispatch, isAuthenticated, searchQuery] // Add searchQuery as a dependency
-    );
-    
+    );    
 
     // Fetch chatrooms on component mount
     useEffect(() => {

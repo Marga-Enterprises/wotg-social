@@ -6,6 +6,8 @@ import Cookies from 'js-cookie';
 import styles from './index.module.css';
 import ChatWindowStream from '../../components/ChatWindowStream';
 import wotgLogo from './wotgLogo.jpg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -26,6 +28,7 @@ const Page = () => {
   const [user, setUser] = useState(null);
   const [videoId, setVideoId] = useState(''); // YouTube video ID
   const [newVideoId, setNewVideoId] = useState('');
+  const [viewersCount, setViewersCount] = useState(0);
 
   // Fetch user authentication details
   useEffect(() => {
@@ -205,7 +208,24 @@ const Page = () => {
     };
   }, [socket, selectedChatroom]);
 
-  console.log('userRole:', userRole);
+  useEffect(() => {
+    if (!socket) return;
+  
+    // Notify server that this user joined the worship page
+    socket.emit("join_worship");
+  
+    // Listen for viewer count updates from the server
+    socket.on("update_viewers", (count) => {
+      setViewersCount(count);
+    });
+  
+    // Cleanup: Notify server when user leaves the page
+    return () => {
+      socket.emit("leave_worship");
+      socket.off("update_viewers");
+    };
+  }, [socket]);
+  
 
   return (
     <div className={styles.container}>
@@ -238,6 +258,10 @@ const Page = () => {
               referrerPolicy="strict-origin-when-cross-origin" 
               allowFullScreen
           />
+        </div>
+
+        <div className={styles.viewerCounter}>
+          <FontAwesomeIcon icon={faEye} className={styles.sendIcon}/> {viewersCount} Viewers
         </div>
 
         {/*<div className={styles.overlay}/>*/}

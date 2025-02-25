@@ -146,6 +146,30 @@
   background-color: #54a79b;
 }
 
+.viewerCount {
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  background: #ff0000;
+  padding: 6px 10px;
+  border-radius: 12px;
+  margin-right: 10px;
+}
+
+/* Small viewer counter under livestream */
+.viewerCounter {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+  padding: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+
 
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {

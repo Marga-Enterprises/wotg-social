@@ -343,7 +343,7 @@
   transform: translateX(-50%);
   display: flex;
   flex-direction: column; /* Vertical layout */
-  gap: 10px;
+  gap: 8px;
   background: white;
   border-radius: 12px;
   padding: 10px;
@@ -363,9 +363,9 @@
 .reactionDrawer button {
   border: none;
   background: none;
-  font-size: 28px; /* Bigger reactions */
+  font-size: 25px; /* Bigger reactions */
   cursor: pointer;
-  padding: 8px;
+  padding: 4px;
   transition: transform 0.2s ease-in-out;
 }
 

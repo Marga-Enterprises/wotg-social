@@ -11,7 +11,6 @@ import { jwtDecode } from 'jwt-decode';
 import * as types from '../types';
 
 export const getAllUsersAction = (payload) => async (dispatch) => {
-    console.log('PAYLOAD USER ACTION', payload);
     return getAllUsers(payload).then((res) => {
         if (res.success) {
             dispatch({
@@ -30,7 +29,6 @@ export const getAllUsersAction = (payload) => async (dispatch) => {
 };
 
 export const updateUserAction = (payload) => async (dispatch) => {
-    console.log('[[[[[[[[[[[[PAYLOAD USER ACTION]]]]]]]]]]]]', payload);
     return updateUser(payload).then((res) => {
         if (res.success) {
             dispatch({
@@ -70,7 +68,6 @@ export const setAuthorizationHeader = (token) => {
     const bearerToken = `Bearer ${token}`;
     Cookies.set('token', token); // Set cookie properly
     axios.defaults.headers.common.Authorization = bearerToken;
-    console.log('Token Set in Axios Header:', bearerToken); // Verify header set
 };
 
 
@@ -92,15 +89,9 @@ export const loginFunction = (payload) => async (dispatch) => {
         const res = await loginFunc(payload);
         const { success, data, msg } = res;
 
-        console.log('RESPONSEEEE', res);
-
         if (success) {
-            console.log('RESPONSEEEE', res);
             const { token } = data;
             const account = jwtDecode(token);
-
-            console.log('ACCOUNT', account);
-
             setAuthorizationHeader(token);
             dispatch(setUserDetails(account));
         }
@@ -108,7 +99,6 @@ export const loginFunction = (payload) => async (dispatch) => {
         return res; // Return the response object in both success and error cases
 
     } catch (err) {
-        console.log('ERRORRRRRR', err);
         return dispatch({
         type: types.LOGIN_FAIL,
         payload: err.response.data.msg,
@@ -120,8 +110,6 @@ export const addUser = (payload) => async (dispatch) => {
     try {
         const res = await registerFunc(payload);
         const { success, data, msg } = res;
-
-        console.log('RESPONSEEEE SA REDUX', res);
 
         if (success) {
             dispatch({

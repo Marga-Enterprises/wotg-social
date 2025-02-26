@@ -26,7 +26,7 @@ const MeetingRoomCreateForm = ({ onClose }) => {
       launchJitsiMeeting(res.data.name); // Assuming res.data contains the newly created room details
       onClose(); // Close the modal if successful
     } else {
-      console.log('Error creating room:', res.msg); // Handle error if needed
+
     }
   };
 
@@ -46,7 +46,7 @@ const MeetingRoomCreateForm = ({ onClose }) => {
 
       // Optional: You can listen for events here, like when the meeting has started
       api.addEventListener('videoConferenceJoined', () => {
-        console.log('Successfully joined the meeting!');
+
       });
     } else {
       console.error('Jitsi container not found. Make sure it is rendered in the DOM.');

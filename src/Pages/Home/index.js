@@ -77,12 +77,12 @@ const Page = () => {
 
         // Log successful connection
         newSocket.on('connect', () => {
-            console.log('Socket connected successfully:', newSocket.id);
+            // console.log('Socket connected successfully:', newSocket.id);
         });
 
         // Log disconnection
         newSocket.on('disconnect', () => {
-            console.log('Socket disconnected');
+            // console.log('Socket disconnected');
         });
 
         return () => {
@@ -112,10 +112,10 @@ const Page = () => {
     
     // Web Push Notification: Request Permission and Subscribe
     const subscribeToPushNotifications = async () => {
-        console.log('Subscribing to push notifications...');
+        // console.log('Subscribing to push notifications...');
     
         if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-            console.error('Push notifications are not supported in this browser');
+            // console.error('Push notifications are not supported in this browser');
             return;
         }
     
@@ -124,16 +124,16 @@ const Page = () => {
     
         // Proceed only if permission is granted
         if (permission !== 'granted') {
-            console.log('Push notification permission denied');
+            // console.log('Push notification permission denied');
             return;
         } else {
-            console.log('Push notification permission granted');
+            // console.log('Push notification permission granted');
     
             // Service worker registration: check if it's already registered
             let registration;
             try {
                 registration = await navigator.serviceWorker.register('/service-worker.js');
-                console.log('Service Worker registered successfully.');
+                // console.log('Service Worker registered successfully.');
             } catch (error) {
                 console.error('Service Worker registration failed:', error);
                 return;
@@ -144,7 +144,7 @@ const Page = () => {
     
             // If a subscription exists, log it and proceed
             if (existingSubscription) {
-                console.log('Existing subscription found. No need to re-subscribe:', existingSubscription);
+                // console.log('Existing subscription found. No need to re-subscribe:', existingSubscription);
             }
     
             // Generate a unique deviceId for this device
@@ -158,7 +158,7 @@ const Page = () => {
             };
     
             const deviceId = getDeviceId();
-            console.log('Device ID:', deviceId);
+            // console.log('Device ID:', deviceId);
     
             // Now subscribe with the correct applicationServerKey (VAPID public key)
             const subscription = existingSubscription || await registration.pushManager.subscribe({
@@ -166,7 +166,7 @@ const Page = () => {
                 applicationServerKey: process.env.REACT_APP_VAPID_PUBLIC_KEY, // VAPID public key
             });
     
-            console.log('New push notification subscription:', subscription);
+            //console.log('New push notification subscription:', subscription);
     
             // Prepare subscription data
             const arrayBufferToBase64 = (buffer) => {
@@ -194,24 +194,24 @@ const Page = () => {
                 }
             };
     
-            console.log('Subscription Data:', subscriptionData);
+            // console.log('Subscription Data:', subscriptionData);
     
             // Now send the subscriptionData to the backend
             try {
-                console.log('Attempting to subscribe:', subscriptionData);
+                // console.log('Attempting to subscribe:', subscriptionData);
     
                 // Dispatch subscription to backend
                 const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
     
                 // Handle backend response
                 if (res.error && res.error.status === 400) {
-                    console.log('Subscription already exists in the backend for this device.');
+                    // console.log('Subscription already exists in the backend for this device.');
                     return null; // Return null if the subscription already exists in the backend
                 }
     
-                console.log('Subscription successfully saved:', res);
+                // console.log('Subscription successfully saved:', res);
             } catch (error) {
-                console.error('Error occurred while subscribing:', error);
+                // console.error('Error occurred while subscribing:', error);
                 return null; // Return null in case of any errors
             }
         }
@@ -366,7 +366,7 @@ const Page = () => {
         if (!socket || !user) return;
     
         socket.on('new_participants', (updatedChatroom) => {
-            console.log("New participant added, updating sidebar:", updatedChatroom);
+            // console.log("New participant added, updating sidebar:", updatedChatroom);
     
             // Check if the current user is in the updated chatroom
             const isCurrentUserParticipant = updatedChatroom.Participants?.some(
@@ -379,7 +379,7 @@ const Page = () => {
                     const chatroomExists = prevChatrooms.some(chat => chat.id === updatedChatroom.id);
     
                     if (!chatroomExists) {
-                        console.log("Adding new chatroom to sidebar:", updatedChatroom);
+                        // console.log("Adding new chatroom to sidebar:", updatedChatroom);
                         return [...prevChatrooms, updatedChatroom]; // Add chatroom to the sidebar
                     }
     

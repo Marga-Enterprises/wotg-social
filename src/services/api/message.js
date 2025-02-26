@@ -10,3 +10,7 @@ export async function getMessagesByChatroom(chatroomId, payload = {}) {
 export async function sendMessage(payload) {
   return POST('/messages', payload); // Payload should include content, senderId, and chatroomId
 }
+
+export async function reactToMessage(payload) {
+  return POST('/messages/react', payload); // Payload should include messageId, userId, and react
+}

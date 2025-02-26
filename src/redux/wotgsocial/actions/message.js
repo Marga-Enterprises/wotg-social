@@ -1,4 +1,4 @@
-import { getMessagesByChatroom, sendMessage } from '../../../services/api/message';
+import { getMessagesByChatroom, sendMessage, reactToMessage } from '../../../services/api/message';
 
 // Types
 import * as types from '../types';
@@ -33,6 +33,25 @@ export const sendMessageAction = (payload) => async (dispatch) => {
     } else {
       dispatch({
         type: types.MESSAGE_CREATE_FAIL,
+        payload: res.msg,
+      });
+    }
+
+    return res;
+  });
+};
+
+// React to Message
+export const reactToMessageAction = (payload) => async (dispatch) => {
+  return reactToMessage(payload).then((res) => {
+    if (res.success) {
+      dispatch({
+        type: types.REACT_TO_MESSAGE_SUCCESS,
+        payload: res.data,
+      });
+    } else {
+      dispatch({
+        type: types.REACT_TO_MESSAGE_FAIL,
         payload: res.msg,
       });
     }

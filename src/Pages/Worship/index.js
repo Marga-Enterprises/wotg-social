@@ -30,6 +30,7 @@ const Page = () => {
   const [newVideoId, setNewVideoId] = useState('');
   const [viewersCount, setViewersCount] = useState(1);
   const [reactions, setReactions] = useState([]);
+  // const [messageReacts, setMessageReacts] = useState([]);
   
   // Fetch user authentication details
   useEffect(() => {
@@ -55,8 +56,15 @@ const Page = () => {
     const newSocket = io(socketUrl, { transports: ['websocket'] });
     setSocket(newSocket);
 
-    newSocket.on('connect', () => console.log('Socket connected:', newSocket.id));
-    newSocket.on('disconnect', () => console.log('Socket disconnected'));
+    /*
+    newSocket.on('connect', () => {
+      console.log('🚀 Socket connected!');
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('🚀 Socket disconnected!');
+    });
+    */
 
     return () => newSocket.disconnect();
   }, [isAuthenticated]);
@@ -187,6 +195,23 @@ const Page = () => {
 
       return () => socket.off("new_reaction");
   }, [socket]);
+
+  /*
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("new_message_react", (messageReact) => {
+        setMessageReacts((prev) => [...prev, messageReact]);
+
+        // Remove message reaction after animation
+        setTimeout(() => {
+            setMessageReacts((prev) => prev.slice(1));
+        }, 3000);
+    });
+
+    return () => socket.off("new_message_react");
+  }, [socket]);
+  */
 
   // Real-time message updates
   useEffect(() => {

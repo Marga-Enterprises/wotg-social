@@ -6,6 +6,7 @@ import SignIn from './Pages/SignIn';
 import SignUp from './Pages/SignUp';
 import Worship from './Pages/Worship';
 import Menu from './Pages/Menu';
+import Default from './Pages/Default';
 
 // COMPONENTS
 // import Navbar from './components/Navbar';
@@ -26,6 +27,7 @@ function App() {
             <Route path="/" exact element={<AuthRouter><Home /></AuthRouter>} />
             <Route path="/login" exact element={<SignIn />} />
             <Route path="/register" exact element={<SignUp />} />
+            <Route path="*" element={<Default />} />
           </Routes>
         </main>
         {/*<footer className="footer"><Footer /></footer>*/}

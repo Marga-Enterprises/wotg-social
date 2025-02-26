@@ -190,9 +190,8 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               }}
             >
               {reaction.type === "heart" && "❤️"}
-              {reaction.type === "raised_hands" && "🙌"}
+              {reaction.type === "clap" && "👏"}
               {reaction.type === "pray" && "🙏"}
-              {reaction.type === "smile" && "😊"}
             </span>
           );
         })}
@@ -284,9 +283,9 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           {/* Reaction Drawer (Visible when showReactions is true) */}
           <div className={`${styles.reactionDrawer} ${showReactions ? styles.open : ""}`}>
             <button onClick={() => { handleSendReaction("heart"); }}>❤️</button>
-            <button onClick={() => { handleSendReaction("raised_hands"); }}>🙌</button>
+            <button onClick={() => { handleSendReaction("clap"); }}>👏</button>
             <button onClick={() => { handleSendReaction("pray"); }}>🙏</button>
-            <button onClick={() => { handleSendReaction("smile"); }}>😊</button>
+            {/*<button onClick={() => { handleSendReaction("smile"); }}>😊</button>*/}
           </div>
         </div>
 

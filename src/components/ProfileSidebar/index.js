@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import Cookies from 'js-cookie';
 import { wotgsocial } from '../../redux/combineActions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignalStream } from '@fortawesome/free-solid-svg-icons';
+import { faBroadcastTower, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 const ProfileSidebar = ({ onOpenProfileModal }) => {
   const dispatch = useDispatch();
@@ -52,21 +52,20 @@ const ProfileSidebar = ({ onOpenProfileModal }) => {
       )}
 
       <div>
-        <a href="/menu">
-          <FontAwesomeIcon icon="fa-solid fa-signal-stream" />
-        </a>
+        <div>
+          <a href="/worship">
+            <FontAwesomeIcon size="2x" icon={faBroadcastTower} className={styles.headerIcon}/>
+          </a>
+        </div>
 
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          strokeWidth="1.5" 
-          stroke="currentColor" 
-          onClick={handleSignOut}
-          className={styles.headerIcon}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-        </svg>
+        <div>
+          <FontAwesomeIcon 
+            icon={faRightFromBracket} 
+            size="2x" 
+            className={styles.headerIcon}
+            onClick={handleSignOut}
+          />
+        </div>
       </div>
     </div>
   );

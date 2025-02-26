@@ -29,7 +29,8 @@ const Page = () => {
   const [videoId, setVideoId] = useState(''); // YouTube video ID
   const [newVideoId, setNewVideoId] = useState('');
   const [viewersCount, setViewersCount] = useState(1);
-
+  const [reactions, setReactions] = useState([]);
+  
   // Fetch user authentication details
   useEffect(() => {
     const account = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
@@ -162,6 +163,31 @@ const Page = () => {
     dispatch(wotgsocial.message.sendMessageAction(message));
   };
 
+  const sendReaction = (reaction) => {
+      if (!socket) {
+          console.error("⚠️ Socket is not connected! Cannot send reaction.");
+          return;
+      }
+
+      socket.emit("send_reaction", reaction);
+  };
+
+  // Listen for real-time reactions from the server
+  useEffect(() => {
+      if (!socket) return;
+
+      socket.on("new_reaction", (reaction) => {
+          setReactions((prev) => [...prev, { id: Date.now(), type: reaction }]);
+
+          // Remove reaction after animation
+          setTimeout(() => {
+              setReactions((prev) => prev.slice(1));
+          }, 3000);
+      });
+
+      return () => socket.off("new_reaction");
+  }, [socket]);
+
   // Real-time message updates
   useEffect(() => {
     if (!socket) return;
@@ -275,6 +301,8 @@ const Page = () => {
               selectedChatroom={selectedChatroom}
               selectedChatroomDetails={selectedChatroomDetails}
               userId={user?.id}
+              onSendReaction={sendReaction}
+              reactions={reactions}
             />
           </div>
         )}

@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFaceSmile, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faFaceSmile, faPaperPlane, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 
 import styles from './index.module.css';
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal }) => {
+const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, selectedChatroomDetails, onSendReaction, reactions }) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
@@ -16,6 +16,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   const [message, setMessage] = useState('');
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showReactions, setShowReactions] = useState(false);
 
   // Reference for scrolling
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
@@ -63,7 +64,15 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
         textarea.style.height = 'auto'; // Force height reset
       }
     }
-  };  
+  };
+  
+  const handleSendReaction = (reaction) => {
+      if (onSendReaction) {
+          onSendReaction(reaction);
+      }
+  };
+
+
 
   const renderMessageContent = (content) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to detect URLs
@@ -137,8 +146,58 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     };
   }, []);
 
+  const formatName = (name) => {
+    if (!name) return "";
+    return name
+      .toLowerCase() // Convert the whole string to lowercase
+      .split(" ") // Split into an array of words
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+      .join(" "); // Join words back into a single string
+  }; 
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(`.${styles.reactionButton}`)) {
+        setShowReactions(false);
+      }
+    };
+  
+    if (showReactions) {
+      document.addEventListener("click", handleClickOutside);
+    }
+  
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showReactions]);
+
   return (
     <div className={styles.chatContainer}>
+      <div className={styles.reactionContainer}>
+        {reactions.map((reaction) => {
+          const randomX = Math.random() * 80 - 40; // Smooth swerving left-right movement
+          const randomSpeed = Math.random() * 1 + 0.6; // Faster speed (0.6s - 1.6s)
+          const randomStart = Math.random() * 80 + 10; // Random starting position (10% - 90%)
+
+          return (
+            <span
+              key={reaction.id}
+              className={`${styles.floatingReaction} ${styles[reaction.type]}`}
+              style={{
+                "--x-move": `${randomX}px`, // Left-right swerving
+                "--speed": `${randomSpeed}s`, // Smoother speed range
+                left: `${randomStart}%`, // Randomized starting position along bottom
+              }}
+            >
+              {reaction.type === "heart" && "❤️"}
+              {reaction.type === "raised_hands" && "🙌"}
+              {reaction.type === "pray" && "🙏"}
+              {reaction.type === "smile" && "😊"}
+            </span>
+          );
+        })}
+      </div>
+
       <div ref={messagesEndRef} />
       <div className={styles.messageContainer}>
         {realtimeMessages &&
@@ -171,7 +230,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                     >
                       {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
                         <p className={styles.senderName}>
-                          {msg?.sender?.user_fname} {msg?.sender?.user_lname}
+                          {formatName(`${msg?.sender?.user_fname} ${msg?.sender?.user_lname}`)}
                         </p>
                       )}
 
@@ -215,6 +274,21 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
             />
           </div>
         )}
+
+        <div className={styles.reactionButton}>
+          {/* Toggle Reaction Drawer on Click */}
+          <button onClick={() => setShowReactions(!showReactions)} className={styles.heart}>
+            <FontAwesomeIcon icon={faHeart} className={styles.reactionIcon} />
+          </button>
+
+          {/* Reaction Drawer (Visible when showReactions is true) */}
+          <div className={`${styles.reactionDrawer} ${showReactions ? styles.open : ""}`}>
+            <button onClick={() => { handleSendReaction("heart"); }}>❤️</button>
+            <button onClick={() => { handleSendReaction("raised_hands"); }}>🙌</button>
+            <button onClick={() => { handleSendReaction("pray"); }}>🙏</button>
+            <button onClick={() => { handleSendReaction("smile"); }}>😊</button>
+          </div>
+        </div>
 
         <button className={styles.sendButton}>
           <FontAwesomeIcon onClick={handleSend} icon={faPaperPlane} className={styles.sendIcon} />

@@ -269,7 +269,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                       </p>
 
                       {/* Show Reactions Below Message */}
-                      {msg.reactions.length > 0 && (
+                      {msg?.reactions?.length > 0 && (
                         <div
                           onClick={() => handleShowMessageReactors(msg.id)}
                           className={styles.reactionDisplay}
@@ -284,7 +284,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                           ))}
 
                           {/* Display total count of reactions */}
-                          <span className={styles.totalReactionCount}>{msg.reactions.length}</span>
+                          <span className={styles.totalReactionCount}>{msg?.reactions?.length}</span>
                         </div>
                       )}
                     </div>

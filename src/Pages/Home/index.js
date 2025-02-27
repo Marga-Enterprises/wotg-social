@@ -90,6 +90,22 @@ const Page = () => {
         };
     }, [isAuthenticated]);
 
+    useEffect(() => {
+        if (!socket) return;
+        
+        socket.on("new_message_reaction", (newReaction) => {
+            setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+                msg.id === newReaction.messageId
+                ? { ...msg, reactions: [...(msg.reactions || []), newReaction] } // ✅ Ensure reactions is always an array
+                : msg
+            )
+            );
+        });
+        
+        return () => socket.off("new_message_reaction");
+    }, [socket]); 
+
     const handleOpenCreateChatroomModal = () => {
         setIsModalOpen(true);
     };
@@ -107,6 +123,16 @@ const Page = () => {
         setIsModalOpen(false);
         setIsProfileModalOpen(false);
         setIsModalOpenForAddParticipant(false);
+    };
+
+    const handleReactMessage = (messageId, reactionType) => {
+        if (!socket) {
+            console.error("⚠️ Socket is not connected! Cannot send reaction.");
+            return;
+        }
+        
+        socket.emit("send_message_reaction", { messageId, react: reactionType });
+        dispatch(wotgsocial.message.reactToMessageAction({ messageId, react: reactionType }));
     };
 
     
@@ -494,6 +520,7 @@ const Page = () => {
                         className={isMobile ? styles.chatWindowVisible : ''} 
                         onBackClick={handleBackClick}
                         isMobile={isMobile}
+                        onMessageReaction={handleReactMessage}
                         onOpenAddParticipantModal={handleOpenAddParticipantModal}
                     />
                 )}

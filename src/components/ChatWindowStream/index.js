@@ -81,7 +81,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     }
 
     setActiveMessageId(null);
- };
+  };
 
   const renderMessageContent = (content) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to detect URLs

@@ -56,6 +56,16 @@ const Page = () => {
     const newSocket = io(socketUrl, { transports: ['websocket'] });
     setSocket(newSocket);
 
+    /*
+    newSocket.on('connect', () => {
+      console.log('🚀 Socket connected!');
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('🚀 Socket disconnected!');
+    });
+    */
+
     return () => newSocket.disconnect();
   }, [isAuthenticated]);
 
@@ -163,6 +173,7 @@ const Page = () => {
 
   const handleReactMessage = (messageId, reactionType) => {
     if (!socket) {
+      console.error("⚠️ Socket is not connected! Cannot send reaction.");
       return;
     }
   
@@ -172,6 +183,7 @@ const Page = () => {
   
   const sendReaction = (reaction) => {
       if (!socket) {
+          console.error("⚠️ Socket is not connected! Cannot send reaction.");
           return;
       }
 

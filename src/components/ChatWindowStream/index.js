@@ -21,10 +21,8 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   const [showMessageReactors, setShowMessageReactors] = useState(false);
   const [selectedMessageReactions, setSelectedMessageReactions] = useState([]);
 
-  // Reference for scrolling
+  const longPressTimeout = useRef(null);
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
-
-  // Reference for the emoji picker container
   const emojiPickerRef = useRef(null); 
 
   // Sync initial messages with realtimeMessages
@@ -55,6 +53,35 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     };
   }, [socket, selectedChatroom]);
 
+
+
+  const handleLongPress = (e, messageId) => {
+    e.preventDefault();
+
+    // Set timeout to trigger after 600ms (adjust as needed)
+    longPressTimeout.current = setTimeout(() => {
+      handleShowMessageReacts(messageId);
+    }, 600);
+  };
+
+  // Cancel long press if user releases early
+  const cancelLongPress = () => {
+    if (longPressTimeout.current) {
+      clearTimeout(longPressTimeout.current);
+    }
+  };
+
+  // Attach cancel on mouse/touch release
+  useEffect(() => {
+    document.addEventListener("mouseup", cancelLongPress);
+    document.addEventListener("touchend", cancelLongPress);
+
+    return () => {
+      document.removeEventListener("mouseup", cancelLongPress);
+      document.removeEventListener("touchend", cancelLongPress);
+    };
+  }, []);
+
   // Handle Send Message
   const handleSend = () => {
     if (message.trim() && selectedChatroom) {
@@ -81,7 +108,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     }
 
     setActiveMessageId(null);
-  };
+ };
 
   const renderMessageContent = (content) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to detect URLs
@@ -257,6 +284,10 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
                     <div
                       className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
+                      {...(!isSender && {
+                        onMouseDown: (e) => handleLongPress(e, msg.id),
+                        onTouchStart: (e) => handleLongPress(e, msg.id),
+                      })}
                     >
                       {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
                         <p className={styles.senderName}>

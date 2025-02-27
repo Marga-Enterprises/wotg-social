@@ -267,14 +267,14 @@ const Page = () => {
       setMessages((prevMessages) =>
         prevMessages.map((msg) =>
           msg.id === newReaction.messageId
-            ? { ...msg, reactions: [...msg.reactions, newReaction] }
+            ? { ...msg, reactions: [...(msg.reactions || []), newReaction] } // ✅ Ensure reactions is always an array
             : msg
         )
       );
     });
   
     return () => socket.off("new_message_reaction");
-  }, [socket]);  
+  }, [socket]);   
 
   return (
     <div className={styles.container}>

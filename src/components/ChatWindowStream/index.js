@@ -192,6 +192,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               {reaction.type === "heart" && "❤️"}
               {reaction.type === "clap" && "👏"}
               {reaction.type === "pray" && "🙏"}
+              {reaction.type === "praise" && "🙌"}
             </span>
           );
         })}
@@ -285,7 +286,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
             <button onClick={() => { handleSendReaction("heart"); }}>❤️</button>
             <button onClick={() => { handleSendReaction("clap"); }}>👏</button>
             <button onClick={() => { handleSendReaction("pray"); }}>🙏</button>
-            {/*<button onClick={() => { handleSendReaction("smile"); }}>😊</button>*/}
+            <button onClick={() => { handleSendReaction("praise"); }}>🙌</button>
           </div>
         </div>
 

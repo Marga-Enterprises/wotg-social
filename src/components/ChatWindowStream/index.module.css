@@ -373,16 +373,16 @@
   transform: scale(1.5);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
   .reactionDrawer {
-    bottom: 20px;
+    bottom: 15px;
     gap: 5px;
     padding: 5px;
     border-radius: 8px;
   }
 
   .reactionDrawer button {
-    font-size: 20px;
+    font-size: 18px;
     padding: 2px;
   }
 }

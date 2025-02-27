@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import { wotgsocial, common } from '../../redux/combineActions';
@@ -55,16 +55,6 @@ const Page = () => {
 
     const newSocket = io(socketUrl, { transports: ['websocket'] });
     setSocket(newSocket);
-
-    /*
-    newSocket.on('connect', () => {
-      console.log('🚀 Socket connected!');
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('🚀 Socket disconnected!');
-    });
-    */
 
     return () => newSocket.disconnect();
   }, [isAuthenticated]);
@@ -171,9 +161,17 @@ const Page = () => {
     dispatch(wotgsocial.message.sendMessageAction(message));
   };
 
+  const handleReactMessage = (messageId, reactionType) => {
+    if (!socket) {
+      return;
+    }
+  
+    socket.emit("send_message_reaction", { messageId, react: reactionType });
+    dispatch(wotgsocial.message.reactToMessageAction({ messageId, react: reactionType }));
+  };
+  
   const sendReaction = (reaction) => {
       if (!socket) {
-          console.error("⚠️ Socket is not connected! Cannot send reaction.");
           return;
       }
 
@@ -195,23 +193,6 @@ const Page = () => {
 
       return () => socket.off("new_reaction");
   }, [socket]);
-
-  /*
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("new_message_react", (messageReact) => {
-        setMessageReacts((prev) => [...prev, messageReact]);
-
-        // Remove message reaction after animation
-        setTimeout(() => {
-            setMessageReacts((prev) => prev.slice(1));
-        }, 3000);
-    });
-
-    return () => socket.off("new_message_react");
-  }, [socket]);
-  */
 
   // Real-time message updates
   useEffect(() => {
@@ -277,6 +258,21 @@ const Page = () => {
     };
   }, [socket]);
   
+  useEffect(() => {
+    if (!socket) return;
+  
+    socket.on("new_message_reaction", (newReaction) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === newReaction.messageId
+            ? { ...msg, reactions: [...msg.reactions, newReaction] }
+            : msg
+        )
+      );
+    });
+  
+    return () => socket.off("new_message_reaction");
+  }, [socket]);  
 
   return (
     <div className={styles.container}>
@@ -327,6 +323,7 @@ const Page = () => {
               selectedChatroomDetails={selectedChatroomDetails}
               userId={user?.id}
               onSendReaction={sendReaction}
+              onMessageReaction={handleReactMessage}
               reactions={reactions}
             />
           </div>

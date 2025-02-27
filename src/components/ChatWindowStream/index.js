@@ -3,11 +3,11 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFaceSmile, faPaperPlane, faHeart } from '@fortawesome/free-solid-svg-icons';
-
+import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './index.module.css';
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, selectedChatroomDetails, onSendReaction, reactions }) => {
+const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, selectedChatroomDetails, onSendReaction, onMessageReaction, reactions }) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
@@ -17,6 +17,9 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
+  const [activeMessageId, setActiveMessageId] = useState(null);
+  const [showMessageReactors, setShowMessageReactors] = useState(false);
+  const [selectedMessageReactions, setSelectedMessageReactions] = useState([]);
 
   // Reference for scrolling
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
@@ -72,7 +75,13 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
       }
   };
 
+  const handleMessageReaction = (reaction, messageId) => {
+    if (onMessageReaction) {
+      onMessageReaction(messageId, reaction); 
+    }
 
+    setActiveMessageId(null);
+ };
 
   const renderMessageContent = (content) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to detect URLs
@@ -134,17 +143,30 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   // Close emoji picker when clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
-        setShowEmojiPicker(false); // Close emoji picker
+      // Close Emoji Picker if clicked outside
+      if (
+        emojiPickerRef.current && 
+        !emojiPickerRef.current.contains(event.target)
+      ) {
+        setShowEmojiPicker(false);
+      }
+  
+      // Close Reaction Drawer if clicked outside (EXCLUDE MESSAGE REACTIONS)
+      if (
+        !event.target.closest(`.${styles.reactionButton}`) && 
+        !event.target.closest(`.${styles.messageReactions}`) // 🔥 Prevent closing when clicking inside the drawer
+      ) {
+        setShowReactions(false);
+        setActiveMessageId(null); // Keep this but prevent it from closing when clicking inside reactions
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
+  
+    document.addEventListener("mousedown", handleClickOutside);
+  
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [showReactions, showEmojiPicker]);
 
   const formatName = (name) => {
     if (!name) return "";
@@ -154,22 +176,24 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
       .join(" "); // Join words back into a single string
   }; 
-  
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest(`.${styles.reactionButton}`)) {
-        setShowReactions(false);
-      }
-    };
-  
-    if (showReactions) {
-      document.addEventListener("click", handleClickOutside);
+
+  const handleShowMessageReacts = (messageId) => {
+    setActiveMessageId(activeMessageId === messageId ? null : messageId);
+  };
+
+  const handleShowMessageReactors = (messageId) => {
+    const message = messages.find((msg) => msg.id === messageId);
+    if (message && message.reactions.length > 0) {
+      setSelectedMessageReactions(message.reactions);
+      setShowMessageReactors(true);
     }
+  };
+
+  const closeMessageReactors = () => {
+    setShowMessageReactors(false);
+    setSelectedMessageReactions([]);
+  };
   
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [showReactions]);
 
   return (
     <div className={styles.chatContainer}>
@@ -210,6 +234,12 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                   (participant) => participant.user.id === msg.senderId
                 );
 
+                // Group reactions by type and count them
+                const groupedReactions = msg.reactions.reduce((acc, reaction) => {
+                  acc[reaction.react] = (acc[reaction.react] || 0) + 1;
+                  return acc;
+                }, {});
+
                 return (
                   <div
                     key={index}
@@ -217,7 +247,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                   >
                     {!isSender && (
                       <img
-                        src={receiver?.user?.user_profile_picture 
+                        src={receiver?.user?.user_profile_picture
                           ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
                           : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
                         alt={receiver?.user?.user_fname || "User Avatar"}
@@ -235,9 +265,55 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                       )}
 
                       <p className={styles.messageContent}>
-                        {msg?.content ? renderMessageContent(msg.content) : 'No content available'}
+                        {msg?.content ? renderMessageContent(msg.content) : "No content available"}
                       </p>
+
+                      {/* Show Reactions Below Message */}
+                      {msg.reactions.length > 0 && (
+                        <div
+                          onClick={() => handleShowMessageReactors(msg.id)}
+                          className={styles.reactionDisplay}
+                        >
+                          {Object.entries(groupedReactions).map(([type, count], i) => (
+                            <span key={i} className={styles.reactionItem}>
+                              {type === "heart" && "❤️"}
+                              {type === "clap" && "👏"}
+                              {type === "pray" && "🙏"}
+                              {type === "praise" && "🙌"}
+                            </span>
+                          ))}
+
+                          {/* Display total count of reactions */}
+                          <span className={styles.totalReactionCount}>{msg.reactions.length}</span>
+                        </div>
+                      )}
                     </div>
+                    
+
+                    {/* Smiley Icon for Message Reactions */}
+                    {!isSender && (
+                      <div>
+                        <FontAwesomeIcon
+                          onClick={() => handleShowMessageReacts(msg.id)}
+                          icon={faFaceSmileRegular}
+                          className={styles.messageReactIcon}
+                        />
+                      </div>
+                    )}
+
+                    {/* Reaction Drawer (Only Visible for Active Message) */}
+                    {activeMessageId === msg.id && !isSender && (
+                      <div className={styles.messageReactions}>
+                        {["heart", "clap", "pray", "praise"].map((reaction) => (
+                          <button key={reaction} onClick={() => handleMessageReaction(reaction, msg.id)}>
+                            {reaction === "heart" && "❤️"}
+                            {reaction === "clap" && "👏"}
+                            {reaction === "pray" && "🙏"}
+                            {reaction === "praise" && "🙌"}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })
@@ -294,6 +370,34 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           <FontAwesomeIcon onClick={handleSend} icon={faPaperPlane} className={styles.sendIcon} />
         </button>
       </div>
+
+      {/* Modal for Message Reactions */}
+      {showMessageReactors && (
+        <div className={styles.modalOverlay} onClick={closeMessageReactors}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h1 className={styles.reactorName}>Message Reactions</h1>
+            <button className={styles.closeButton} onClick={closeMessageReactors}>×</button>
+            <ul className={styles.reactorsList}>
+              {selectedMessageReactions.map((reactor, index) => (
+                <li key={index} className={styles.reactorItem}>
+                  <img
+                    src={`${backendUrl}/uploads/${reactor.user.user_profile_picture}`}
+                    alt={reactor.user.user_fname}
+                    className={styles.reactorAvatar}
+                  />
+                  <span className={styles.reactorName}>{reactor.user.user_fname} {reactor.user.user_lname}</span>
+                  <span className={styles.reactionEmoji}>
+                    {reactor.react === "heart" && "❤️"}
+                    {reactor.react === "clap" && "👏"}
+                    {reactor.react === "pray" && "🙏"}
+                    {reactor.react === "praise" && "🙌"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   );
    

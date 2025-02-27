@@ -235,7 +235,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                 );
 
                 // Group reactions by type and count them
-                const groupedReactions = msg.reactions.reduce((acc, reaction) => {
+                const groupedReactions = msg?.reactions?.reduce((acc, reaction) => {
                   acc[reaction.react] = (acc[reaction.react] || 0) + 1;
                   return acc;
                 }, {});

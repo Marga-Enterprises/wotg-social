@@ -56,16 +56,6 @@ const Page = () => {
     const newSocket = io(socketUrl, { transports: ['websocket'] });
     setSocket(newSocket);
 
-    /*
-    newSocket.on('connect', () => {
-      console.log('🚀 Socket connected!');
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('🚀 Socket disconnected!');
-    });
-    */
-
     return () => newSocket.disconnect();
   }, [isAuthenticated]);
 

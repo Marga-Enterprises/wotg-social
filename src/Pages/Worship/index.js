@@ -21,7 +21,6 @@ const Page = () => {
   // Local state
   const [messages, setMessages] = useState([]);
   const [chatrooms, setChatrooms] = useState([]);
-  const [selectedChatroom, setSelectedChatroom] = useState(wotglivechatroom);
   const [selectedChatroomDetails, setSelectedChatroomDetails] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [socket, setSocket] = useState(null);
@@ -61,22 +60,6 @@ const Page = () => {
     return () => newSocket.disconnect();
   }, [isAuthenticated]);
 
-  // Fetch Chatrooms
-  const fetchChatrooms = useCallback(async () => {
-    if (!isAuthenticated) return;
-
-    dispatch(common.ui.setLoading());
-    const res = await dispatch(wotgsocial.chatroom.getAllChatroomsAction());
-
-    dispatch(common.ui.clearLoading());
-    if (res.success) {
-      setChatrooms(res.data);
-      if (res.data.length > 0) {
-        handleSelectChatroom(res.data[0].id); // Auto-select first chatroom
-      }
-    }
-  }, [dispatch, isAuthenticated]);
-
   const handleUpdateWorship = async () => {
     if (!newVideoId) return;
 
@@ -107,13 +90,6 @@ const Page = () => {
     }
   }, [dispatch, isAuthenticated]);
 
-  // Fetch chatrooms on mount
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchChatrooms();
-    }
-  }, [fetchChatrooms, isAuthenticated]);
-
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(wotgsocial.worship.getWorshipServiceAction()).then((res) => {
@@ -127,39 +103,19 @@ const Page = () => {
 
   // Fetch messages when chatroom changes
   useEffect(() => {
-    if (selectedChatroom && isAuthenticated) {
+    if (isAuthenticated) {
       fetchMessages(wotglivechatroom);
     }
-  }, [selectedChatroom, fetchMessages, isAuthenticated]);
-
-  // Handle chatroom selection
-  const handleSelectChatroom = (chatroomId) => {
-    setSelectedChatroom(wotglivechatroom);
-    fetchMessages(wotglivechatroom);
-
-    // Mark messages as read when the chatroom is opened
-    if (socket) {
-      socket.emit('mark_as_read', { chatroomId: wotglivechatroom, userId: user?.id });
-    }
-
-    // Clear unread messages count
-    setChatrooms((prevChatrooms) =>
-      prevChatrooms.map((chat) =>
-        chat.id === chatroomId
-          ? { ...chat, unreadCount: 0, hasUnread: false }
-          : chat
-      )
-    );
-  };
+  }, [fetchMessages, isAuthenticated]);
 
   // Handle sending a message
   const handleSendMessage = (messageContent) => {
-    if (!selectedChatroom || !user) return;
+    if (!user) return;
 
     const message = {
       content: messageContent,
       senderId: user.id,
-      chatroomId: selectedChatroom,
+      chatroomId: wotglivechatroom,
     };
 
     socket.emit('send_message', message);
@@ -207,7 +163,7 @@ const Page = () => {
 
     socket.on('new_message', (message) => {
       // Update only if the message belongs to the current chatroom
-      if (message.chatroomId === selectedChatroom) {
+      if (message.chatroomId === wotglivechatroom) {
         setMessages((prevMessages) => {
             const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
             if (isDuplicate) return prevMessages;
@@ -218,34 +174,25 @@ const Page = () => {
             return updatedMessages;
         });
       }
-
-      // Update chatrooms with the latest message
-      setChatrooms((prevChatrooms) =>
-        prevChatrooms.map((chat) =>
-          chat.id === message.chatroomId
-            ? { ...chat, RecentMessage: message }
-            : chat
-        )
-      );
     });
 
     return () => socket.off('new_message');
-  }, [socket, selectedChatroom]);
+  }, [socket]);
 
   // Join and leave chatrooms dynamically
   useEffect(() => {
-    if (!socket || !selectedChatroom) return;
+    if (!socket) return;
 
     chatrooms.forEach((chatroom) => {
       socket.emit('join_room', chatroom.id);
     });
 
-    socket.emit('join_room', selectedChatroom);
+    socket.emit('join_room', wotglivechatroom);
 
     return () => {
-      socket.emit('leave_room', selectedChatroom);
+      socket.emit('leave_room', wotglivechatroom);
     };
-  }, [socket, selectedChatroom]);
+  }, [socket]);
 
   useEffect(() => {
     if (!socket || !user) return;
@@ -326,12 +273,12 @@ const Page = () => {
         {/*<div className={styles.overlay}/>*/}
 
         {/* Chat Window at the Bottom */}
-        {isAuthenticated && selectedChatroom && (
+        {isAuthenticated && wotglivechatroom && (
           <div className={styles.chatSection}>
             <ChatWindowStream
               messages={messages}
               onSendMessage={handleSendMessage}
-              selectedChatroom={selectedChatroom}
+              selectedChatroom={wotglivechatroom}
               selectedChatroomDetails={selectedChatroomDetails}
               userId={user?.id}
               onSendReaction={sendReaction}

@@ -20,7 +20,6 @@ const Page = () => {
 
   // Local state
   const [messages, setMessages] = useState([]);
-  const [chatrooms, setChatrooms] = useState([]);
   const [selectedChatroomDetails, setSelectedChatroomDetails] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [socket, setSocket] = useState(null);
@@ -182,10 +181,6 @@ const Page = () => {
   // Join and leave chatrooms dynamically
   useEffect(() => {
     if (!socket) return;
-
-    chatrooms.forEach((chatroom) => {
-      socket.emit('join_room', chatroom.id);
-    });
 
     socket.emit('join_room', wotglivechatroom);
 

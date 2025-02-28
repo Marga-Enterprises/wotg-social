@@ -189,6 +189,14 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           participant.user.user_lname.toLowerCase().startsWith(query))
         )
         .sort((a, b) => a.user.user_fname.localeCompare(b.user.user_fname)) // Sort alphabetically
+        .map(participant => ({
+          ...participant,
+          user: {
+            ...participant.user,
+            user_fname: formatName(participant.user.user_fname),
+            user_lname: formatName(participant.user.user_lname),
+          }
+        }))
         .slice(0, 5); // Limit results to 5 participants
   
       setMentionList(filteredParticipants); 
@@ -196,7 +204,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     } else {
       setShowMentionList(false);
     }
-  };  
+  };
   
   const handleMentionSelect = (participant) => {
     const mentionText = `@${participant.user.user_fname} ${participant.user.user_lname} `;

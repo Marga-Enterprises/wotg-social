@@ -29,6 +29,8 @@ const Page = () => {
   const [videoId, setVideoId] = useState(''); // YouTube video ID
   const [newVideoId, setNewVideoId] = useState('');
   const [viewersCount, setViewersCount] = useState(1);
+  const [viewersList, setViewersList] = useState([]); 
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [reactions, setReactions] = useState([]);
   // const [messageReacts, setMessageReacts] = useState([]);
   
@@ -87,6 +89,9 @@ const Page = () => {
       setNewVideoId('');
     }
   };
+
+  const openViewersListModal = () => setIsModalOpen(true);
+  const closeViewersListModal = () => setIsModalOpen(false);
 
   // Fetch Messages
   const fetchMessages = useCallback(async (chatroomId) => {
@@ -243,22 +248,27 @@ const Page = () => {
   }, [socket, selectedChatroom]);
 
   useEffect(() => {
-    if (!socket) return;
-  
+    if (!socket || !user) return;
+
     // Notify server that this user joined the worship page
-    socket.emit("join_worship");
-  
-    // Listen for viewer count updates from the server
-    socket.on("update_viewers", (count) => {
-      setViewersCount(count);
+    socket.emit("join_worship", {
+      email: user.email,
+      user_fname: user.user_fname,
+      user_lname: user.user_lname
     });
-  
-    // Cleanup: Notify server when user leaves the page
+
+    // Listen for viewer count and list updates
+    socket.on("update_viewers", ({ count, viewers }) => {
+      setViewersCount(count);
+      setViewersList(viewers);
+    });
+
+    // Cleanup: Notify server when user leaves
     return () => {
-      socket.emit("leave_worship");
+      socket.emit("leave_worship", { email: user.email });
       socket.off("update_viewers");
     };
-  }, [socket]);
+  }, [socket, user]);
   
   useEffect(() => {
     if (!socket) return;
@@ -309,8 +319,8 @@ const Page = () => {
           />
         </div>
 
-        <div className={styles.viewerCounter}>
-          <FontAwesomeIcon icon={faEye} className={styles.sendIcon}/> {viewersCount} Viewers
+        <div className={styles.viewerCounter} onClick={openViewersListModal}>
+          <FontAwesomeIcon icon={faEye} className={styles.sendIcon}/> {viewersCount} Watching
         </div>
 
         {/*<div className={styles.overlay}/>*/}
@@ -341,6 +351,27 @@ const Page = () => {
               onChange={(e) => setNewVideoId(e.target.value)}
             />
             <button onClick={handleUpdateWorship}>Update</button>
+          </div>
+        )}
+
+        {isModalOpen && (
+          <div className={styles.modalOverlay} onClick={closeViewersListModal}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <h3>👥 Current Viewers</h3>
+              <ul className={styles.viewerList}>
+                {viewersList.length > 0 ? (
+                  viewersList.map((viewer, index) => (
+                    <li key={index}>
+                      <strong>{viewer.fullName}</strong> <br />
+                      <small>{viewer.email}</small>
+                    </li>
+                  ))
+                ) : (
+                  <li>No active viewers</li>
+                )}
+              </ul>
+              <button className={styles.closeModalButton} onClick={closeViewersListModal}>Close</button>
+            </div>
           </div>
         )}
       </div>

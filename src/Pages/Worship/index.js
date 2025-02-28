@@ -363,7 +363,7 @@ const Page = () => {
                   viewersList.map((viewer, index) => (
                     <li key={index}>
                       <strong>{viewer.fullName}</strong> <br />
-                      <small>{viewer.email}</small>
+                      {/*<small>{viewer.email}</small>*/}
                     </li>
                   ))
                 ) : (

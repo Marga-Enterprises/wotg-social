@@ -357,7 +357,7 @@ const Page = () => {
         {isModalOpen && (
           <div className={styles.modalOverlay} onClick={closeViewersListModal}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-              <h3>👥 Current Viewers</h3>
+              <h3><FontAwesomeIcon icon={faEye} className={styles.sendIcon}/> Current Viewers</h3>
               <ul className={styles.viewerList}>
                 {viewersList.length > 0 ? (
                   viewersList.map((viewer, index) => (

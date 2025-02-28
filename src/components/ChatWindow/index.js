@@ -359,7 +359,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
             );
           })
         ) : (
-          <div className={styles.noMessages}><p>Say 'hi' and start messaging</p></div>
+          <div className={styles.noMessages}><p>Say 'Hi' and start messaging</p></div>
         )}
       </div>
 

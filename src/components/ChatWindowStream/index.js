@@ -20,6 +20,10 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   const [activeMessageId, setActiveMessageId] = useState(null);
   const [showMessageReactors, setShowMessageReactors] = useState(false);
   const [selectedMessageReactions, setSelectedMessageReactions] = useState([]);
+  const [mentionList, setMentionList] = useState([]); // List of participants
+  const [showMentionList, setShowMentionList] = useState(false); // Controls mention dropdown visibility
+  const [cursorPosition, setCursorPosition] = useState(0); // Tracks cursor position
+
 
   const longPressTimeout = useRef(null);
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
@@ -111,24 +115,38 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
  };
 
   const renderMessageContent = (content) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to detect URLs
-    return content.split(urlRegex).map((part, index) =>
-      urlRegex.test(part) ? (
-        <a
-          key={index}
-          href={part}
-          target="_blank" // Open in a new tab
-          rel="noopener noreferrer" // Prevent security vulnerabilities
-          style={{ color: '#007bff', textDecoration: 'underline' }} // Optional link styling
-        >
-          {part}
-        </a>
-      ) : (
-        part
-      )
-    );
+    const urlRegex = /(https?:\/\/[^\s]+)/g; // Detects URLs
+    const mentionRegex = /(^|\s)(@\w+(?:\s\w+)?)(?=\s|$)/g; // Captures mentions only (single or double names)
+
+    return content.split(urlRegex).map((part, index) => {
+      if (urlRegex.test(part)) {
+        // Convert URLs into clickable links
+        return (
+          <a
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#007bff', textDecoration: 'underline' }}
+          >
+            {part}
+          </a>
+        );
+      } else {
+        // Format mentions properly without affecting other text
+        return part.split(mentionRegex).map((subPart, subIndex) => {
+          if (subPart.trim().startsWith("@")) {
+            return (
+              <strong key={subIndex} style={{ fontWeight: 'bold' }}>
+                {subPart}
+              </strong>
+            );
+          }
+          return subPart; // Normal text remains unchanged
+        });
+      }
+    });
   };
-  
 
   // Handle Enter key press to send the message
   const handleKeyDown = (e) => {
@@ -146,17 +164,61 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
   const handleTextareaChange = (e) => {
     const textarea = e.target;
-
+    const cursorPos = textarea.selectionStart;
+    const newMessage = textarea.value;
+  
     // Dynamically adjust height
     textarea.style.height = 'auto'; // Reset height to auto
     const maxHeight = parseFloat(getComputedStyle(textarea).lineHeight) * 5; // Limit to 5 rows
     textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
-
-    setMessage(textarea.value); // Update the message state
+  
+    setMessage(newMessage); // Update message state
+    setCursorPosition(cursorPos); // Store cursor position
+  
+    // Extract the last typed word
+    const words = newMessage.slice(0, cursorPos).split(" ");
+    const lastWord = words[words.length - 1];
+  
+    // Check if lastWord starts with "@" to trigger mention list
+    if (lastWord.startsWith("@")) {
+      const query = lastWord.slice(1).toLowerCase(); // Remove "@" and convert to lowercase
+      const filteredParticipants = selectedChatroomDetails?.Participants
+        ?.filter(participant => 
+          participant.user.id !== userId && // Exclude the current user
+          (participant.user.user_fname.toLowerCase().startsWith(query) || 
+          participant.user.user_lname.toLowerCase().startsWith(query))
+        )
+        .slice(0, 5); // Limit results to 5 participants
+  
+      setMentionList(filteredParticipants); 
+      setShowMentionList(filteredParticipants.length > 0); // Show only if results exist
+    } else {
+      setShowMentionList(false);
+    }
   };
   
+  const handleMentionSelect = (participant) => {
+    const mentionText = `@${participant.user.user_fname} ${participant.user.user_lname} `;
   
+    // Get the part of the message before the "@" and after the cursor
+    const beforeCursor = message.slice(0, cursorPosition).replace(/@\S*$/, ""); // Remove "@..." before cursor
+    const afterCursor = message.slice(cursorPosition);
+  
+    const updatedMessage = beforeCursor + mentionText + afterCursor;
+    setMessage(updatedMessage);
+    setCursorPosition(beforeCursor.length + mentionText.length);
+    setShowMentionList(false);
+  };  
 
+  const formatMessageContent = (content) => {
+    return content.split(/(@[A-Za-z\s]+)/g).map((part, index) => {
+      if (part.startsWith('@')) {
+        return <strong key={index}>{part}</strong>; // Make mentions bold
+      }
+      return part;
+    });
+  };  
+  
   // Handle emoji selection
   const handleEmojiSelect = (emoji) => {
     setMessage((prevMessage) => prevMessage + emoji.native);
@@ -350,10 +412,20 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               })
           ) : (
             <div className={styles.noMessages}>
-              <p>Say 'hi' and start messaging</p>
+              <p>Say 'Hi' and start messaging</p>
             </div>
           )}
       </div>
+
+      {showMentionList && (
+        <ul className={styles.mentionList}>
+          {mentionList.map((participant) => (
+            <li key={participant.user.id} onClick={() => handleMentionSelect(participant)}>
+              {participant.user.user_fname} {participant.user.user_lname}
+            </li>
+          ))}
+        </ul>
+      )}
 
       <div className={styles.inputContainer}>
         <div className={styles.textareaWrapper}> {/* Wrapper for positioning */}

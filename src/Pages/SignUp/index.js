@@ -33,7 +33,7 @@ const Page = () => {
         dispatch(wotgsocial.user.addUser(payload))
             .then((res) => {
                 if (res.success) {
-                    window.location.replace('/login');
+                    window.location.replace('/menu');
                 } else {
                     setOpenErrorSnackbar(true);
                     setErrMsg(res.payload);

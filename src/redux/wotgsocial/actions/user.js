@@ -112,21 +112,27 @@ export const addUser = (payload) => async (dispatch) => {
         const { success, data, msg } = res;
 
         if (success) {
+            const { token } = data;
+            const account = jwtDecode(token);
+            setAuthorizationHeader(token);
+            dispatch(setUserDetails(account));
+
             dispatch({
                 type: types.USER_ADD_SUCCESS,
-                payload: res.data.docs,
+                payload: data, // You might want to store user data in Redux
             });
         }
 
-        return res; // Return the response object in both success and error cases
+        return res; // Return the response object
 
     } catch (err) {
         return dispatch({
-        type: types.USER_ADD_FAIL,
-        payload: err.response.data.msg,
+            type: types.USER_ADD_FAIL,
+            payload: err.response?.data?.msg || "Registration failed.",
         });
     }
 };
+
 
 
 

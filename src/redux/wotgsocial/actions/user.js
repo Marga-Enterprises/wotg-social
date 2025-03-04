@@ -175,13 +175,13 @@ export const refreshTokenAction = () => async (dispatch) => {
 
 export const restoreSessionAction = () => async (dispatch) => {
     try {
-        const refreshToken = Cookies.get("refreshToken"); // ✅ Get refresh token from cookies
+        const refreshToken = Cookies.get("refreshToken");
 
         if (!refreshToken) {
-            return dispatch(userLogout()); // No refresh token = force logout
+            return; // ✅ Prevent calling `userLogout()` if already logged out
         }
 
-        const res = await refreshTokenFunc({ refreshToken }); // ✅ Try refreshing access token
+        const res = await refreshTokenFunc({ refreshToken });
         const { success, data } = res;
 
         if (success) {
@@ -190,17 +190,14 @@ export const restoreSessionAction = () => async (dispatch) => {
 
             const account = jwtDecode(accessToken);
             dispatch(setUserDetails(account));
-
-            return { success: true, accessToken };
         } else {
-            dispatch(userLogout());
-            return { success: false, message: "Session expired." };
+            dispatch(userLogout()); // ✅ Only call logout if refresh explicitly fails
         }
     } catch (err) {
-        dispatch(userLogout());
-        return { success: false, message: "Session expired, please log in again." };
+        console.error("Session restore failed:", err);
     }
 };
+
 
 
 // 🔹 LOGOUT ACTION

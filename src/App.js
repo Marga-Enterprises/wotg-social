@@ -23,7 +23,7 @@ function App() {
 
   useEffect(() => {
     dispatch(wotgsocial.user.restoreSessionAction());
-  }, [dispatch]);
+  }, []);
 
   return (
     <BrowserRouter>

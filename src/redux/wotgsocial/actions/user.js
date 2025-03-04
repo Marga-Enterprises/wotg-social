@@ -1,29 +1,27 @@
-//api
-import { loginFunc,
-registerFunc, getAllUsers, updateUser, getUser } from '../../../services/api/user';
+// API
+import { loginFunc, registerFunc, getAllUsers, updateUser, getUser, refreshTokenFunc, logoutUser } from '../../../services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-//jwtDecode
+// JWT Decode
 import { jwtDecode } from 'jwt-decode';
 
-//types
+// Types
 import * as types from '../types';
 
 export const getAllUsersAction = (payload) => async (dispatch) => {
     return getAllUsers(payload).then((res) => {
         if (res.success) {
             dispatch({
-            type: types.USER_LIST_SUCCESS,
-            payload: res.data, 
+                type: types.USER_LIST_SUCCESS,
+                payload: res.data, 
             });
         } else {
             dispatch({
-            type: types.USER_LIST_FAIL,
-            payload: res.msg,
+                type: types.USER_LIST_FAIL,
+                payload: res.msg,
             });
         }
-
         return res; 
     });
 };
@@ -32,16 +30,15 @@ export const updateUserAction = (payload) => async (dispatch) => {
     return updateUser(payload).then((res) => {
         if (res.success) {
             dispatch({
-            type: types.USER_UPDATE_SUCCESS,
-            payload: res.data,
+                type: types.USER_UPDATE_SUCCESS,
+                payload: res.data,
             });
         } else {
             dispatch({
-            type: types.USER_UPDATE_FAIL,
-            payload: res.msg,
+                type: types.USER_UPDATE_FAIL,
+                payload: res.msg,
             });
         }
-
         return res; 
     });
 };
@@ -50,32 +47,35 @@ export const getUserAction = (payload) => async (dispatch) => {
     return getUser(payload).then((res) => {
         if (res.success) {
             dispatch({
-            type: types.USER_GET_SUCCESS,
-            payload: res.data,
+                type: types.USER_GET_SUCCESS,
+                payload: res.data,
             });
         } else {
             dispatch({
-            type: types.USER_GET_FAIL,
-            payload: res.msg,
+                type: types.USER_GET_FAIL,
+                payload: res.msg,
             });
         }
-
         return res; 
     });
 };
 
 export const setAuthorizationHeader = (token) => {
     const bearerToken = `Bearer ${token}`;
-    Cookies.set('token', token); // Set cookie properly
+    
+    // ✅ Store access token in cookies with 1-year expiration
+    Cookies.set("token", token, { expires: 365, secure: true, sameSite: "Strict" });
+
     axios.defaults.headers.common.Authorization = bearerToken;
 };
 
-
 export const setUserDetails = (userDetails) => {
     const { user } = userDetails;
-    Cookies.set('account', JSON.stringify(user));
-    Cookies.set('authenticated', true);
-    Cookies.set('role', user.user_role);
+
+    // ✅ Store user details persistently (1-year expiration)
+    Cookies.set("account", JSON.stringify(user), { expires: 365, secure: true, sameSite: "Strict" });
+    Cookies.set("authenticated", true, { expires: 365, secure: true, sameSite: "Strict" });
+    Cookies.set("role", user.user_role, { expires: 365, secure: true, sameSite: "Strict" });
 
     return {
         type: types.SET_USER_DETAILS,
@@ -84,24 +84,30 @@ export const setUserDetails = (userDetails) => {
 };
 
 
+// 🔹 UPDATED LOGIN FUNCTION
 export const loginFunction = (payload) => async (dispatch) => {
     try {
         const res = await loginFunc(payload);
-        const { success, data, msg } = res;
+        const { success, data } = res;
 
         if (success) {
-            const { token } = data;
-            const account = jwtDecode(token);
-            setAuthorizationHeader(token);
+            const { accessToken, refreshToken } = data;
+            const account = jwtDecode(accessToken);
+
+            setAuthorizationHeader(accessToken);
+
+            // ✅ Store refresh token persistently (1 year)
+            Cookies.set("refreshToken", refreshToken, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
+
             dispatch(setUserDetails(account));
         }
 
-        return res; // Return the response object in both success and error cases
+        return res;
 
     } catch (err) {
         return dispatch({
-        type: types.LOGIN_FAIL,
-        payload: err.response.data.msg,
+            type: types.LOGIN_FAIL,
+            payload: err.response?.data?.msg || "Login failed.",
         });
     }
 };
@@ -109,21 +115,25 @@ export const loginFunction = (payload) => async (dispatch) => {
 export const addUser = (payload) => async (dispatch) => {
     try {
         const res = await registerFunc(payload);
-        const { success, data, msg } = res;
+        const { success, data } = res;
 
         if (success) {
-            const { token } = data;
-            const account = jwtDecode(token);
-            setAuthorizationHeader(token);
-            dispatch(setUserDetails(account));
+            const { accessToken, refreshToken } = data;
+            const account = jwtDecode(accessToken);
 
+            setAuthorizationHeader(accessToken);
+
+            // ✅ Store refresh token persistently (1 year)
+            Cookies.set("refreshToken", refreshToken, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
+
+            dispatch(setUserDetails(account));
             dispatch({
                 type: types.USER_ADD_SUCCESS,
-                payload: data, // You might want to store user data in Redux
+                payload: data,
             });
         }
 
-        return res; // Return the response object
+        return res;
 
     } catch (err) {
         return dispatch({
@@ -135,17 +145,87 @@ export const addUser = (payload) => async (dispatch) => {
 
 
 
+// 🔹 REFRESH TOKEN ACTION (Auto-renew Access Token)
+export const refreshTokenAction = () => async (dispatch) => {
+    try {
+        const refreshToken = Cookies.get("refreshToken"); // ✅ Fetch refresh token from cookies
 
+        if (!refreshToken) {
+            dispatch(userLogout());
+            return { success: false, message: "No refresh token found, please log in again." };
+        }
 
+        const res = await refreshTokenFunc({ refreshToken }); // ✅ Send refreshToken in request body
+        const { success, data } = res;
 
-export const userLogout = () => {
-    Cookies.remove('token');
-    Cookies.remove('account');
-    Cookies.remove('role');
-    Cookies.remove('authenticated');
-    window.location.replace('/login');
+        if (success) {
+            const { accessToken } = data;
+            setAuthorizationHeader(accessToken);
+            return { success: true, accessToken };
+        } else {
+            dispatch(userLogout());
+            return { success: false, message: "Refresh failed." };
+        }
 
-    return {
-        type: 'USER_LOGOUT',
-    };
+    } catch (err) {
+        dispatch(userLogout());
+        return { success: false, message: "Session expired, please log in again." };
+    }
 };
+
+export const restoreSessionAction = () => async (dispatch) => {
+    try {
+        const refreshToken = Cookies.get("refreshToken"); // ✅ Get refresh token from cookies
+
+        if (!refreshToken) {
+            return dispatch(userLogout()); // No refresh token = force logout
+        }
+
+        const res = await refreshTokenFunc({ refreshToken }); // ✅ Try refreshing access token
+        const { success, data } = res;
+
+        if (success) {
+            const { accessToken } = data;
+            setAuthorizationHeader(accessToken);
+
+            const account = jwtDecode(accessToken);
+            dispatch(setUserDetails(account));
+
+            return { success: true, accessToken };
+        } else {
+            dispatch(userLogout());
+            return { success: false, message: "Session expired." };
+        }
+    } catch (err) {
+        dispatch(userLogout());
+        return { success: false, message: "Session expired, please log in again." };
+    }
+};
+
+
+// 🔹 LOGOUT ACTION
+export const userLogout = () => async (dispatch) => {
+    try {
+        const refreshToken = Cookies.get("refreshToken"); // ✅ Fetch refresh token from cookies
+
+        if (refreshToken) {
+            await logoutUser({ refreshToken }); // ✅ Send refreshToken in request body
+        }
+
+        // ✅ Remove cookies
+        Cookies.remove("token");
+        Cookies.remove("refreshToken"); 
+        Cookies.remove("account");
+        Cookies.remove("role");
+        Cookies.remove("authenticated");
+
+        window.location.replace("/login");
+
+        return dispatch({
+            type: "USER_LOGOUT",
+        });
+    } catch (err) {
+        console.error("Logout failed:", err);
+    }
+};
+

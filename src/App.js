@@ -8,12 +8,23 @@ import Worship from './Pages/Worship';
 import Menu from './Pages/Menu';
 import Default from './Pages/Default';
 
+// REDUX
+import { useDispatch } from 'react-redux';
+import { wotgsocial } from './redux/combineActions';
+
 // COMPONENTS
 // import Navbar from './components/Navbar';
 // import Footer from './components/Footer';
 import AuthRouter from './components/AuthRouter'
+import { use, useEffect } from 'react';
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(wotgsocial.user.restoreSessionAction());
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <div className="grid-container">

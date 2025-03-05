@@ -5,6 +5,8 @@ import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
 
+import { requestForToken } from "../../firebase";
+
 // Components
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
@@ -138,111 +140,73 @@ const Page = () => {
     
     // Web Push Notification: Request Permission and Subscribe
     const subscribeToPushNotifications = async () => {
-        // console.log('Subscribing to push notifications...');
-    
-        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-            // console.error('Push notifications are not supported in this browser');
+        if (!("Notification" in window)) {
+            console.error("🚫 Push notifications are not supported in this browser.");
             return;
         }
     
-        // Check if notification permissions are already granted
+        // Request notification permission
         const permission = await Notification.requestPermission();
-    
-        // Proceed only if permission is granted
-        if (permission !== 'granted') {
-            // console.log('Push notification permission denied');
+        if (permission !== "granted") {
+            console.warn("⚠️ Push notification permission denied.");
             return;
-        } else {
-            // console.log('Push notification permission granted');
+        }
     
-            // Service worker registration: check if it's already registered
-            let registration;
-            try {
-                registration = await navigator.serviceWorker.register('/service-worker.js');
-                // console.log('Service Worker registered successfully.');
-            } catch (error) {
-                console.error('Service Worker registration failed:', error);
+        try {
+            // 🔥 Get the FCM Token
+            const fcmToken = await requestForToken();
+            if (!fcmToken) {
+                console.error("❌ FCM Token is not available.");
                 return;
             }
     
-            // Check if a subscription already exists
-            const existingSubscription = await registration.pushManager.getSubscription();
-    
-            // If a subscription exists, log it and proceed
-            if (existingSubscription) {
-                // console.log('Existing subscription found. No need to re-subscribe:', existingSubscription);
-            }
-    
-            // Generate a unique deviceId for this device
+            // ✅ Generate a unique deviceId for this device
             const getDeviceId = () => {
-                let deviceId = localStorage.getItem('deviceId');
+                let deviceId = localStorage.getItem("deviceId");
                 if (!deviceId) {
                     deviceId = crypto.randomUUID(); // Generate a unique UUID
-                    localStorage.setItem('deviceId', deviceId);
+                    localStorage.setItem("deviceId", deviceId);
                 }
                 return deviceId;
             };
     
             const deviceId = getDeviceId();
-            // console.log('Device ID:', deviceId);
     
-            // Now subscribe with the correct applicationServerKey (VAPID public key)
-            const subscription = existingSubscription || await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: process.env.REACT_APP_VAPID_PUBLIC_KEY, // VAPID public key
-            });
-    
-            //console.log('New push notification subscription:', subscription);
-    
-            // Prepare subscription data
-            const arrayBufferToBase64 = (buffer) => {
-                const binary = String.fromCharCode(...new Uint8Array(buffer));  // Convert ArrayBuffer to binary string
-                return window.btoa(binary);  // Convert binary string to base64
+            // 🔍 Detect Device Type (Web, Android, iOS)
+            const getDeviceType = () => {
+                const userAgent = navigator.userAgent.toLowerCase();
+                if (/android/.test(userAgent)) return "android";
+                if (/iphone|ipad|ipod/.test(userAgent)) return "ios";
+                return "web"; // Default to web
             };
     
-            // Get the raw ArrayBuffer for p256dh and auth
-            const p256dh = subscription.getKey('p256dh');
-            const auth = subscription.getKey('auth');
+            const deviceType = getDeviceType();
     
-            // Convert both to base64
-            const p256dhBase64 = arrayBufferToBase64(p256dh);
-            const authBase64 = arrayBufferToBase64(auth);
-    
+            // ✅ Prepare subscription data
             const subscriptionData = {
                 userId: user.id,  // Assuming the user object contains an ID field
-                deviceId,         // Include the unique device ID
-                subscription: {
-                    endpoint: subscription.endpoint,
-                    keys: {
-                        p256dh: p256dhBase64,  // Encoded base64 public encryption key
-                        auth: authBase64       // Encoded base64 authentication key
-                    }
-                }
+                deviceId,         // Unique device ID
+                deviceType,       // Store device type
+                subscription: {   // Store FCM token inside subscription JSON
+                    fcmToken: fcmToken,
+                },
             };
     
-            // console.log('Subscription Data:', subscriptionData);
+            // ✅ Send the FCM token to the backend for storage
+            const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
     
-            // Now send the subscriptionData to the backend
-            try {
-                // console.log('Attempting to subscribe:', subscriptionData);
-    
-                // Dispatch subscription to backend
-                const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
-    
-                // Handle backend response
-                if (res.error && res.error.status === 400) {
-                    // console.log('Subscription already exists in the backend for this device.');
-                    return null; // Return null if the subscription already exists in the backend
-                }
-    
-                // console.log('Subscription successfully saved:', res);
-            } catch (error) {
-                // console.error('Error occurred while subscribing:', error);
-                return null; // Return null in case of any errors
+            // 🛠 Handle backend response
+            if (res.error && res.error.status === 400) {
+                console.log("ℹ️ Subscription already exists in the backend for this device.");
+                return null; // Return null if the subscription already exists in the backend
             }
-        }
-    };
     
+            console.log("✅ Subscription successfully saved:", res);
+        } catch (error) {
+            console.error("❌ Error subscribing to push notifications:", error);
+            return null;
+        }
+    };    
     
 
     // Fetch chatrooms

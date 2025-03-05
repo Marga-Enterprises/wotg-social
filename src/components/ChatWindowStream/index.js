@@ -101,6 +101,8 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   };
   
   const handleSendReaction = (reaction) => {
+      console.log('[[[REACTION CHAT STREAM COMPONENT]]]', reaction);  
+
       if (onSendReaction) {
           onSendReaction(reaction);
       }

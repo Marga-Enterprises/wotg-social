@@ -132,6 +132,7 @@ const Page = () => {
   };
   
   const sendReaction = (reaction) => {
+      console.log('[[[REACTION WORSHIP PAGE]]]', reaction); 
       if (!socket) {
           console.error("⚠️ Socket is not connected! Cannot send reaction.");
           return;

@@ -100,6 +100,15 @@ export const loginFunction = (payload) => async (dispatch) => {
             Cookies.set("refreshToken", refreshToken, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
 
             dispatch(setUserDetails(account));
+
+            // ✅ Send login details to Flutter
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler("onLoginSuccess", {
+                    userId: account.user.id,   // Extracted from JWT
+                    email: account.user.email, // Extracted from JWT
+                    token: accessToken    // Send access token
+                });
+            }
         }
 
         return res;

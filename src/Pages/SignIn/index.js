@@ -21,23 +21,13 @@ const Page = () => {
 
     const handleSubmitLogin = (event) => {
         event.preventDefault();
-    
+
         const payload = { email, password };
-    
+
         dispatch(common.ui.setLoading());
         dispatch(wotgsocial.user.loginFunction(payload))
             .then((res) => {
                 if (res.success) {
-                    // Notify Flutter about login success
-                    if (window.flutter_inappwebview) {
-                        window.flutter_inappwebview.callHandler("onLoginSuccess", {
-                            userId: res.user.id, // Adjust based on API response
-                            name: res.user.name, // Adjust based on API response
-                            token: res.token // JWT or session token
-                        });
-                    }
-    
-                    // Redirect to the menu page
                     window.location.replace('/menu');
                 } else {
                     setOpenErrorSnackbar(true);
@@ -52,7 +42,7 @@ const Page = () => {
             .finally(() => {
                 dispatch(common.ui.clearLoading());
             });
-    };    
+    };
 
     useEffect(() => {
         const token = Cookies.get('token');

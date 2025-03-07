@@ -1,0 +1,47 @@
+.privacyContainer {
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.effectiveDate {
+    text-align: center;
+    font-size: 1rem;
+    color: #777;
+}
+
+.section {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #444;
+}
+
+p, ul {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+}

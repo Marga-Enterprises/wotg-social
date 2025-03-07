@@ -27,21 +27,24 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+.sectionTitle {
     font-size: 1.5rem;
     color: #444;
+    margin-bottom: 10px;
 }
 
-p, ul {
+.text {
     font-size: 1rem;
     color: #666;
     line-height: 1.6;
 }
 
-ul {
+.list {
     padding-left: 20px;
 }
 
-li {
+.listItem {
     margin-bottom: 10px;
+    font-size: 1rem;
+    color: #666;
 }

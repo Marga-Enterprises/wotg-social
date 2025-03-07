@@ -385,3 +385,47 @@
   font-size: 20px;
   margin-left: auto;
 }
+
+.noChatIdContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+  background-color: #ece9e9;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.avatarWrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #4a90e2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.noChatIdAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.greetingText {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.noChatIdText {
+  font-size: 16px;
+  color: #666;
+}

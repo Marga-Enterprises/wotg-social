@@ -132,13 +132,9 @@ const ChatSidebar = ({
                             (participant) => participant.user.id !== currentUserId
                           ).map((participant, index) => (
                             <span key={index}>
-                              {`${participant.user.user_fname} ${participant.user.user_lname}`.length > maxLength
-                                ? `${participant.user.user_fname} ${participant.user.user_lname}`.substring(0, maxLength) + "..."
-                                : `${participant.user.user_fname} ${participant.user.user_lname}`}
+                              {`${participant.user.user_fname} ${participant.user.user_lname}`}
                             </span>
                           ))
-                        : chat.name?.length > maxLength
-                        ? `${chat.name.substring(0, maxLength)}...`
                         : chat.name || "Unnamed Chat"}
                     </p>
                     <p className={styles.chatMessage}>

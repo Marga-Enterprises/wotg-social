@@ -1,7 +1,7 @@
 .chatContainer {
   background: #fff;
   width: 100%;
-  max-width: 70px; /* Constrain the width of the container */
+  max-width: 55px; /* Constrain the width of the container */
   display: flex;
   flex-direction: column; /* Allows child elements to stack vertically */
   align-items: center;
@@ -18,8 +18,8 @@
 }
 
 .profilePicture {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   cursor: pointer;

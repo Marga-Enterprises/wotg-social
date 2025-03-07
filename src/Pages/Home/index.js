@@ -234,7 +234,7 @@ const Page = () => {
                         handleSelectChatroom(chatId);
                     } else {
                         if (!searchQuery) {
-                            handleSelectChatroom(filteredChatrooms[0].id);
+                            // handleSelectChatroom(filteredChatrooms[0].id);
                         }
                     }
                 }
@@ -403,25 +403,27 @@ const Page = () => {
 
     // Handle chatroom selection
     const handleSelectChatroom = async (chatroomId) => {
-        setSelectedChatroom(chatroomId); // Set the selected chatroom
-        setIsChatVisible(true); // Show the chat window
-    
-        // Update the local state to set `unreadCount` to 0 for the selected chatroom
-        setChatrooms((prevChatrooms) =>
-            prevChatrooms.map((chat) =>
-                chat.id === chatroomId
-                    ? { ...chat, unreadCount: 0, hasUnread: false } // Clear unread count and hasUnread flag
-                    : chat
-            )
-        );
-    
-        // Notify the backend to mark messages as read
-        if (socket) {
-            socket.emit('mark_as_read', { chatroomId, userId: user?.id });
+        if (chatroomId) {
+            setSelectedChatroom(chatroomId); // Set the selected chatroom
+            setIsChatVisible(true); // Show the chat window
+        
+            // Update the local state to set `unreadCount` to 0 for the selected chatroom
+            setChatrooms((prevChatrooms) =>
+                prevChatrooms.map((chat) =>
+                    chat.id === chatroomId
+                        ? { ...chat, unreadCount: 0, hasUnread: false } // Clear unread count and hasUnread flag
+                        : chat
+                )
+            );
+        
+            // Notify the backend to mark messages as read
+            if (socket) {
+                socket.emit('mark_as_read', { chatroomId, userId: user?.id });
+            }
+        
+            // Fetch messages for the selected chatroom
+            await fetchMessages(chatroomId);
         }
-    
-        // Fetch messages for the selected chatroom
-        await fetchMessages(chatroomId);
     };
     
     
@@ -486,6 +488,7 @@ const Page = () => {
                         isMobile={isMobile}
                         onMessageReaction={handleReactMessage}
                         onOpenAddParticipantModal={handleOpenAddParticipantModal}
+                        userDetails={user}
                     />
                 )}
 

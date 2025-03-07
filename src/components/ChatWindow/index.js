@@ -6,8 +6,9 @@ import { faFaceSmile, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './index.module.css';
+import { chatroom } from '../../redux/wotgsocial/actions';
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal, onMessageReaction }) => {
+const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal, onMessageReaction, userDetails }) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
@@ -199,229 +200,255 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     setActiveMessageId(activeMessageId === messageId ? null : messageId);
   };
 
+  useEffect(() => {
+    if (selectedChatroom === null && isMobile) {
+      onBackClick();
+    }
+  }, [selectedChatroom]);
+
   return (
-    <div className={styles.chatContainer}>
-      <div className={styles.chatHeader}>
-        {isMobile && onBackClick && selectedChatroomDetails && (
-            <div className={styles.backButtonContainer}>
-              <button
-                className={styles.backButton}
-                onClick={onBackClick}
-                aria-label="Back to chatrooms"
-              >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  strokeWidth="3.0" 
-                  stroke="currentColor" 
-                  className={styles.backIcon}
+    <>
+        { selectedChatroom ? (
+          <div className={styles.chatContainer}>
+            <div className={styles.chatHeader}>
+              {isMobile && onBackClick && selectedChatroomDetails && (
+                  <div className={styles.backButtonContainer}>
+                    <button
+                      className={styles.backButton}
+                      onClick={onBackClick}
+                      aria-label="Back to chatrooms"
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        strokeWidth="3.0" 
+                        stroke="currentColor" 
+                        className={styles.backIcon}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                { selectedChatroomDetails && (
+                  <div className={styles.participantDetails}>
+                    <div
+                      className={styles.chatAvatar}
+                      style={{
+                        backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#c0392b',
+                      }}
+                    >
+                      {selectedChatroomDetails?.Participants?.length === 2 ? (
+                        // Find the receiver (the participant who is NOT the current user)
+                        selectedChatroomDetails.Participants.filter(participant => participant?.user.id !== userId)
+                          .map((participant, index) => {
+                            return participant.user.user_profile_picture ? (
+                              <img
+                                key={index}
+                                onClick={onOpenAddParticipantModal}
+                                src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
+                                alt={participant.user.user_fname}
+                                className={styles.avatarImage}
+                              />
+                            ) : (
+                              <img
+                                key={index}
+                                onClick={onOpenAddParticipantModal}
+                                src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
+                                alt={participant.user.user_fname}
+                                className={styles.avatarImage}
+                              />
+                            );
+                          })
+                      ) : (
+                        // If it's a group chat (more than 2 participants), show the chat name's first letter
+                        <span onClick={onOpenAddParticipantModal} className={styles.avatarText}>
+                          {selectedChatroomDetails?.name ? selectedChatroomDetails.name.charAt(0).toUpperCase() : 'A'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Chat Name Display */}
+                    <p className={styles.chatNameHeader}>
+                      {selectedChatroomDetails?.Participants?.length === 2
+                        ? selectedChatroomDetails.Participants.filter(
+                            (participant) => participant?.user.id !== userId
+                          ).map((participant, index) => (
+                            <span key={index}>
+                              {`${participant.user.user_fname} ${participant.user.user_lname}`}
+                            </span>
+                          ))
+                        : selectedChatroomDetails?.name || ''}
+                    </p>
+                  </div>
+                )}
+            </div>
+            <div ref={messagesEndRef} />
+            <div className={styles.messageContainer}>
+              {realtimeMessages.length > 0 ? (
+                realtimeMessages.map((msg, index) => {
+                  const isSender = msg.senderId === userId;
+                  const receiver = selectedChatroomDetails?.Participants?.find(
+                    (participant) => participant.user.id === msg.senderId
+                  );
+
+                  const groupedReactions = msg?.reactions?.reduce((acc, reaction) => {
+                    acc[reaction.react] = (acc[reaction.react] || 0) + 1;
+                    return acc;
+                  }, {});
+
+                  return (
+                    <div key={index} className={isSender ? styles.messageSender : styles.messageReceiver}>
+                      {!isSender && (
+                        <img
+                          src={receiver?.user?.user_profile_picture
+                            ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
+                            : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
+                          alt={receiver?.user?.user_fname || "User Avatar"}
+                          className={styles.receiverAvatar}
+                        />
+                      )}
+                      <div
+                        className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
+                        {...(!isSender && {
+                          onMouseDown: (e) => handleLongPress(e, msg.id),
+                          onTouchStart: (e) => handleLongPress(e, msg.id),
+                        })}
+                      >
+                        {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
+                          <p className={styles.senderName}>{msg.sender.user_fname} {msg.sender.user_lname}</p>
+                        )}
+                        {msg?.content ? renderMessageContent(msg.content) : "No content available"}
+
+                        {msg?.reactions?.length > 0 && (
+                          <div
+                            onClick={() => handleShowMessageReactors(msg.id)}
+                            className={styles.reactionDisplay}
+                          >
+                            {Object.entries(groupedReactions).map(([type, count], i) => (
+                              <span key={i} className={styles.reactionItem}>
+                                {type === "heart" && "❤️"}
+                                {type === "clap" && "👏"}
+                                {type === "pray" && "🙏"}
+                                {type === "praise" && "🙌"}
+                              </span>
+                            ))}
+
+                            {/* Display total count of reactions */}
+                            <span className={styles.totalReactionCount}>{msg?.reactions?.length}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {!isSender && (
+                        <div>
+                          <FontAwesomeIcon
+                            onClick={() => handleShowMessageReacts(msg.id)}
+                            icon={faFaceSmileRegular}
+                            className={styles.messageReactIcon}
+                          />
+                        </div>
+                      )}
+
+                      {/* Reaction Drawer (Only Visible for Active Message) */}
+                      {activeMessageId === msg.id && !isSender && (
+                        <div className={styles.messageReactions}>
+                          {["heart", "clap", "pray", "praise"].map((reaction) => (
+                            <button key={reaction} onClick={() => handleMessageReaction(reaction, msg.id)}>
+                              {reaction === "heart" && "❤️"}
+                              {reaction === "clap" && "👏"}
+                              {reaction === "pray" && "🙏"}
+                              {reaction === "praise" && "🙌"}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className={styles.noMessages}><p>Say 'Hi' and start messaging</p></div>
+              )}
+            </div>
+
+            <div className={styles.inputContainer}>
+              <div className={styles.textareaWrapper}> {/* Wrapper for positioning */}
+                <textarea
+                  value={message}
+                  onChange={handleTextareaChange}
+                  placeholder="Type a message..."
+                  className={styles.messageTextarea}
+                  rows={1}
+                  onKeyDown={handleKeyDown}
+                ></textarea>
+
+                <button
+                  className={styles.emojiButton}  
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-                </svg>
+                  <FontAwesomeIcon onClick={toggleEmojiPicker} icon={faFaceSmile} className={styles.sendIcon}/>
+                </button>
+              </div>
+
+              {showEmojiPicker && (
+                <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
+                  <Picker 
+                    data={data} 
+                    onEmojiSelect={handleEmojiSelect} 
+                  />
+                </div>
+              )}
+
+              <button className={styles.sendButton}>
+                <FontAwesomeIcon onClick={handleSend} icon={faPaperPlane} className={styles.sendIcon} />
               </button>
             </div>
-          )}
-          { selectedChatroomDetails && (
-            <div className={styles.participantDetails}>
-              <div
-                className={styles.chatAvatar}
-                style={{
-                  backgroundColor: selectedChatroomDetails?.avatar ? 'transparent' : '#c0392b',
-                }}
-              >
-                {selectedChatroomDetails?.Participants?.length === 2 ? (
-                  // Find the receiver (the participant who is NOT the current user)
-                  selectedChatroomDetails.Participants.filter(participant => participant?.user.id !== userId)
-                    .map((participant, index) => {
-                      return participant.user.user_profile_picture ? (
+
+            {showMessageReactors && (
+              <div className={styles.modalOverlay} onClick={closeMessageReactors}>
+                <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                  <h1 className={styles.reactorName}>Message Reactions</h1>
+                  <button className={styles.closeButton} onClick={closeMessageReactors}>×</button>
+                  <ul className={styles.reactorsList}>
+                    {selectedMessageReactions.map((reactor, index) => (
+                      <li key={index} className={styles.reactorItem}>
                         <img
-                          key={index}
-                          onClick={onOpenAddParticipantModal}
-                          src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
-                          alt={participant.user.user_fname}
-                          className={styles.avatarImage}
+                          src={`${backendUrl}/uploads/${reactor.user.user_profile_picture}`}
+                          alt={reactor.user.user_fname}
+                          className={styles.reactorAvatar}
                         />
-                      ) : (
-                        <img
-                          key={index}
-                          onClick={onOpenAddParticipantModal}
-                          src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
-                          alt={participant.user.user_fname}
-                          className={styles.avatarImage}
-                        />
-                      );
-                    })
-                ) : (
-                  // If it's a group chat (more than 2 participants), show the chat name's first letter
-                  <span onClick={onOpenAddParticipantModal} className={styles.avatarText}>
-                    {selectedChatroomDetails?.name ? selectedChatroomDetails.name.charAt(0).toUpperCase() : 'A'}
-                  </span>
-                )}
-              </div>
-
-              {/* Chat Name Display */}
-              <p className={styles.chatNameHeader}>
-                {selectedChatroomDetails?.Participants?.length === 2
-                  ? selectedChatroomDetails.Participants.filter(
-                      (participant) => participant?.user.id !== userId
-                    ).map((participant, index) => (
-                      <span key={index}>
-                        {`${participant.user.user_fname} ${participant.user.user_lname}`}
-                      </span>
-                    ))
-                  : selectedChatroomDetails?.name || ''}
-              </p>
-            </div>
-          )}
-      </div>
-      <div ref={messagesEndRef} />
-      <div className={styles.messageContainer}>
-        {realtimeMessages.length > 0 ? (
-          realtimeMessages.map((msg, index) => {
-            const isSender = msg.senderId === userId;
-            const receiver = selectedChatroomDetails?.Participants?.find(
-              (participant) => participant.user.id === msg.senderId
-            );
-
-            const groupedReactions = msg?.reactions?.reduce((acc, reaction) => {
-              acc[reaction.react] = (acc[reaction.react] || 0) + 1;
-              return acc;
-            }, {});
-
-            return (
-              <div key={index} className={isSender ? styles.messageSender : styles.messageReceiver}>
-                {!isSender && (
-                  <img
-                    src={receiver?.user?.user_profile_picture
-                      ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
-                      : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
-                    alt={receiver?.user?.user_fname || "User Avatar"}
-                    className={styles.receiverAvatar}
-                  />
-                )}
-                <div
-                  className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
-                  {...(!isSender && {
-                    onMouseDown: (e) => handleLongPress(e, msg.id),
-                    onTouchStart: (e) => handleLongPress(e, msg.id),
-                  })}
-                >
-                  {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
-                    <p className={styles.senderName}>{msg.sender.user_fname} {msg.sender.user_lname}</p>
-                  )}
-                  {msg?.content ? renderMessageContent(msg.content) : "No content available"}
-
-                  {msg?.reactions?.length > 0 && (
-                    <div
-                      onClick={() => handleShowMessageReactors(msg.id)}
-                      className={styles.reactionDisplay}
-                    >
-                      {Object.entries(groupedReactions).map(([type, count], i) => (
-                        <span key={i} className={styles.reactionItem}>
-                          {type === "heart" && "❤️"}
-                          {type === "clap" && "👏"}
-                          {type === "pray" && "🙏"}
-                          {type === "praise" && "🙌"}
+                        <span className={styles.reactorName}>{reactor.user.user_fname} {reactor.user.user_lname}</span>
+                        <span className={styles.reactionEmoji}>
+                          {reactor.react === "heart" && "❤️"}
+                          {reactor.react === "clap" && "👏"}
+                          {reactor.react === "pray" && "🙏"}
+                          {reactor.react === "praise" && "🙌"}
                         </span>
-                      ))}
-
-                      {/* Display total count of reactions */}
-                      <span className={styles.totalReactionCount}>{msg?.reactions?.length}</span>
-                    </div>
-                  )}
-                </div>
-
-                {!isSender && (
-                  <div>
-                    <FontAwesomeIcon
-                      onClick={() => handleShowMessageReacts(msg.id)}
-                      icon={faFaceSmileRegular}
-                      className={styles.messageReactIcon}
-                    />
-                  </div>
-                )}
-
-                {/* Reaction Drawer (Only Visible for Active Message) */}
-                {activeMessageId === msg.id && !isSender && (
-                  <div className={styles.messageReactions}>
-                    {["heart", "clap", "pray", "praise"].map((reaction) => (
-                      <button key={reaction} onClick={() => handleMessageReaction(reaction, msg.id)}>
-                        {reaction === "heart" && "❤️"}
-                        {reaction === "clap" && "👏"}
-                        {reaction === "pray" && "🙏"}
-                        {reaction === "praise" && "🙌"}
-                      </button>
+                      </li>
                     ))}
-                  </div>
-                )}
+                  </ul>
+                </div>
               </div>
-            );
-          })
+            )}
+          </div>
         ) : (
-          <div className={styles.noMessages}><p>Say 'Hi' and start messaging</p></div>
-        )}
-      </div>
-
-      <div className={styles.inputContainer}>
-        <div className={styles.textareaWrapper}> {/* Wrapper for positioning */}
-          <textarea
-            value={message}
-            onChange={handleTextareaChange}
-            placeholder="Type a message..."
-            className={styles.messageTextarea}
-            rows={1}
-            onKeyDown={handleKeyDown}
-          ></textarea>
-
-          <button
-            className={styles.emojiButton}  
-          >
-            <FontAwesomeIcon onClick={toggleEmojiPicker} icon={faFaceSmile} className={styles.sendIcon}/>
-          </button>
-        </div>
-
-        {showEmojiPicker && (
-          <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
-            <Picker 
-              data={data} 
-              onEmojiSelect={handleEmojiSelect} 
-            />
+          <div className={styles.noChatIdContainer}>
+            <div className={styles.avatarWrapper}>
+              <img
+                src={`${backendUrl}/uploads/${userDetails.user_profile_picture}`}
+                alt={userDetails.user_fname}
+                className={styles.noChatIdAvatarImage}
+              />
+            </div>
+            <p className={styles.greetingText}>Hello, {userDetails.user_fname}!</p>
+            <p className={styles.noChatIdText}>
+              Welcome to WOTG Community! Connect, share, and grow together.  
+              Select a chat to start messaging and be part of the conversation.
+            </p>
           </div>
-        )}
+        ) }
 
-        <button className={styles.sendButton}>
-          <FontAwesomeIcon onClick={handleSend} icon={faPaperPlane} className={styles.sendIcon} />
-        </button>
-      </div>
-
-      {showMessageReactors && (
-        <div className={styles.modalOverlay} onClick={closeMessageReactors}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h1 className={styles.reactorName}>Message Reactions</h1>
-            <button className={styles.closeButton} onClick={closeMessageReactors}>×</button>
-            <ul className={styles.reactorsList}>
-              {selectedMessageReactions.map((reactor, index) => (
-                <li key={index} className={styles.reactorItem}>
-                  <img
-                    src={`${backendUrl}/uploads/${reactor.user.user_profile_picture}`}
-                    alt={reactor.user.user_fname}
-                    className={styles.reactorAvatar}
-                  />
-                  <span className={styles.reactorName}>{reactor.user.user_fname} {reactor.user.user_lname}</span>
-                  <span className={styles.reactionEmoji}>
-                    {reactor.react === "heart" && "❤️"}
-                    {reactor.react === "clap" && "👏"}
-                    {reactor.react === "pray" && "🙏"}
-                    {reactor.react === "praise" && "🙌"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
    
 };

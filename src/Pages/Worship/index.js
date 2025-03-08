@@ -244,6 +244,7 @@ const Page = () => {
           {/* Links on the Right */}
           <div className={styles.navLinks}>
             <a href="/" className={styles.navLink}>Chat</a>
+            <a href="/blogs" className={styles.navLink}>Devotion</a>
             <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
           </div>
         </div>

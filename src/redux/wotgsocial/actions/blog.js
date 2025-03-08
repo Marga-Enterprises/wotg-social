@@ -28,6 +28,7 @@ export const getAllBlogsAction = (payload) => async (dispatch) => {
 // New action to get blog by ID
 export const getBlogByIdAction = (id) => async (dispatch) => {
   try {
+    console.log('[[[[[[BLOG ID]]]]]]', id);
     const res = await getBlogById(id);
     const { success, data } = res;
 

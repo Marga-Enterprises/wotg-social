@@ -245,6 +245,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                           .map((participant, index) => {
                             return participant.user.user_profile_picture ? (
                               <img
+                                loading="lazy"
                                 key={index}
                                 onClick={onOpenAddParticipantModal}
                                 src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
@@ -254,6 +255,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                             ) : (
                               <img
                                 key={index}
+                                loading="lazy"
                                 onClick={onOpenAddParticipantModal}
                                 src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
                                 alt={participant.user.user_fname}
@@ -302,6 +304,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                     <div key={index} className={isSender ? styles.messageSender : styles.messageReceiver}>
                       {!isSender && (
                         <img
+                          loading="lazy"
                           src={receiver?.user?.user_profile_picture
                             ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
                             : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
@@ -413,6 +416,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                     {selectedMessageReactions.map((reactor, index) => (
                       <li key={index} className={styles.reactorItem}>
                         <img
+                          loading="lazy"
                           src={`${backendUrl}/uploads/${reactor.user.user_profile_picture}`}
                           alt={reactor.user.user_fname}
                           className={styles.reactorAvatar}
@@ -435,6 +439,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           <div className={styles.noChatIdContainer}>
             <div className={styles.avatarWrapper}>
               <img
+                loading="lazy"
                 src={`${backendUrl}/uploads/${userDetails.user_profile_picture}`}
                 alt={userDetails.user_fname}
                 className={styles.noChatIdAvatarImage}

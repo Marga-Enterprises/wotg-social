@@ -347,6 +347,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                   >
                     {!isSender && (
                       <img
+                        loading="lazy"
                         src={receiver?.user?.user_profile_picture
                           ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
                           : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
@@ -495,6 +496,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
               {selectedMessageReactions.map((reactor, index) => (
                 <li key={index} className={styles.reactorItem}>
                   <img
+                    loading="lazy"
                     src={`${backendUrl}/uploads/${reactor.user.user_profile_picture}`}
                     alt={reactor.user.user_fname}
                     className={styles.reactorAvatar}

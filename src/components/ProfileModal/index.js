@@ -108,7 +108,7 @@ const Profile = ({ onClose }) => {
                 <div className={styles.profileImageContainer}>
                   <label htmlFor="file" className={styles.profileImageLabel}>
                     {previewImage ? (
-                      <img src={previewImage} alt="Profile Preview" className={styles.profileImage} />
+                      <img loading="lazy" src={previewImage} alt="Profile Preview" className={styles.profileImage} />
                     ) : (
                       <div className={styles.placeholder}>Upload Image</div>
                     )}

@@ -46,7 +46,7 @@ const ProfileSidebar = ({ onOpenProfileModal }) => {
   return (
     <div className={styles.chatContainer}>
       {profilePicture ? (
-        <img onClick={onOpenProfileModal} src={profilePicture} alt="Profile" className={styles.profilePicture} />
+        <img loading="lazy" onClick={onOpenProfileModal} src={profilePicture} alt="Profile" className={styles.profilePicture} />
       ) : (
         <div className={styles.fallbackAvatar} onClick={onOpenProfileModal}>{userInitials}</div>
       )}

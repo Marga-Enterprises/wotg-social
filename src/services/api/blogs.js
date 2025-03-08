@@ -8,5 +8,5 @@ export async function getAllBlogs(payload) {
 }
 
 export async function getBlogById(payload) {
-  return GET('/blogs', payload);
+  return GET(`/blogs/${payload}`);
 }

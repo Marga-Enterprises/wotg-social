@@ -7,17 +7,7 @@ import styles from './index.module.css';
 import wotgLogo from './wotg-logo.png';
 import prayer from './prayer.jpg';
 
-// Function to strip HTML tags
-const stripHtml = (html) => {
-    return html.replace(/<\/?[^>]+(>|$)/g, ""); // Removes all HTML tags
-};
-
-// Function to decode HTML entities
-const decodeHtmlEntities = (text) => {
-    const textArea = document.createElement("textarea");
-    textArea.innerHTML = text;
-    return textArea.value;
-};
+import { Link } from "react-router-dom";
 
 const Page = () => {
     const dispatch = useDispatch();
@@ -29,6 +19,18 @@ const Page = () => {
         totalPages: 0,
     });
     const [loading, setLoading] = useState(true);
+
+    // Function to strip HTML tags
+    const stripHtml = (html) => {
+        return html.replace(/<\/?[^>]+(>|$)/g, ""); // Removes all HTML tags
+    };
+
+    // Function to decode HTML entities
+    const decodeHtmlEntities = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.innerHTML = text;
+        return textArea.value;
+    };
 
     const handleBlogList = useCallback(
         (pageIndex = 1) => {
@@ -102,6 +104,7 @@ const Page = () => {
                                 blogs.map((blog) => (
                                     <div key={blog.id} className={styles.blogCard}>
                                         <h3 className={styles.blogTitle}>{blog.blog_title}</h3>
+
                                         {/* Placeholder for Image */}
                                         <div className={styles.blogImagePlaceholder}>[Image Placeholder]</div>
 
@@ -110,14 +113,16 @@ const Page = () => {
                                             {truncateText(decodeHtmlEntities(stripHtml(blog.blog_body)), 200)}
                                         </p>
 
-                                        <button className={styles.readMore}>See More</button>
+                                        {/* ✅ Updated "See More" as a <Link> */}
+                                        <Link to={`/blog/${blog.id}`} className={styles.readMore}>
+                                            See More
+                                        </Link>
                                     </div>
                                 ))
                             ) : (
                                 <p className={styles.noBlogs}>No blogs available.</p>
                             )}
                         </div>
-
                         <div className={styles.pagination}>
                             <button
                                 className={styles.paginationButton}

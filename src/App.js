@@ -9,6 +9,7 @@ import Menu from './Pages/Menu';
 import Default from './Pages/Default';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
 import Blogs from './Pages/Blogs';
+import BlogDetails from './Pages/BlogDetails';
 
 // REDUX
 import { useDispatch } from 'react-redux';
@@ -35,13 +36,14 @@ function App() {
         </header>*/}
         <main> {/* Add top padding to the main content */}
           <Routes>
-            <Route path="/worship" exact element={<AuthRouter><Worship /></AuthRouter>} />
-            <Route path="/menu" exact element={<AuthRouter><Menu /></AuthRouter>} />
-            <Route path="/blogs" exact element={<AuthRouter><Blogs /></AuthRouter>} />
-            <Route path="/" exact element={<AuthRouter><Home /></AuthRouter>} />
-            <Route path="/login" exact element={<SignIn />} />
-            <Route path="/register" exact element={<SignUp />} />
-            <Route path="/privacypolicy" exact element={<PrivacyPolicy />} />
+            <Route path="/worship" element={<AuthRouter><Worship /></AuthRouter>} />
+            <Route path="/menu" element={<AuthRouter><Menu /></AuthRouter>} />
+            <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
+            <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
+            <Route path="/" element={<AuthRouter><Home /></AuthRouter>} />
+            <Route path="/login" element={<SignIn />} />
+            <Route path="/register" element={<SignUp />} />
+            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
             <Route path="*" element={<Default />} />
           </Routes>
         </main>

@@ -95,20 +95,17 @@
   width: auto;
 }
 
-/* Container for links */
 .navLinks {
   display: flex;
-  gap: 20px; /* Space between links */
 }
 
 /* Styling for links */
 .navLink {
-  color: rgb(88, 88, 88);
+  color: #616161;
   text-decoration: none;
   font-size: 16px;
-  font-weight: bold;
   padding: 8px 12px;
-  transition: background 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .navLink:hover {

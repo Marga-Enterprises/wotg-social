@@ -96,6 +96,7 @@ const ChatSidebar = ({
                             if (participant.user.user_profile_picture) {
                               return (
                                 <img
+                                  loading="lazy"
                                   key={index}
                                   src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
                                   alt={participant.user.user_fname}
@@ -105,6 +106,7 @@ const ChatSidebar = ({
                             } else {
                               return (
                                 <img
+                                  loading="lazy"
                                   key={index}
                                   src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
                                   alt={participant.user.user_fname}

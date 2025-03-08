@@ -10,6 +10,7 @@ const Page = () => {
                 <ul className={styles.menuList}>
                     <li><a href="/worship">Worship</a></li>
                     <li><a href="/">Chat</a></li>
+                    <li><a href="/blogs">Devotion</a></li>
                 </ul>
             </div>
         </div>

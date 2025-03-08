@@ -8,6 +8,7 @@ import Worship from './Pages/Worship';
 import Menu from './Pages/Menu';
 import Default from './Pages/Default';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
+import Blogs from './Pages/Blogs';
 
 // REDUX
 import { useDispatch } from 'react-redux';
@@ -36,6 +37,7 @@ function App() {
           <Routes>
             <Route path="/worship" exact element={<AuthRouter><Worship /></AuthRouter>} />
             <Route path="/menu" exact element={<AuthRouter><Menu /></AuthRouter>} />
+            <Route path="/blogs" exact element={<AuthRouter><Blogs /></AuthRouter>} />
             <Route path="/" exact element={<AuthRouter><Home /></AuthRouter>} />
             <Route path="/login" exact element={<SignIn />} />
             <Route path="/register" exact element={<SignUp />} />

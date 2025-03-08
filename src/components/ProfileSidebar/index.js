@@ -52,11 +52,11 @@ const ProfileSidebar = ({ onOpenProfileModal }) => {
       )}
 
       <div>
-        <div>
+        {/*<div>
           <a href="/worship">
             <FontAwesomeIcon size="2x" icon={faBroadcastTower} className={styles.headerIcon}/>
           </a>
-        </div>
+        </div>*/}
 
         <div>
           <FontAwesomeIcon 

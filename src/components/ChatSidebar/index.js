@@ -43,23 +43,24 @@ const ChatSidebar = ({
       <div className={styles.chatContainer}>
         {/* Header */}
         <div className={styles.header}>
-          <div header className={styles.headerContentLeft}>
+          {/*<div header className={styles.headerContentLeft}>
             <h2 className={styles.title}>MESSAGES</h2>
+          </div>*/}
+          <div header className={styles.headerContentLeft}>
+            <svg 
+              onClick={onOpenCreateChatroomModal} 
+              xmlns="http://www.w3.org/2000/svg" 
+              className={styles.newChatButton}
+              fill="none" 
+              viewBox="0 0 24 24" 
+              strokeWidth="1.5" 
+              stroke="currentColor" 
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            <a className={styles.worshipLink} href="/worship">Worship</a>
+            <a className={styles.worshipLink} href="/blogs">Devotion</a>
           </div>
-          {/*<button onClick={onOpenCreateChatroomModal} className={styles.newChatButton}>
-            + New Chat
-          </button>*/}
-          <svg 
-            onClick={onOpenCreateChatroomModal} 
-            xmlns="http://www.w3.org/2000/svg" 
-            className={styles.newChatButton}
-            fill="none" 
-            viewBox="0 0 24 24" 
-            strokeWidth="1.5" 
-            stroke="currentColor" 
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
         </div>
 
         {/* Search */}

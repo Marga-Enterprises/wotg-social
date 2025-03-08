@@ -54,6 +54,11 @@
   width : 3rem;
 }
 
+.worshipLink {
+  color: #17bfdd;
+  font-weight: bold;
+}
+
 .headerIcon {
   padding: 0;
   background-color: transparent;
@@ -188,5 +193,5 @@
 .headerContentLeft {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
 }

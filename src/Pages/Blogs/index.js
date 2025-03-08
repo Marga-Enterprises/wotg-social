@@ -20,6 +20,11 @@ const Page = () => {
     });
     const [loading, setLoading] = useState(true);
 
+    const backendUrl =
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:5000'
+      : 'https://community.wotgonline.com/api';
+
     // Function to strip HTML tags
     const stripHtml = (html) => {
         return html.replace(/<\/?[^>]+(>|$)/g, ""); // Removes all HTML tags
@@ -101,12 +106,20 @@ const Page = () => {
                     <div className={styles.leftContainer}>
                         <div className={styles.blogsContainer}>
                             {blogs.length > 0 ? (
-                                blogs.map((blog) => (
+                                blogs.map((blog, index) => (
                                     <div key={blog.id} className={styles.blogCard}>
                                         <h3 className={styles.blogTitle}>{blog.blog_title}</h3>
 
                                         {/* Placeholder for Image */}
-                                        <div className={styles.blogImagePlaceholder}>[Image Placeholder]</div>
+                                        <div className={styles.blogImagePlaceholder}>
+                                            <img
+                                                loading="lazy"
+                                                key={index}
+                                                src={`${backendUrl}/uploads/${blog.blog_thumbnail}`}
+                                                alt={blog.blog_title}
+                                                className={styles.avatarImage}
+                                            />
+                                        </div>
 
                                         {/* Render Blog Body as Plain Text (No HTML + No Entities) */}
                                         <p className={styles.blogBody}>

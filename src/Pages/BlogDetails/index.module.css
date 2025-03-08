@@ -103,3 +103,22 @@
 .backButton:hover {
     background-color: #c53030; /* Darker red on hover */
 }
+
+/* ✅ Blog Image Container - Centers the image */
+.blogImageContainer {
+    width: 100%;
+    height: 250px; /* Adjust height if needed */
+    display: flex;
+    align-items: center; /* Centers vertically */
+    justify-content: center; /* Centers horizontally */
+    border-radius: 8px;
+    overflow: hidden; /* Prevents image stretching */
+}
+
+/* ✅ Blog Image - Ensures proper fit */
+.blogImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Ensures image is fully visible without cropping */
+    border-radius: 8px;
+}

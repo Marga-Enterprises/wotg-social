@@ -5,6 +5,7 @@ import { wotgsocial } from '../../redux/combineActions';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 import wotgLogo from './wotg-logo.png';
+import wotgLogo1 from './wotgLogo.jpg';
 import prayer from './prayer.jpg';
 
 import { Link } from "react-router-dom";
@@ -111,16 +112,17 @@ const Page = () => {
                                         <h3 className={styles.blogTitle}>{blog.blog_title}</h3>
 
                                         {/* Placeholder for Image */}
-                                        <div className={styles.blogImagePlaceholder}>
+                                        <div
+                                            className={styles.blogImageContainer}
+                                            style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}
+                                        >
                                             <img
                                                 loading="lazy"
-                                                key={index}
-                                                src={`${backendUrl}/uploads/${blog.blog_thumbnail}`}
+                                                src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : wotgLogo1}
                                                 alt={blog.blog_title}
-                                                className={styles.avatarImage}
+                                                className={styles.blogImage}
                                             />
                                         </div>
-
                                         {/* Render Blog Body as Plain Text (No HTML + No Entities) */}
                                         <p className={styles.blogBody}>
                                             {truncateText(decodeHtmlEntities(stripHtml(blog.blog_body)), 200)}

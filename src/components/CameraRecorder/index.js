@@ -8,11 +8,13 @@ import LoadingSpinner from '../LoadingSpinner';
 
 const CameraRecorder = ({ blogId }) => {
     const dispatch = useDispatch();
-    const [videoBlob, setVideoBlob] = useState(null);
-    const [mediaUrl, setMediaUrl] = useState(null);
-    const [isRecording, setIsRecording] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [cameraAvailable, setCameraAvailable] = useState(true);
+    const [videoBlob, setVideoBlob] = useState(null); // Holds the recorded video file
+    const [isRecording, setIsRecording] = useState(false); // Tracks recording state
+    const [loading, setLoading] = useState(false); // Loading state for uploading
+    const [cameraAvailable, setCameraAvailable] = useState(true); // Detects camera presence
+    const [startRecording, setStartRecording] = useState(() => () => {});
+    const [stopRecording, setStopRecording] = useState(() => () => {});
+    const [status, setStatus] = useState("Idle");
 
     useEffect(() => {
         navigator.mediaDevices.enumerateDevices()
@@ -24,7 +26,7 @@ const CameraRecorder = ({ blogId }) => {
     }, []);
 
     const handleSaveVideo = () => {
-        if (!videoBlob) return;
+        if (!videoBlob) return alert("No video recorded.");
 
         const file = new File([videoBlob], `blog-video-${blogId}.mp4`, { type: 'video/mp4' });
 
@@ -48,71 +50,57 @@ const CameraRecorder = ({ blogId }) => {
                     {!cameraAvailable ? (
                         <p className={styles.noCameraMessage}>🚫 Camera not detected</p>
                     ) : (
-                        <ReactMediaRecorder
-                            video
-                            render={({ startRecording, stopRecording, mediaBlobUrl, status }) => {
-                                return (
-                                    <div className={styles.recorder}>
-                                        <p>Status: {status}</p>
+                        <>
+                            {/* ReactMediaRecorder (Hidden) to store recording functions */}
+                            <ReactMediaRecorder
+                                video
+                                render={({ startRecording, stopRecording, mediaBlobUrl, status }) => {
+                                    setStartRecording(() => startRecording);
+                                    setStopRecording(() => stopRecording);
+                                    setStatus(status);
+                                    return null;
+                                }}
+                            />
 
-                                        {/* ✅ Container for Video Preview & Buttons */}
-                                        <div className={styles.videoContainer}>
-                                            {/* ✅ Camera Preview while Recording */}
-                                            {(isRecording || !mediaUrl) && (
-                                                <video autoPlay playsInline className={styles.cameraPreview}>
-                                                    <track kind="captions" />
-                                                </video>
-                                            )}
+                            <div className={styles.recorder}>
+                                <p>Status: {status}</p>
 
-                                            {/* ✅ Show Video Preview After Recording */}
-                                            {mediaUrl && !isRecording && (
-                                                <video src={mediaUrl} controls className={styles.videoPreview} />
-                                            )}
+                                {/* ✅ Camera Live Feed while Recording */}
+                                {isRecording && (
+                                    <video autoPlay playsInline className={styles.cameraPreview}>
+                                        <track kind="captions" />
+                                    </video>
+                                )}
 
-                                            {/* Recording Controls */}
-                                            <div className={styles.controls}>
-                                                {!isRecording ? (
-                                                    <button onClick={() => {
-                                                        setIsRecording(true);
-                                                        startRecording();
-                                                    }} className={styles.recordButton}>
-                                                        🎥 Start Recording
-                                                    </button>
-                                                ) : (
-                                                    <button onClick={() => {
-                                                        stopRecording();
-                                                        setIsRecording(false);
-                                                        fetch(mediaBlobUrl)
-                                                            .then(res => res.blob())
-                                                            .then(blob => {
-                                                                setVideoBlob(blob);
-                                                                setMediaUrl(mediaBlobUrl);
-                                                            });
-                                                    }} className={styles.stopButton}>
-                                                        ⏹ Stop Recording
-                                                    </button>
-                                                )}
-                                            </div>
+                                {/* Recording Controls */}
+                                <div className={styles.controls}>
+                                    {!isRecording ? (
+                                        <button onClick={() => {
+                                            setIsRecording(true);
+                                            startRecording();
+                                        }} className={styles.recordButton}>
+                                            🎥 Start Recording
+                                        </button>
+                                    ) : (
+                                        <button onClick={() => {
+                                            stopRecording();
+                                            setIsRecording(false);
+                                        }} className={styles.stopButton}>
+                                            ⏹ Stop Recording
+                                        </button>
+                                    )}
+                                </div>
 
-                                            {/* ✅ Keep Save & Discard Buttons After Recording */}
-                                            {mediaUrl && (
-                                                <div className={styles.actionButtons}>
-                                                    <button onClick={handleSaveVideo} className={styles.saveButton}>
-                                                        ✅ Save Video
-                                                    </button>
-                                                    <button onClick={() => {
-                                                        setVideoBlob(null);
-                                                        setMediaUrl(null);
-                                                    }} className={styles.discardButton}>
-                                                        ❌ Discard
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
+                                {/* ✅ Show Save Button AFTER Stopping Recording */}
+                                {status === "stopped" && (
+                                    <div className={styles.actionButtons}>
+                                        <button onClick={handleSaveVideo} className={styles.saveButton}>
+                                            ✅ Save Video
+                                        </button>
                                     </div>
-                                );
-                            }}
-                        />
+                                )}
+                            </div>
+                        </>
                     )}
                 </div>
             )}

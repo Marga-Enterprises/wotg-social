@@ -3,18 +3,7 @@
     margin-top: 20px;
 }
 
-.videoContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.cameraPreview, .videoPreview {
+.cameraPreview {
     width: 100%;
     max-width: 400px;
     height: auto;
@@ -29,7 +18,7 @@
     margin-top: 10px;
 }
 
-.recordButton, .stopButton, .saveButton, .discardButton {
+.recordButton, .stopButton, .saveButton {
     padding: 10px 15px;
     font-size: 16px;
     border: none;
@@ -49,10 +38,5 @@
 
 .saveButton {
     background-color: green;
-    color: white;
-}
-
-.discardButton {
-    background-color: gray;
     color: white;
 }

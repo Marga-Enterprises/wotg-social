@@ -1,0 +1,61 @@
+.recorderContainer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.recorder p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.videoPreview {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+.controls {
+    margin-top: 10px;
+}
+
+.recordButton, .stopButton {
+    background-color: red;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.stopButton {
+    background-color: black;
+}
+
+.actionButtons {
+    margin-top: 10px;
+}
+
+.saveButton {
+    background-color: green;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.discardButton {
+    background-color: gray;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+}

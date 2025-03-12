@@ -10,7 +10,11 @@ import prayer from './prayer.jpg';
 
 import { Link } from "react-router-dom";
 
+import Cookies from 'js-cookie';
+
 const Page = () => {
+    const account = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
+
     const dispatch = useDispatch();
     const [blogs, setBlogs] = useState([]);
     const [pageSize] = useState(5);
@@ -129,9 +133,18 @@ const Page = () => {
                                         </p>
 
                                         {/* ✅ Updated "See More" as a <Link> */}
-                                        <Link to={`/blog/${blog.id}`} className={styles.readMore}>
-                                            See More
-                                        </Link>
+
+                                        <div className={styles.linksContainer}>
+                                            <Link to={`/blog/${blog.id}`} className={styles.readMore}>
+                                                See More
+                                            </Link>
+
+                                            { account.user_role !== 'user' && (
+                                                <Link to={`/blog/upload-video/${blog.id}`} className={styles.readMore}>
+                                                    Upload Video
+                                                </Link>
+                                            )}
+                                        </div>
                                     </div>
                                 ))
                             ) : (

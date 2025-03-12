@@ -64,6 +64,12 @@
     border-radius: 8px;
 }
 
+.linksContainer {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
 .blogBody {
     font-size: 14px;
@@ -74,7 +80,7 @@
 .readMore {
     background-color: transparent;
     color: darkred;
-    border: 2px solid darkred;
+    border: 1.5px solid darkred;
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 14px;

@@ -10,6 +10,7 @@ import Default from './Pages/Default';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
 import Blogs from './Pages/Blogs';
 import BlogDetails from './Pages/BlogDetails';
+import UploadVideo from './Pages/UploadVideo'
 
 // REDUX
 import { useDispatch } from 'react-redux';
@@ -19,7 +20,8 @@ import { wotgsocial } from './redux/combineActions';
 // import Navbar from './components/Navbar';
 // import Footer from './components/Footer';
 import AuthRouter from './components/AuthRouter'
-import { use, useEffect } from 'react';
+import AdminRouter from './components/AdminRouter'
+import { useEffect } from 'react';
 
 function App() {
   const dispatch = useDispatch();
@@ -40,6 +42,7 @@ function App() {
             <Route path="/menu" element={<AuthRouter><Menu /></AuthRouter>} />
             <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
             <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
+            <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
             <Route path="/" element={<AuthRouter><Home /></AuthRouter>} />
             <Route path="/login" element={<SignIn />} />
             <Route path="/register" element={<SignUp />} />

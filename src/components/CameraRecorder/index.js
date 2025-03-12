@@ -8,12 +8,15 @@ import LoadingSpinner from '../LoadingSpinner';
 
 const CameraRecorder = ({ blogId }) => {
     const dispatch = useDispatch();
-    const [videoBlob, setVideoBlob] = useState(null); // Holds the recorded video file
-    const [isRecording, setIsRecording] = useState(false); // Tracks recording state
-    const [loading, setLoading] = useState(false); // Loading state for uploading
-    const [cameraAvailable, setCameraAvailable] = useState(true); // Detects camera presence
-    const [startRecording, setStartRecording] = useState(() => () => {});
-    const [stopRecording, setStopRecording] = useState(() => () => {});
+    const [videoBlob, setVideoBlob] = useState(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [cameraAvailable, setCameraAvailable] = useState(true);
+
+    // ✅ Store recording functions in state
+    const [startRecordingFn, setStartRecordingFn] = useState(null);
+    const [stopRecordingFn, setStopRecordingFn] = useState(null);
+    const [mediaBlobUrl, setMediaBlobUrl] = useState(null);
     const [status, setStatus] = useState("Idle");
 
     useEffect(() => {
@@ -30,10 +33,7 @@ const CameraRecorder = ({ blogId }) => {
 
         const file = new File([videoBlob], `blog-video-${blogId}.mp4`, { type: 'video/mp4' });
 
-        const payload = {
-            id: blogId,
-            file: file
-        };
+        const payload = { id: blogId, file };
 
         setLoading(true);
 
@@ -51,12 +51,13 @@ const CameraRecorder = ({ blogId }) => {
                         <p className={styles.noCameraMessage}>🚫 Camera not detected</p>
                     ) : (
                         <>
-                            {/* ReactMediaRecorder (Hidden) to store recording functions */}
+                            {/* ✅ Store Recording Functions Without Infinite Loop */}
                             <ReactMediaRecorder
                                 video
                                 render={({ startRecording, stopRecording, mediaBlobUrl, status }) => {
-                                    setStartRecording(() => startRecording);
-                                    setStopRecording(() => stopRecording);
+                                    if (!startRecordingFn) setStartRecordingFn(() => startRecording);
+                                    if (!stopRecordingFn) setStopRecordingFn(() => stopRecording);
+                                    setMediaBlobUrl(mediaBlobUrl);
                                     setStatus(status);
                                     return null;
                                 }}
@@ -76,15 +77,19 @@ const CameraRecorder = ({ blogId }) => {
                                 <div className={styles.controls}>
                                     {!isRecording ? (
                                         <button onClick={() => {
-                                            setIsRecording(true);
-                                            startRecording();
+                                            if (startRecordingFn) {
+                                                setIsRecording(true);
+                                                startRecordingFn();
+                                            }
                                         }} className={styles.recordButton}>
                                             🎥 Start Recording
                                         </button>
                                     ) : (
                                         <button onClick={() => {
-                                            stopRecording();
-                                            setIsRecording(false);
+                                            if (stopRecordingFn) {
+                                                stopRecordingFn();
+                                                setIsRecording(false);
+                                            }
                                         }} className={styles.stopButton}>
                                             ⏹ Stop Recording
                                         </button>

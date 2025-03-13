@@ -20,8 +20,10 @@ const Page = () => {
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [step, setStep] = useState(0);
-    const [scriptText, setScriptText] = useState(""); // Hold script text
-    const [recordedVideo, setRecordedVideo] = useState(null); // Store recorded video
+    const [scriptText, setScriptText] = useState(""); // ✅ Hold script text
+    const [recordedVideo, setRecordedVideo] = useState(null); // ✅ Store recorded video
+    const [fontSize, setFontSize] = useState(16); // ✅ Store font size from Teleprompter
+    const [scrollSpeed, setScrollSpeed] = useState(2); // ✅ Store scroll speed from Teleprompter
 
     // Function to remove all <img> elements from HTML string
     const removeImagesFromHTML = (htmlString) => {
@@ -40,7 +42,7 @@ const Page = () => {
                 if (res.success) {
                     setBlog(res.data);
     
-                    // Convert HTML to plain text
+                    // ✅ Convert HTML to plain text
                     const cleanedHtml = removeImagesFromHTML(res.data.blog_body);
                     const plainText = new DOMParser().parseFromString(cleanedHtml, 'text/html').body.textContent;
     
@@ -74,7 +76,6 @@ const Page = () => {
                         </div>
                     )}
 
-
                     <div className={styles.blogContainer}>
                         {blog ? (
                             <div>
@@ -88,6 +89,10 @@ const Page = () => {
                                 {step === 1 && (
                                     <TeleprompterPreview 
                                         scriptText={scriptText}
+                                        fontSize={fontSize} /* ✅ Pass user settings */
+                                        setFontSize={setFontSize}
+                                        scrollSpeed={scrollSpeed}
+                                        setScrollSpeed={setScrollSpeed}
                                         onPrev={() => setStep(0)}
                                         onNext={() => setStep(2)}
                                     />
@@ -95,6 +100,8 @@ const Page = () => {
                                 {step === 2 && (
                                     <RecordingSection 
                                         scriptText={scriptText}
+                                        fontSize={fontSize} /* ✅ Uses the same font size */
+                                        scrollSpeed={scrollSpeed} /* ✅ Uses the same scroll speed */
                                         setRecordedVideo={setRecordedVideo}
                                         onPrev={() => setStep(1)}
                                         onNext={() => setStep(3)}

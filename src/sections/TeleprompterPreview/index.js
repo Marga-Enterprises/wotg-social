@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./index.module.css";
 
-const Section = ({ scriptText, onNext, onPrev }) => {
-    const [fontSize, setFontSize] = useState(16);
-    const [scrollSpeed, setScrollSpeed] = useState(2);
+const TeleprompterPreview = ({ 
+    scriptText, 
+    fontSize, setFontSize, // ✅ Now using props to pass font size 
+    scrollSpeed, setScrollSpeed, // ✅ Now using props to pass scroll speed 
+    onNext, 
+    onPrev 
+}) => {
     const [isScrolling, setIsScrolling] = useState(false);
     const [cameraStream, setCameraStream] = useState(null);
     const [isFrontCamera, setIsFrontCamera] = useState(true);
@@ -24,13 +28,11 @@ const Section = ({ scriptText, onNext, onPrev }) => {
         if (teleprompterRef.current) {
             teleprompterRef.current.scrollTop = 0; // ✅ Ensures teleprompter starts from the top
         }
-    }, [scriptText]); // ✅ Runs when scriptText is set or changed
+    }, [scriptText]);
 
     const startCamera = async () => {
         try {
-            const constraints = {
-                video: { facingMode: isFrontCamera ? "user" : "environment" },
-            };
+            const constraints = { video: { facingMode: isFrontCamera ? "user" : "environment" } };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             videoRef.current.srcObject = stream;
             setCameraStream(stream);
@@ -51,11 +53,11 @@ const Section = ({ scriptText, onNext, onPrev }) => {
     };
 
     const adjustFontSize = (increment) => {
-        setFontSize((prev) => Math.max(1, Math.min(prev + increment, 80)));
+        setFontSize((prev) => Math.max(10, Math.min(prev + increment, 80))); // ✅ Saves globally
     };
 
     const adjustScrollSpeed = (increment) => {
-        setScrollSpeed((prev) => Math.max(1, Math.min(prev + increment, 10)));
+        setScrollSpeed((prev) => Math.max(1, Math.min(prev + increment, 10))); // ✅ Saves globally
     };
 
     const startScrolling = () => {
@@ -121,4 +123,4 @@ const Section = ({ scriptText, onNext, onPrev }) => {
     );
 };
 
-export default Section;
+export default TeleprompterPreview;

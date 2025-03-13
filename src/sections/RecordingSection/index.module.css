@@ -1,0 +1,118 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100svh;
+    background: #f9f9f9;
+}
+
+.cameraOverlay {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+}
+
+.video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.teleprompter {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    overflow-y: hidden;
+    text-align: justify;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 20px;
+    z-index: 2;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.teleprompterText {
+    margin: 5px 0; /* ✅ Reduced gaps */
+    line-height: 1.5;
+    text-align: justify;
+}
+
+/* ✅ Controls Below Video */
+.recordControls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 15px;
+    background: #333;
+}
+
+/* ✅ Back Button (⬅️) */
+.iconButton {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    margin: 0 15px;
+    transition: transform 0.2s ease;
+}
+
+.iconButton:hover {
+    transform: scale(1.2);
+}
+
+/* ✅ Red "Record" Button */
+.recordButton {
+    color: white;
+    font-size: 40px;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.recordButton:hover {
+    transform: scale(1.1);
+}
+
+/* ✅ Gray "Stop" Button */
+.stopButton {
+    background: gray;
+    color: white;
+    font-size: 40px;
+    border: none;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.stopButton:hover {
+    background: darkgray;
+    transform: scale(1.1);
+}

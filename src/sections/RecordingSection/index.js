@@ -7,7 +7,7 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const [recordedChunks, setRecordedChunks] = useState([]);
     const [isFrontCamera, setIsFrontCamera] = useState(true);
-    const [videoReady, setVideoReady] = useState(false); // ✅ Track if recording is done
+    const [videoReady, setVideoReady] = useState(false);
 
     const videoRef = useRef(null);
     const teleprompterRef = useRef(null);
@@ -45,25 +45,26 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     const startRecording = () => {
         if (cameraStream) {
             const recorder = new MediaRecorder(cameraStream, { mimeType: "video/webm" });
+            let tempChunks = []; // ✅ Temporary array to store recorded chunks
+
             recorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
-                    setRecordedChunks((prev) => [...prev, event.data]);
+                    tempChunks.push(event.data);
                 }
             };
+
             recorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: "video/webm" });
-                setRecordedVideo(blob);
-                setVideoReady(true); // ✅ Recording is ready for preview
+                const blob = new Blob(tempChunks, { type: "video/webm" });
+                setRecordedVideo(blob); // ✅ Save recorded video
+                setVideoReady(true); // ✅ Show the "Next" button
             };
+
             recorder.start();
             setMediaRecorder(recorder);
             setIsRecording(true);
 
-            // ✅ Reset scroll position to top before starting
             if (teleprompterRef.current) {
                 teleprompterRef.current.scrollTop = 0;
-
-                // ✅ Start Scrolling Automatically using saved scroll speed
                 scrollInterval.current = setInterval(() => {
                     teleprompterRef.current.scrollBy(0, scrollSpeed);
                 }, 50);
@@ -76,7 +77,7 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
             mediaRecorder.stop();
             setIsRecording(false);
         }
-        clearInterval(scrollInterval.current); // ✅ Stop Scrolling
+        clearInterval(scrollInterval.current);
     };
 
     return (
@@ -91,12 +92,11 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
                 />
                 <div className={styles.teleprompter} ref={teleprompterRef} style={{ fontSize: `${fontSize}px` }}>
                     {scriptText.split("\n").map((line, index) => (
-                        <p key={index} className={styles.teleprompterText}>{line.trim()}</p> // ✅ Removes unnecessary gaps
+                        <p key={index} className={styles.teleprompterText}>{line.trim()}</p>
                     ))}
                 </div>
             </div>
 
-            {/* ✅ Controls Below Video */}
             <div className={styles.recordControls}>
                 {!isRecording && !videoReady ? (
                     <>
@@ -106,7 +106,6 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
                 ) : isRecording ? (
                     <button className={styles.stopButton} onClick={stopRecording}>⏹️</button>
                 ) : (
-                    // ✅ Show "Next" (✅) button when recording is done
                     <button className={styles.iconButton} onClick={onNext}>✅</button>
                 )}
             </div>

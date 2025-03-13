@@ -75,7 +75,13 @@ const Section = ({ scriptText, onNext, onPrev }) => {
     return (
         <div className={styles.container}>
             <div className={styles.cameraOverlay}>
-                <video ref={videoRef} autoPlay playsInline className={styles.video} />
+                <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    playsInline 
+                    className={styles.video} 
+                    style={{ transform: isFrontCamera ? "scaleX(-1)" : "scaleX(1)" }} 
+                />
                 <div
                     className={styles.teleprompter}
                     ref={teleprompterRef}

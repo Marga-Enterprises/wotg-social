@@ -26,12 +26,16 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
 
     const startCamera = async () => {
         try {
-            const constraints = { video: { facingMode: isFrontCamera ? "user" : "environment" } };
+            const constraints = {
+                video: { facingMode: isFrontCamera ? "user" : "environment" },
+                audio: true, // ✅ Enable audio recording
+            };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
             videoRef.current.srcObject = stream;
             setCameraStream(stream);
         } catch (error) {
-            console.error("Error accessing camera: ", error);
+            console.error("Error accessing camera/audio: ", error);
         }
     };
 
@@ -44,8 +48,8 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
 
     const startRecording = () => {
         if (cameraStream) {
-            const recorder = new MediaRecorder(cameraStream, { mimeType: "video/webm" });
-            let tempChunks = []; // ✅ Temporary array to store recorded chunks
+            const recorder = new MediaRecorder(cameraStream, { mimeType: "video/webm;codecs=vp8,opus" }); // ✅ Ensure audio is recorded
+            let tempChunks = [];
 
             recorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {

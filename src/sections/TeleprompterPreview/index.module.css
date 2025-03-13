@@ -37,20 +37,22 @@
     height: 100%;
     padding: 20px;
     overflow-y: hidden;
-    text-align: center;
+    text-align: justify; /* ✅ Justifies text */
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* ✅ Fix: Ensures text starts from the top */
-    padding-top: 30px; /* ✅ Small padding to prevent text from sticking */
+    justify-content: flex-start; /* ✅ Ensures text starts at the top */
+    padding-top: 20px; /* ✅ Small padding for breathing space */
     z-index: 2;
-    color: rgba(255, 255, 255, 0.7); /* ✅ Slightly brighter for better visibility */
+    color: rgba(255, 255, 255, 0.7); /* ✅ Slightly brighter for readability */
     font-weight: bold;
     background: rgba(0, 0, 0, 0.4);
 }
 
 .teleprompterText {
-    margin: 10px 0; /* ✅ Reduced excessive gaps */
-    line-height: 1.5; /* ✅ Improved readability */
+    margin: 5px 0; /* ✅ Reduce gaps between lines */
+    line-height: 1.5; /* ✅ Adjust line spacing for readability */
+    text-align: justify; /* ✅ Justifies text properly */
+    padding: 0 10px; /* ✅ Small padding on the sides to avoid edge touching */
 }
 
 /* ✅ Controls below the video */

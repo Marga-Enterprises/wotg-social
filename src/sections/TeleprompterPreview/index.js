@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./index.module.css";
 
-const Section = ({ scriptText, onNext }) => {
+const Section = ({ scriptText, onNext, onPrev }) => {
     const [fontSize, setFontSize] = useState(16);
     const [scrollSpeed, setScrollSpeed] = useState(2);
     const [isScrolling, setIsScrolling] = useState(false);
@@ -88,6 +88,7 @@ const Section = ({ scriptText, onNext }) => {
             </div>
 
             <div className={styles.controls}>
+                <button className={styles.iconButton} onClick={onPrev}>⬅️</button>
                 <button className={styles.iconButton} onClick={toggleCamera}>🔄</button>
 
                 <div className={styles.fontSizeControls}>

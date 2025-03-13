@@ -85,6 +85,7 @@ const Page = () => {
                                 {step === 1 && (
                                     <TeleprompterPreview 
                                         scriptText={scriptText}
+                                        onPrev={() => setStep(0)}
                                         onNext={() => setStep(2)}
                                     />
                                 )}
@@ -92,6 +93,7 @@ const Page = () => {
                                     <RecordingSection 
                                         scriptText={scriptText}
                                         setRecordedVideo={setRecordedVideo}
+                                        onPrev={() => setStep(1)}
                                         onNext={() => setStep(3)}
                                     />
                                 )}

@@ -141,7 +141,7 @@ const Page = () => {
 
                                             { account.user_role !== 'user' && (
                                                 <Link to={`/blog/upload-video/${blog.id}`} className={styles.readMore}>
-                                                    Upload Video
+                                                    Create Video
                                                 </Link>
                                             )}
                                         </div>

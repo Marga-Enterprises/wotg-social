@@ -7,6 +7,7 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const [recordedChunks, setRecordedChunks] = useState([]);
     const [isFrontCamera, setIsFrontCamera] = useState(true);
+    const [videoReady, setVideoReady] = useState(false); // ✅ Track if recording is done
 
     const videoRef = useRef(null);
     const teleprompterRef = useRef(null);
@@ -52,6 +53,7 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
             recorder.onstop = () => {
                 const blob = new Blob(recordedChunks, { type: "video/webm" });
                 setRecordedVideo(blob);
+                setVideoReady(true); // ✅ Recording is ready for preview
             };
             recorder.start();
             setMediaRecorder(recorder);
@@ -96,11 +98,16 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
 
             {/* ✅ Controls Below Video */}
             <div className={styles.recordControls}>
-                <button className={styles.iconButton} onClick={onPrev}>⬅️</button>
-                {!isRecording ? (
-                    <button className={styles.recordButton} onClick={startRecording}>🔴</button>
-                ) : (
+                {!isRecording && !videoReady ? (
+                    <>
+                        <button className={styles.iconButton} onClick={onPrev}>⬅️</button>
+                        <button className={styles.recordButton} onClick={startRecording}>🔴</button>
+                    </>
+                ) : isRecording ? (
                     <button className={styles.stopButton} onClick={stopRecording}>⏹️</button>
+                ) : (
+                    // ✅ Show "Next" (✅) button when recording is done
+                    <button className={styles.iconButton} onClick={onNext}>✅</button>
                 )}
             </div>
         </div>

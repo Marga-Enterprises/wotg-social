@@ -20,10 +20,10 @@ const Page = () => {
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [step, setStep] = useState(0);
-    const [scriptText, setScriptText] = useState(""); // ✅ Hold script text
+    const [scriptText, setScriptText] = useState(""); 
     const [recordedVideo, setRecordedVideo] = useState(null); // ✅ Store recorded video
-    const [fontSize, setFontSize] = useState(16); // ✅ Store font size from Teleprompter
-    const [scrollSpeed, setScrollSpeed] = useState(2); // ✅ Store scroll speed from Teleprompter
+    const [fontSize, setFontSize] = useState(16); 
+    const [scrollSpeed, setScrollSpeed] = useState(2);
 
     // Function to remove all <img> elements from HTML string
     const removeImagesFromHTML = (htmlString) => {
@@ -46,7 +46,7 @@ const Page = () => {
                     const cleanedHtml = removeImagesFromHTML(res.data.blog_body);
                     const plainText = new DOMParser().parseFromString(cleanedHtml, 'text/html').body.textContent;
     
-                    setScriptText(plainText); // ✅ Set scriptText to plain text
+                    setScriptText(plainText); 
                 }
             })
             .finally(() => setLoading(false));
@@ -89,7 +89,7 @@ const Page = () => {
                                 {step === 1 && (
                                     <TeleprompterPreview 
                                         scriptText={scriptText}
-                                        fontSize={fontSize} /* ✅ Pass user settings */
+                                        fontSize={fontSize} 
                                         setFontSize={setFontSize}
                                         scrollSpeed={scrollSpeed}
                                         setScrollSpeed={setScrollSpeed}
@@ -100,18 +100,21 @@ const Page = () => {
                                 {step === 2 && (
                                     <RecordingSection 
                                         scriptText={scriptText}
-                                        fontSize={fontSize} /* ✅ Uses the same font size */
-                                        scrollSpeed={scrollSpeed} /* ✅ Uses the same scroll speed */
-                                        setRecordedVideo={setRecordedVideo}
+                                        fontSize={fontSize} 
+                                        scrollSpeed={scrollSpeed} 
+                                        setRecordedVideo={setRecordedVideo} // ✅ Pass function to update recordedVideo
                                         onPrev={() => setStep(1)}
                                         onNext={() => setStep(3)}
                                     />
                                 )}
                                 {step === 3 && (
                                     <RecordingPreview 
-                                        recordedVideo={recordedVideo}
+                                        recordedVideo={recordedVideo} // ✅ Pass recorded video to preview
                                         onSave={() => dispatch(wotgsocial.blog.uploadBlogVideoAction(recordedVideo))}
-                                        onReRecord={() => setStep(2)}
+                                        onReRecord={() => {
+                                            setRecordedVideo(null); // ✅ Reset video if user discards
+                                            setStep(2); // ✅ Go back to Step 3 (Recording)
+                                        }}
                                     />
                                 )}
                             </div>

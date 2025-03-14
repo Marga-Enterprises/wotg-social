@@ -11,14 +11,25 @@ export async function getBlogById(payload) {
 }
 
 export async function uploadBlogVideo(payload) {
-  const formData = new FormData();
+  console.log("🚀 [SERVICE API UPLOAD] Preparing upload for blog ID:", payload.id);
 
+  const formData = new FormData();
+  
   for (const key in payload) {
     if (payload[key] !== null && payload[key] !== undefined) {
       formData.append(key, payload[key]);
     }
   }
 
-  return POST_FORM_DATA(`/blogs/${payload.id}/upload-video`, { formData });
+  console.log("📡 [SERVICE API UPLOAD] Sending request to backend...");
+  try {
+    const response = await POST_FORM_DATA(`/blogs/${payload.id}/upload-video`, { formData });
+    console.log("✅ [SERVICE API UPLOAD] Upload successful:", response);
+    return response;
+  } catch (error) {
+    console.log("❌ [SERVICE API UPLOAD] Upload error:", error.response?.data?.msg || error.message);
+    throw error;
+  }
 }
+
 

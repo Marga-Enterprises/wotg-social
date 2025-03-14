@@ -52,22 +52,29 @@ export const getBlogByIdAction = (id) => async (dispatch) => {
 
 // Upload blog video
 export const uploadBlogVideoAction = (payload) => async (dispatch) => {
+  console.log("🚀 [BLOG UPLOAD VIDEO REDUX ACTION] Upload triggered:", payload);
+
   try {
     dispatch({ type: types.BLOG_VIDEO_UPLOAD_REQUEST }); // Dispatch request action
 
+    console.log("📡 [BLOG UPLOAD VIDEO REDUX ACTION] Sending request to API...");
     const res = await uploadBlogVideo(payload);
     const { success, data } = res;
 
     if (success) {
+      console.log("✅ [BLOG UPLOAD VIDEO REDUX ACTION] Upload successful:", data);
       dispatch({
         type: types.BLOG_VIDEO_UPLOAD_SUCCESS,
         payload: data, // Store uploaded video URL
       });
+    } else {
+      console.log("⚠️ [BLOG UPLOAD VIDEO REDUX ACTION] Upload failed:", res);
     }
 
     return res; // Return response object
 
   } catch (err) {
+    console.log("❌ [BLOG UPLOAD VIDEO REDUX ACTION] Upload error:", err.response?.data?.msg || err.message);
     dispatch({
       type: types.BLOG_VIDEO_UPLOAD_FAIL,
       payload: err.response?.data?.msg || "Video upload failed",
@@ -75,3 +82,4 @@ export const uploadBlogVideoAction = (payload) => async (dispatch) => {
     return err;
   }
 };
+

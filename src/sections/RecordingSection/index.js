@@ -212,3 +212,4 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
 };
 
 export default RecordingSection;
+    

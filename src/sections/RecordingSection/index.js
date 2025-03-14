@@ -134,25 +134,61 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
         }
     };
 
-    const stopRecording = () => {
-        if (!mediaRecorder) return;
-
-        if (mediaRecorder instanceof RecordRTC) {
-            // ✅ Stop RecordRTC for iOS
-            mediaRecorder.stopRecording(() => {
+    const stopRecording = async () => {
+        if (!mediaRecorder) {
+            alert("⚠️ No active recording found. Please start recording first.");
+            logToUI("❌ [STOP RECORDING] No active media recorder.");
+            return;
+        }
+    
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+        if (isIOS && mediaRecorder instanceof RecordRTC) {
+            // ✅ Ensure RecordRTC stops correctly on iOS
+            logToUI("⏹️ [STOP RECORDING] Stopping RecordRTC on iOS...");
+    
+            try {
+                await mediaRecorder.stopRecording(); // Force stopping
                 let blob = mediaRecorder.getBlob();
+    
+                if (!blob || blob.size === 0) {
+                    alert("⚠️ Recording stopped, but no video file was created.");
+                    logToUI("❌ [STOP ERROR] RecordRTC stopped but returned an empty blob.");
+                    return;
+                }
+    
                 setRecordedVideo(blob);
                 setVideoReady(true);
+                setIsRecording(false);
+                setMediaRecorder(null);
                 logToUI("✅ [RECORDING COMPLETE] Video Blob Created (RecordRTC).");
-            });
+                alert("✅ Recording saved successfully!");
+    
+            } catch (error) {
+                alert(`❌ Error stopping recording: ${error.message}`);
+                logToUI(`❌ [STOP ERROR] Failed to stop RecordRTC: ${error.message}`);
+            }
         } else {
             // ✅ Stop MediaRecorder for Android/Desktop
+            logToUI("⏹️ [STOP RECORDING] Stopping MediaRecorder...");
+    
+            if (mediaRecorder.state !== "recording") {
+                alert("⚠️ MediaRecorder is not recording.");
+                logToUI("❌ [STOP ERROR] MediaRecorder is not in a recording state.");
+                return;
+            }
+    
             mediaRecorder.stop();
+            mediaRecorder.onstop = () => {
+                setIsRecording(false);
+                setMediaRecorder(null);
+                logToUI("✅ [STOP RECORDING] MediaRecorder stopped.");
+                alert("✅ Recording saved successfully!");
+            };
         }
-
-        setIsRecording(false);
+    
         stopScrolling();
-    };
+    };    
 
     const stopCamera = () => {
         if (cameraStream) {

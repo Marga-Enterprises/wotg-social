@@ -1,5 +1,5 @@
 import * as methods from '../../utils/methods';
-import { GET, POST_FORM_DATA } from '../request';
+import { GET, PUT_FORM_DATA } from '../request';
 
 export async function getAllBlogs(payload) {
   const params = methods.convertQueryString(payload);
@@ -25,7 +25,7 @@ export async function uploadBlogVideo(payload) {
 
   console.log("📡 [SERVICE API UPLOAD] Sending request to backend...");
   try {
-    const response = await POST_FORM_DATA(`/blogs/${payload.id}/upload-video`, { formData });
+    const response = await PUT_FORM_DATA(`/blogs/${payload.id}/upload-video`, { formData });
     console.log("✅ [SERVICE API UPLOAD] Upload successful:", response);
     return response;
   } catch (error) {

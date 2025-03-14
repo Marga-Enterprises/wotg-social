@@ -122,8 +122,7 @@ export const POST = (url, options) => fetch(url, { ...options, method: 'POST' })
  * @param options
  * @constructor
  */
-export const POST_FORM_DATA = (url, options) =>
-  fetch(url, { ...options, method: 'POST_FORM_DATA' });
+export const POST_FORM_DATA = (url, options) => fetch(url, { ...options, method: 'POST_FORM_DATA' });
 
 /**
  * handle POST request

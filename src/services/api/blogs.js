@@ -11,10 +11,6 @@ export async function getBlogById(payload) {
 }
 
 export async function uploadBlogVideo(payload) {
-  console.log("🚀 [SERVICE API UPLOAD] Preparing upload for blog ID:", payload.id);
-  
-  console.log('[PAYLOAD BLOGS SERVICE API]', payload);
-
   const formData = new FormData();
   
   for (const key in payload) {
@@ -23,15 +19,9 @@ export async function uploadBlogVideo(payload) {
     }
   }
 
-  console.log("📡 [SERVICE API UPLOAD] Sending request to backend...");
   try {
-    const response = await PUT_FORM_DATA(`/blogs/${payload.id}/upload-video`, { formData });
-    console.log("✅ [SERVICE API UPLOAD] Upload successful:", response);
-    return response;
+    return await PUT_FORM_DATA(`/blogs/${payload.id}/upload-video`, { formData });
   } catch (error) {
-    console.log("❌ [SERVICE API UPLOAD] Upload error:", error.response?.data?.msg || error.message);
     throw error;
   }
 }
-
-

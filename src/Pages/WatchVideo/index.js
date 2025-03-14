@@ -65,13 +65,6 @@ const Page = () => {
                                 {blog.blog_video && (
                                     <div className={styles.videoWrapper}>
                                         <div className={styles.videoContainer}>
-                                            {!videoLoaded && (
-                                                <img
-                                                    src={wotgLogo1}
-                                                    alt="Loading video..."
-                                                    className={styles.videoPlaceholder}
-                                                />
-                                            )}
                                             <video
                                                 controls
                                                 autoPlay

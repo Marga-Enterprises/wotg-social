@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
 import wotgLogo from "./wotg-logo.png"; // ✅ Placeholder
-import wotgLogo1 from "./wotgLogo.jpg"; // ✅ Placeholder
+import wotgLogo1 from "./wotgLogo.webp"; // ✅ Placeholder
 
 import { Link } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";

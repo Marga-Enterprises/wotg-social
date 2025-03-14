@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import parse from 'html-react-parser'; // Import html-react-parser
 import { wotgsocial } from '../../redux/combineActions';
 import wotgLogo from './wotg-logo.png';
-import wotgLogo1 from './wotgLogo.jpg';
+import wotgLogo1 from './wotgLogo.webp';
 
 import { Link } from "react-router-dom";
 

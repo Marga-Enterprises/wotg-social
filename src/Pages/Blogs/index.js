@@ -5,8 +5,8 @@ import { wotgsocial } from '../../redux/combineActions';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 import wotgLogo from './wotg-logo.png';
-import wotgLogo1 from './wotgLogo.jpg';
-import prayer from './prayer.jpg';
+import wotgLogo1 from './wotgLogo.webp';
+import prayer from './prayer.webp';
 
 import { Link } from "react-router-dom";
 

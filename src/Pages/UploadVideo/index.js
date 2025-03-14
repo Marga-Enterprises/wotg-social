@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import parse from "html-react-parser";
 import { wotgsocial } from "../../redux/combineActions";
 import wotgLogo from "./wotg-logo.png";
 

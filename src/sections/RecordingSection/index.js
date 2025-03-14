@@ -5,13 +5,13 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     const [isRecording, setIsRecording] = useState(false);
     const [cameraStream, setCameraStream] = useState(null);
     const [mediaRecorder, setMediaRecorder] = useState(null);
+    const [recordedChunks, setRecordedChunks] = useState([]);
+    const [isFrontCamera, setIsFrontCamera] = useState(true);
     const [videoReady, setVideoReady] = useState(false);
-    const [isScrolling, setIsScrolling] = useState(false); // ✅ Track scrolling state
 
     const videoRef = useRef(null);
     const teleprompterRef = useRef(null);
     const scrollInterval = useRef(null);
-    const isFrontCamera = true;
 
     useEffect(() => {
         startCamera();
@@ -27,25 +27,16 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     const startCamera = async () => {
         try {
             const constraints = {
-                video: {
-                    facingMode: isFrontCamera ? "user" : "environment",
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                },
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                },
+                video: { facingMode: isFrontCamera ? "user" : "environment" },
+                audio: true, // ✅ Capture audio but mute playback
             };
-    
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    
+
             videoRef.current.srcObject = stream;
-            videoRef.current.muted = true; // ✅ Prevent feedback but allows recording
+            videoRef.current.muted = true; // ✅ Mute live playback so you don't hear yourself
             setCameraStream(stream);
         } catch (error) {
-            console.error("Chrome on iOS Camera/Audio Error: ", error);
-            alert("Error accessing camera/microphone. Please check permissions in settings.");
+            console.error("Error accessing camera/audio: ", error);
         }
     };
 
@@ -57,36 +48,32 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     };
 
     const startRecording = () => {
-        if (!cameraStream) return;
-    
-        // ✅ Use "video/mp4" for Chrome on iPhone instead of "video/webm"
-        const mimeType = MediaRecorder.isTypeSupported("video/mp4;codecs=h264,aac")
-            ? "video/mp4;codecs=h264,aac"
-            : "video/webm;codecs=vp8,opus"; // ✅ Default to WebM if possible
-    
-        try {
-            const recorder = new MediaRecorder(cameraStream, { mimeType });
+        if (cameraStream) {
+            const recorder = new MediaRecorder(cameraStream, { mimeType: "video/webm;codecs=vp8,opus" });
             let tempChunks = [];
-    
+
             recorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     tempChunks.push(event.data);
                 }
             };
-    
+
             recorder.onstop = () => {
-                const blob = new Blob(tempChunks, { type: mimeType });
+                const blob = new Blob(tempChunks, { type: "video/webm" });
                 setRecordedVideo(blob); // ✅ Save recorded video
-                setVideoReady(true);
+                setVideoReady(true); // ✅ Show the "Next" button
             };
-    
+
             recorder.start();
             setMediaRecorder(recorder);
             setIsRecording(true);
-            startScrolling();
-        } catch (error) {
-            console.error("Chrome on iOS MediaRecorder Error:", error);
-            alert("Recording failed. Try restarting Chrome and allowing permissions.");
+
+            if (teleprompterRef.current) {
+                teleprompterRef.current.scrollTop = 0;
+                scrollInterval.current = setInterval(() => {
+                    teleprompterRef.current.scrollBy(0, scrollSpeed);
+                }, 50);
+            }
         }
     };
 
@@ -95,20 +82,6 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
             mediaRecorder.stop();
             setIsRecording(false);
         }
-        stopScrolling(); // ✅ Stop scrolling when recording stops
-    };
-
-    const startScrolling = () => {
-        if (teleprompterRef.current && !isScrolling) {
-            setIsScrolling(true);
-            scrollInterval.current = setInterval(() => {
-                teleprompterRef.current.scrollBy(0, scrollSpeed);
-            }, 50);
-        }
-    };
-
-    const stopScrolling = () => {
-        setIsScrolling(false);
         clearInterval(scrollInterval.current);
     };
 
@@ -141,14 +114,7 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
                         <button className={styles.recordButton} onClick={startRecording}>🔴</button>
                     </>
                 ) : isRecording ? (
-                    <>
-                        <button className={styles.stopButton} onClick={stopRecording}>⏹️</button>
-
-                        {/* ✅ Play/Pause Teleprompter button is now ONLY visible while recording */}
-                        <button className={styles.iconButton} onClick={isScrolling ? stopScrolling : startScrolling}>
-                            {isScrolling ? "⏸ Pause" : "▶ Play"}
-                        </button>
-                    </>
+                    <button className={styles.stopButton} onClick={stopRecording}>⏹️</button>
                 ) : (
                     <button className={styles.iconButton} onClick={onNext}>✅</button>
                 )}

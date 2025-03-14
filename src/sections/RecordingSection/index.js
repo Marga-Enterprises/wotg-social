@@ -11,12 +11,14 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const [videoReady, setVideoReady] = useState(false);
     const [isScrolling, setIsScrolling] = useState(false);
-    const [debugLogs, setDebugLogs] = useState([]); // ✅ Store logs to render in UI
+    const [debugLogs, setDebugLogs] = useState([]); 
 
     const videoRef = useRef(null);
     const teleprompterRef = useRef(null);
     const scrollInterval = useRef(null);
     const isFrontCamera = true;
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
     useEffect(() => {
         startCamera();
@@ -38,28 +40,23 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
 
     const startCamera = async () => {
         try {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    
             const constraints = {
                 video: {
                     facingMode: isFrontCamera ? "user" : "environment",
                     width: { ideal: isIOS ? 1920 : 1280 },
                     height: { ideal: isIOS ? 1080 : 720 },
                 },
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                },
+                audio: true, 
             };
-    
+
             logToUI(`📸 [START CAMERA] Trying to access camera with constraints: ${JSON.stringify(constraints)}`);
-    
+
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    
+
             videoRef.current.srcObject = stream;
             videoRef.current.muted = true;
             setCameraStream(stream);
-    
+
             logToUI("✅ [START CAMERA] Camera & Microphone Access Granted");
         } catch (error) {
             logToUI(`❌ [CAMERA ERROR] Unable to access camera/audio: ${error.message}`);
@@ -74,17 +71,16 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
             return;
         }
 
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
         logToUI(`📡 [START RECORDING] Detected iOS: ${isIOS}`);
 
         if (isIOS) {
-            // ✅ Use RecordRTC for iOS
+            // ✅ Use RecordRTC with Whammy.js for iOS
             const recorder = new RecordRTC(cameraStream, {
                 type: "video",
-                mimeType: "video/mp4", // Ensures MP4 format for iOS
+                mimeType: "video/webm",
+                recorderType: RecordRTC.WhammyRecorder, // ✅ Ensures WebM support for iOS
                 disableLogs: false,
-                videoBitsPerSecond: 1280000, // Adjust bitrate for better quality
+                videoBitsPerSecond: 1280000, 
             });
 
             recorder.startRecording();
@@ -92,7 +88,7 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
             setMediaRecorder(recorder);
             setIsRecording(true);
             startScrolling();
-            logToUI("🎬 [START RECORDING] Recording started successfully (RecordRTC).");
+            logToUI("🎬 [START RECORDING] Recording started successfully (RecordRTC - WebM for iOS).");
         } else {
             // ✅ Use MediaRecorder for Android/Desktop
             const mimeType = "video/webm;codecs=vp8,opus";
@@ -137,16 +133,14 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
     const stopRecording = () => {
         if (!mediaRecorder) return;
 
-        if (mediaRecorder instanceof RecordRTC) {
-            // ✅ Stop RecordRTC for iOS
+        if (isIOS) {
             mediaRecorder.stopRecording(() => {
                 let blob = mediaRecorder.getBlob();
                 setRecordedVideo(blob);
                 setVideoReady(true);
-                logToUI("✅ [RECORDING COMPLETE] Video Blob Created (RecordRTC).");
+                logToUI("✅ [RECORDING COMPLETE] Video Blob Created (RecordRTC - WebM for iOS).");
             });
         } else {
-            // ✅ Stop MediaRecorder for Android/Desktop
             mediaRecorder.stop();
         }
 

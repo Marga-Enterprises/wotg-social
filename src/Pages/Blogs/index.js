@@ -139,11 +139,15 @@ const Page = () => {
                                                 See More
                                             </Link>
 
-                                            { account.user_role !== 'member' ? (
+                                            {/* ✅ Show "Create Video" ONLY if user is NOT a member */}
+                                            {account.user_role !== 'member' && (
                                                 <Link to={`/blog/upload-video/${blog.id}`} className={styles.readMore}>
                                                     Create Video
                                                 </Link>
-                                            ) : (
+                                            )}
+
+                                            {/* ✅ Show "Watch Video" to ALL users, but ONLY if blog_video exists */}
+                                            {blog.blog_video && (
                                                 <Link to={`/blog/watch-video/${blog.id}`} className={styles.readMore}>
                                                     Watch Video
                                                 </Link>

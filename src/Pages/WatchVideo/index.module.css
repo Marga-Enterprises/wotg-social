@@ -2,12 +2,9 @@
     display: flex;
     justify-content: center;
     background-color: #f8f8f8;
-}
-
-.blogContainer {
-    max-width: 900px;
-    margin-top: 3rem;
-    padding: 20px;
+    height: 94.1svh;
+    padding: 0;
+    margin-top: 3.5rem;
 }
 
 /* Title */
@@ -19,17 +16,6 @@
     margin-bottom: 15px;
 }
 
-/* ✅ Keep only essential styles */
-.blogContainer img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 10px auto;
-}
-
-.blogBodyWrapper * {
-    all: revert; /* Resets all Tailwind styles to browser defaults */
-}
 
 .navbar {
     display: flex;
@@ -73,11 +59,6 @@
 
 /* ✅ Responsive Design */
 @media (max-width: 768px) {
-    .blogContainer {
-        max-width: 90%;
-        padding: 15px;
-    }
-
     .blogTitle {
         font-size: 28px;
     }
@@ -104,21 +85,65 @@
     background-color: #c53030; /* Darker red on hover */
 }
 
-/* ✅ Blog Image Container - Centers the image */
-.blogImageContainer {
-    width: 100%;
-    height: 250px; /* Adjust height if needed */
+.videoWrapper {
+    width: 100vw; /* ✅ Full width */
+    background: black; /* ✅ Ensures full black background */
     display: flex;
-    align-items: center; /* Centers vertically */
-    justify-content: center; /* Centers horizontally */
-    border-radius: 8px;
-    overflow: hidden; /* Prevents image stretching */
+    justify-content: center;
+    align-items: center;
 }
 
-/* ✅ Blog Image - Ensures proper fit */
-.blogImage {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Ensures image is fully visible without cropping */
-    border-radius: 8px;
+/* ✅ Ensure video scales properly */
+.videoContainer {
+    max-width: 1200px; /* ✅ Limits video width */
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border: solid;
+}
+
+/* ✅ Video player adjustments */
+.videoPlayer {
+    width: 100%; /* ✅ Full width inside container */
+    max-height: 100%; /* ✅ Keep proper aspect ratio */
+    object-fit: cover; /* ✅ Prevents stretching */
+    border: 2px solid black; /* ✅ Clean border effect */
+}
+
+.videoPlayer::poster {
+    object-fit: contain; /* Keeps aspect ratio of poster */
+    background-size: contain; /* Ensures it fits properly */
+    background-position: center; /* Centers the poster */
+    background-repeat: no-repeat; /* No repeating */
+}
+
+/* ✅ Responsive Adjustments */
+@media (max-width: 768px) {
+    .videoWrapper {
+        padding: 10px 0; /* ✅ Less padding for smaller screens */
+    }
+
+    .videoContainer {
+        max-width: 100%;
+    }
+}
+
+/* ✅ Adjust the back button for consistency */
+.backButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #d9534f;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    width: fit-content;
+    margin: 20px auto;
+}
+
+.backButton:hover {
+    background: #c9302c;
 }

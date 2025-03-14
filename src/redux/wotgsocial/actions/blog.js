@@ -61,7 +61,7 @@ export const uploadBlogVideoAction = (payload) => async (dispatch) => {
     if (success) {
       dispatch({
         type: types.BLOG_VIDEO_UPLOAD_SUCCESS,
-        payload: data.video_url, // Store uploaded video URL
+        payload: data, // Store uploaded video URL
       });
     }
 

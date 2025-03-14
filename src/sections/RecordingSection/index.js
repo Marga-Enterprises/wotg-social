@@ -28,16 +28,17 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
         try {
             const constraints = {
                 video: { facingMode: isFrontCamera ? "user" : "environment" },
-                audio: true, // ✅ Enable audio recording
+                audio: true, // ✅ Capture audio but mute playback
             };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
+    
             videoRef.current.srcObject = stream;
+            videoRef.current.muted = true; // ✅ Mute live playback so you don't hear yourself
             setCameraStream(stream);
         } catch (error) {
             console.error("Error accessing camera/audio: ", error);
         }
-    };
+    };    
 
     const stopCamera = () => {
         if (cameraStream) {

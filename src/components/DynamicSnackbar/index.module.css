@@ -1,0 +1,32 @@
+.snackbar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    min-width: 250px;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    z-index: 9999;
+}
+
+/* Show animation */
+.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Success Style */
+.success {
+    background-color: #28a745;
+}
+
+/* Error Style */
+.error {
+    background-color: #dc3545;
+}

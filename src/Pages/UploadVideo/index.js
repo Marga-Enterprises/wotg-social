@@ -5,6 +5,7 @@ import { wotgsocial } from "../../redux/combineActions";
 import wotgLogo from "./wotg-logo.png";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
+import DynamicSnackbar from "../../components/DynamicSnackbar"; // ✅ Import Snackbar
 
 import RecordingPreview from "../../sections/RecordingPreview";
 import RecordingSection from "../../sections/RecordingSection";
@@ -20,10 +21,16 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [step, setStep] = useState(0);
     const [scriptText, setScriptText] = useState("");
-    const [recordedVideo, setRecordedVideo] = useState(null); // ✅ Store recorded video
+    const [recordedVideo, setRecordedVideo] = useState(null);
     const [fontSize, setFontSize] = useState(16);
     const [scrollSpeed, setScrollSpeed] = useState(2);
-    const [uploading, setUploading] = useState(false); // ✅ Track upload status
+    const [uploading, setUploading] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
+
+    // ✅ Function to show Snackbar
+    const showSnackbar = (message, type) => {
+        setSnackbar({ open: true, message, type });
+    };
 
     // ✅ Function to remove all <img> elements from HTML string
     const removeImagesFromHTML = useCallback((htmlString) => {
@@ -61,21 +68,22 @@ const Page = () => {
 
     // ✅ Handle Video Upload
     const handleSaveVideo = async () => {
-        if (!recordedVideo || !id) return; 
-        
+        if (!recordedVideo || !id) return;
+
         setUploading(true);
-        setLoading(true); 
-        
+        setLoading(true);
+
         const payload = {
-            id, 
-            file: recordedVideo, 
+            id,
+            file: recordedVideo,
         };
-    
+
         try {
-            await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload)); 
-            setStep(0); 
+            await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload));
+            setStep(0);
+            showSnackbar("Video uploaded successfully!", "success"); // ✅ Show success message
         } catch (error) {
-            console.error("Upload failed:", error);
+            showSnackbar("Upload failed. Please try again.", "error"); // ❌ Show error message
         } finally {
             setUploading(false);
             setLoading(false);
@@ -126,18 +134,18 @@ const Page = () => {
                                         scriptText={scriptText}
                                         fontSize={fontSize}
                                         scrollSpeed={scrollSpeed}
-                                        setRecordedVideo={setRecordedVideo} // ✅ Pass function to update recordedVideo
+                                        setRecordedVideo={setRecordedVideo}
                                         onPrev={() => setStep(1)}
                                         onNext={() => setStep(3)}
                                     />
                                 )}
                                 {step === 3 && (
                                     <RecordingPreview
-                                        recordedVideo={recordedVideo} // ✅ Pass recorded video to preview
+                                        recordedVideo={recordedVideo}
                                         onSave={handleSaveVideo}
                                         onReRecord={() => {
-                                            setRecordedVideo(null); // ✅ Reset video if user discards
-                                            setStep(2); // ✅ Go back to Step 3 (Recording)
+                                            setRecordedVideo(null);
+                                            setStep(2);
                                         }}
                                         blogId={id}
                                     />
@@ -156,6 +164,14 @@ const Page = () => {
                     )}
                 </div>
             )}
+
+            {/* ✅ Dynamic Snackbar for Success/Error Notifications */}
+            <DynamicSnackbar
+                open={snackbar.open}
+                message={snackbar.message}
+                type={snackbar.type}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            />
         </>
     );
 };

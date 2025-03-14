@@ -70,65 +70,67 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
             alert("⚠️ No camera access. Please check your permissions.");
             return;
         }
-
+    
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         logToUI(`📡 [START RECORDING] Detected iOS: ${isIOS}`);
-
+    
         if (isIOS) {
-            // ✅ Use RecordRTC with Whammy.js for iOS
+            // ✅ Use RecordRTC with MP4 support for iOS
             const recorder = new RecordRTC(cameraStream, {
                 type: "video",
-                mimeType: "video/webm",
-                recorderType: RecordRTC.WhammyRecorder, // ✅ Ensures WebM support for iOS
+                mimeType: "video/mp4", // ✅ MP4 for iOS
+                recorderType: RecordRTC.MediaStreamRecorder,
                 disableLogs: false,
-                videoBitsPerSecond: 1280000, 
+                videoBitsPerSecond: 1280000, // ✅ Adjust bitrate for better quality
             });
-
+    
             recorder.startRecording();
-
+    
             setMediaRecorder(recorder);
             setIsRecording(true);
             startScrolling();
-            logToUI("🎬 [START RECORDING] Recording started successfully (RecordRTC - WebM for iOS).");
+            logToUI("🎬 [START RECORDING] Recording started successfully (RecordRTC - MP4).");
+    
         } else {
-            // ✅ Use MediaRecorder for Android/Desktop
+            // ✅ Use MediaRecorder for Android/Desktop with WebM
             const mimeType = "video/webm;codecs=vp8,opus";
-
+    
             logToUI(`🎥 [START RECORDING] Selected MIME Type: ${mimeType}`);
-
+    
             try {
                 if (!MediaRecorder.isTypeSupported(mimeType)) {
                     alert("⚠️ Recording format not supported on this device.");
                     logToUI(`❌ [ERROR] Selected MIME type is not supported: ${mimeType}`);
                     return;
                 }
-
+    
                 const recorder = new MediaRecorder(cameraStream, { mimeType });
                 let tempChunks = [];
-
+    
                 recorder.ondataavailable = (event) => {
                     if (event.data.size > 0) {
                         tempChunks.push(event.data);
                     }
                 };
-
+    
                 recorder.onstop = () => {
                     const blob = new Blob(tempChunks, { type: mimeType });
                     setRecordedVideo(blob);
                     setVideoReady(true);
-                    logToUI("✅ [RECORDING COMPLETE] Video Blob Created.");
+                    logToUI("✅ [RECORDING COMPLETE] Video Blob Created (WebM).");
                 };
-
+    
                 recorder.start();
                 setMediaRecorder(recorder);
                 setIsRecording(true);
                 startScrolling();
-                logToUI("🎬 [START RECORDING] Recording started successfully (MediaRecorder).");
+                logToUI("🎬 [START RECORDING] Recording started successfully (MediaRecorder - WebM).");
             } catch (error) {
                 logToUI(`❌ [RECORDING ERROR] MediaRecorder Error: ${error.message}`);
                 alert("Recording failed. Try restarting browser and allowing permissions.");
             }
         }
-    };
+    };    
 
     const stopRecording = () => {
         if (!mediaRecorder) return;

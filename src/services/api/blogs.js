@@ -12,6 +12,8 @@ export async function getBlogById(payload) {
 
 export async function uploadBlogVideo(payload) {
   console.log("🚀 [SERVICE API UPLOAD] Preparing upload for blog ID:", payload.id);
+  
+  console.log('[PAYLOAD BLOGS SERVICE API]', payload);
 
   const formData = new FormData();
   

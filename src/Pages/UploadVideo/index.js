@@ -61,16 +61,24 @@ const Page = () => {
 
     // ✅ Handle Video Upload
     const handleSaveVideo = async () => {
-        if (!recordedVideo) return;
+        if (!recordedVideo || !id) return; 
         
         setUploading(true);
+        setLoading(true); 
+        
+        const payload = {
+            id, 
+            file: recordedVideo, 
+        };
+    
         try {
-            await dispatch(wotgsocial.blog.uploadBlogVideoAction(recordedVideo));
-            setStep(0); // ✅ Go back to the first step after successful upload
+            await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload)); 
+            setStep(0); 
         } catch (error) {
             console.error("Upload failed:", error);
         } finally {
             setUploading(false);
+            setLoading(false);
         }
     };
 
@@ -131,6 +139,7 @@ const Page = () => {
                                             setRecordedVideo(null); // ✅ Reset video if user discards
                                             setStep(2); // ✅ Go back to Step 3 (Recording)
                                         }}
+                                        blogId={id}
                                     />
                                 )}
                             </div>

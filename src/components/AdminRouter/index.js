@@ -11,7 +11,7 @@ const AdminRouter = ({ children }) => {
   useEffect(() => {
     if (!token) {
       navigate('/login'); // Redirect to login if no token
-    } else if (account?.user_role === 'user') {
+    } else if (account?.user_role === 'member') {
       navigate('/'); // Redirect regular users to home
     }
   }, [navigate, token, account]);

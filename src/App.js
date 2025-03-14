@@ -10,7 +10,8 @@ import Default from './Pages/Default';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
 import Blogs from './Pages/Blogs';
 import BlogDetails from './Pages/BlogDetails';
-import UploadVideo from './Pages/UploadVideo'
+import UploadVideo from './Pages/UploadVideo';
+import WatchVideo from './Pages/WatchVideo'
 
 // REDUX
 import { useDispatch } from 'react-redux';
@@ -43,6 +44,7 @@ function App() {
             <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
             <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
             <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
+            <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
             <Route path="/" element={<AuthRouter><Home /></AuthRouter>} />
             <Route path="/login" element={<SignIn />} />
             <Route path="/register" element={<SignUp />} />

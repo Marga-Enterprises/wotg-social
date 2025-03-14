@@ -139,9 +139,13 @@ const Page = () => {
                                                 See More
                                             </Link>
 
-                                            { account.user_role !== 'user' && (
+                                            { account.user_role !== 'member' ? (
                                                 <Link to={`/blog/upload-video/${blog.id}`} className={styles.readMore}>
                                                     Create Video
+                                                </Link>
+                                            ) : (
+                                                <Link to={`/blog/watch-video/${blog.id}`} className={styles.readMore}>
+                                                    Watch Video
                                                 </Link>
                                             )}
                                         </div>

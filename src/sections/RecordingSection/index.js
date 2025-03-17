@@ -78,7 +78,7 @@ const RecordingSection = ({ scriptText, fontSize, scrollSpeed, setRecordedVideo,
             // ✅ Use RecordRTC with MP4 support for iOS
             const recorder = new RecordRTC(cameraStream, {
                 type: "video",
-                mimeType: "video/mp4", // ✅ MP4 for iOS
+                mimeType: "video/mp4; codecs=h264,aac",
                 recorderType: RecordRTC.MediaStreamRecorder,
                 disableLogs: false,
                 videoBitsPerSecond: 1280000, // ✅ Adjust bitrate for better quality

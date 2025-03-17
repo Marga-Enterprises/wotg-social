@@ -1,4 +1,4 @@
-import { getAllBlogs, getBlogById, uploadBlogVideo } from '../../../services/api/blogs';
+import { getAllBlogs, getBlogById, uploadBlogVideo, deleteBlogVideo } from '../../../services/api/blogs';
 
 // TYPES
 import * as types from '../types';
@@ -21,7 +21,7 @@ export const getAllBlogsAction = (payload) => async (dispatch) => {
   } catch (err) {
     return dispatch({
       type: types.BLOGS_LIST_FAIL,
-      payload: err.response.data.msg,
+      payload: err.response?.data?.msg || "Something went wrong",
     });
   }
 };
@@ -78,4 +78,31 @@ export const uploadBlogVideoAction = (payload) => async (dispatch) => {
   }
 };
 
+// ✅ Delete blog video
+export const deleteBlogVideoAction = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: types.BLOG_VIDEO_DEL_REQUEST });
 
+    const res = await deleteBlogVideo(id);
+    const { success, data } = res;
+
+    if (success) {
+      dispatch({
+        type: types.BLOG_VIDEO_DEL_SUCCESS,
+        payload: data.message, // Return success message
+      });
+    }
+
+    return res; // Return response object
+
+  } catch (err) {
+    const errorMsg = err.response?.data?.msg || "Video deletion failed";
+
+    dispatch({
+      type: types.BLOG_VIDEO_DEL_FAIL,
+      payload: errorMsg,
+    });
+
+    return err;
+  }
+};

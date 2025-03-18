@@ -128,7 +128,7 @@
 }
 
 .paginationButton:disabled {
-    background-color: #ccc;
+    color: #999999;
     cursor: not-allowed;
 }
 

@@ -126,6 +126,17 @@ const RecordingSection = ({
         stopScrolling();
     };
 
+    const resetRecording = () => {
+        // ✅ Stop current recording if it's running
+        if (isRecording) {
+            stopRecording();
+        }
+        // ✅ Reset all states
+        setRecordedVideo(null);
+        setVideoReady(false);
+        setIsRecording(false);
+    };
+
     const stopCamera = () => {
         if (cameraStream) {
             cameraStream.getTracks().forEach((track) => track.stop());
@@ -188,7 +199,10 @@ const RecordingSection = ({
                         </button>
                     </>
                 ) : (
-                    <button className={styles.iconButton} onClick={onNext}>✅</button>
+                    <>
+                        <button className={styles.iconButton} onClick={onNext}>✅</button>
+                        <button className={styles.iconButton} onClick={resetRecording}>🔄</button> {/* ✅ Restart Button */}
+                    </>
                 )}
             </div>
         </div>

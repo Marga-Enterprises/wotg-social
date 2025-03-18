@@ -1,46 +1,49 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
-import wotgLogo from "./wotg-logo.png"; // ✅ Placeholder
-import wotgLogo1 from "./wotgLogo.webp"; // ✅ Placeholder
+import wotgLogo from "./wotg-logo.webp";
+import wotgLogo1 from "./wotgLogo.webp";
 
-import { Link } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
 
 const Page = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
+    const loadingRef = useRef(false); // ✅ Prevent duplicate API calls
+
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [videoLoaded, setVideoLoaded] = useState(false);
 
-    const backendUrl =
-        process.env.NODE_ENV === "development"
+    // ✅ Memoized Backend URL (Prevents unnecessary recalculations)
+    const backendUrl = useMemo(() => {
+        return process.env.NODE_ENV === "development"
             ? "http://localhost:5000"
             : "https://community.wotgonline.com/api";
+    }, []);
 
-    // Fetch blog details
-    const fetchBlogDetails = useCallback(() => {
+    // ✅ Fetch Blog Details (Optimized)
+    const fetchBlogDetails = useCallback(async () => {
+        if (!id || loadingRef.current) return;
+        loadingRef.current = true;
         setLoading(true);
-        dispatch(wotgsocial.blog.getBlogByIdAction(id))
-            .then((res) => {
-                if (res.success) {
-                    setBlog(res.data);
-                }
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, [dispatch, id]);
 
-    // Fetch when component mounts or ID changes
-    useEffect(() => {
-        if (id) {
-            fetchBlogDetails();
+        try {
+            const res = await dispatch(wotgsocial.blog.getBlogByIdAction(id));
+            if (res.success && JSON.stringify(res.data) !== JSON.stringify(blog)) {
+                setBlog(res.data);
+            }
+        } finally {
+            setLoading(false);
+            loadingRef.current = false;
         }
-    }, [fetchBlogDetails, id]);
+    }, [dispatch, id, blog]);
+
+    useEffect(() => {
+        fetchBlogDetails();
+    }, [fetchBlogDetails]);
 
     return (
         <>
@@ -48,9 +51,10 @@ const Page = () => {
                 <LoadingSpinner />
             ) : (
                 <div className={styles.mainContainer}>
+                    {/* ✅ Navbar remains intact */}
                     <div className={styles.navbar}>
                         <div className={styles.logo}>
-                            <img src={wotgLogo} alt="WOTG Logo" />
+                            <img src={wotgLogo} alt="WOTG Logo" loading="lazy" />
                         </div>
                         <div className={styles.navLinks}>
                             <a href="/" className={styles.navLink}>Chat</a>
@@ -59,9 +63,11 @@ const Page = () => {
                         </div>
                     </div>
 
+                    {/* ✅ Blog Content Section */}
                     <div className={styles.blogContainer}>
                         {blog ? (
                             <div className={styles.blogContent}>
+                                {/* ✅ Optimized Video Handling */}
                                 {blog.blog_video && (
                                     <div className={styles.videoWrapper}>
                                         <div className={styles.videoContainer}>
@@ -69,8 +75,13 @@ const Page = () => {
                                                 controls
                                                 autoPlay
                                                 className={styles.videoPlayer}
-                                                onLoadedData={() => setVideoLoaded(true)}
+                                                onLoadedData={() => {
+                                                    if (!videoLoaded) {
+                                                        setVideoLoaded(true);
+                                                    }
+                                                }}
                                                 poster={wotgLogo1}
+                                                preload="metadata" // ✅ Faster page load
                                             >
                                                 <source src={`${backendUrl}/uploads/${blog.blog_video}`} type="video/webm" />
                                                 Your browser does not support the video tag.

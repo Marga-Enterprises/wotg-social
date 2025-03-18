@@ -5,7 +5,7 @@ import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 import styles from './index.module.css';
 import ChatWindowStream from '../../components/ChatWindowStream';
-import wotgLogo from './wotgLogo.jpg';
+import wotgLogo from './wotgLogo.webp';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 

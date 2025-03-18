@@ -1,26 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './index.module.css';
 
-const LoadingSpinner = ({ isLoading }) => {
+const LoadingSpinner = () => {
   const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(true);
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    if (isLoading) {
-      setProgress(0); // Reset progress on new loading
-      intervalRef.current = setInterval(() => {
-        setProgress((prev) => (prev < 90 ? prev + 10 : prev)); // Increase progress
+    setProgress(0); // Reset progress on mount
+    setVisible(true); // Ensure visibility
+
+    intervalRef.current = setInterval(() => {
+      setProgress((prev) => (prev < 90 ? prev + 10 : prev)); // Increment progress
+    }, 500);
+
+    return () => clearInterval(intervalRef.current); // Cleanup interval
+  }, []);
+
+  useEffect(() => {
+    if (progress >= 100) {
+      setTimeout(() => {
+        setVisible(false); // Hide when fully loaded
       }, 500);
-    } else {
-      clearInterval(intervalRef.current);
-      setProgress(100); // Instantly fill when loading is done
-      setTimeout(() => setProgress(0), 500); // Reset after animation
     }
+  }, [progress]);
 
-    return () => clearInterval(intervalRef.current); // Cleanup
-  }, [isLoading]);
-
-  if (!isLoading) return null; // Prevent unnecessary renders
+  if (!visible) return null; // Don't render when loading is complete
 
   return (
     <div className={styles.spinnerContainer}>

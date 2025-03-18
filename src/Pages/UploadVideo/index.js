@@ -22,10 +22,15 @@ const Page = () => {
     const [step, setStep] = useState(0);
     const [scriptText, setScriptText] = useState("");
     const [recordedVideo, setRecordedVideo] = useState(null);
-    const [fontSize, setFontSize] = useState(16);
-    const [scrollSpeed, setScrollSpeed] = useState(2);
     const [uploading, setUploading] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
+
+    // ✅ Load settings from localStorage or set defaults
+    const [teleprompterSettings, setTeleprompterSettings] = useState(() => ({
+        fontSize: parseFloat(localStorage.getItem("teleprompter_fontSize")) || 16,
+        scrollSpeed: parseFloat(localStorage.getItem("teleprompter_scrollSpeed")) || 2,
+        paddingX: parseFloat(localStorage.getItem("teleprompter_paddingX")) || 10
+    }));
 
     // ✅ Function to show Snackbar
     const showSnackbar = (message, type) => {
@@ -81,9 +86,9 @@ const Page = () => {
         try {
             await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload));
             setStep(0);
-            showSnackbar("Video uploaded successfully!", "success"); // ✅ Show success message
+            showSnackbar("Video uploaded successfully!", "success"); 
         } catch (error) {
-            showSnackbar("Upload failed. Please try again.", "error"); // ❌ Show error message
+            showSnackbar("Upload failed. Please try again.", "error");
         } finally {
             setUploading(false);
             setLoading(false);
@@ -121,10 +126,8 @@ const Page = () => {
                                 {step === 1 && (
                                     <TeleprompterPreview
                                         scriptText={scriptText}
-                                        fontSize={fontSize}
-                                        setFontSize={setFontSize}
-                                        scrollSpeed={scrollSpeed}
-                                        setScrollSpeed={setScrollSpeed}
+                                        teleprompterSettings={teleprompterSettings}
+                                        setTeleprompterSettings={setTeleprompterSettings} // ✅ Share state
                                         onPrev={() => setStep(0)}
                                         onNext={() => setStep(2)}
                                     />
@@ -132,8 +135,7 @@ const Page = () => {
                                 {step === 2 && (
                                     <RecordingSection
                                         scriptText={scriptText}
-                                        fontSize={fontSize}
-                                        scrollSpeed={scrollSpeed}
+                                        teleprompterSettings={teleprompterSettings} // ✅ Share settings
                                         setRecordedVideo={setRecordedVideo}
                                         onPrev={() => setStep(1)}
                                         onNext={() => setStep(3)}
@@ -156,7 +158,6 @@ const Page = () => {
                         )}
                     </div>
 
-                    {/* ✅ Show Uploading Indicator */}
                     {uploading && (
                         <div className={styles.uploadingOverlay}>
                             <p>Uploading video...</p>
@@ -165,7 +166,6 @@ const Page = () => {
                 </div>
             )}
 
-            {/* ✅ Dynamic Snackbar for Success/Error Notifications */}
             <DynamicSnackbar
                 open={snackbar.open}
                 message={snackbar.message}

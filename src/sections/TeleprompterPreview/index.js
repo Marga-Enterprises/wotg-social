@@ -3,8 +3,8 @@ import styles from "./index.module.css";
 
 const TeleprompterPreview = ({ 
     scriptText, 
-    fontSize, setFontSize,  
-    scrollSpeed, setScrollSpeed,  
+    teleprompterSettings, 
+    setTeleprompterSettings, 
     onNext, 
     onPrev 
 }) => {
@@ -52,19 +52,18 @@ const TeleprompterPreview = ({
         setIsFrontCamera((prev) => !prev);
     };
 
-    const adjustFontSize = (increment) => {
-        setFontSize((prev) => Math.max(10, Math.min(prev + increment, 80)));
+    const updateSetting = (key, value) => {
+        const newSettings = { ...teleprompterSettings, [key]: value };
+        setTeleprompterSettings(newSettings);
+        localStorage.setItem(`teleprompter_${key}`, value);
     };
-
-    const adjustScrollSpeed = (increment) => {
-        setScrollSpeed((prev) => Math.max(1, Math.min(prev + increment, 10))); // ✅ Adjusted for smoother control
-    };
+    
 
     const startScrolling = () => {
         if (teleprompterRef.current) {
             setIsScrolling(true);
             scrollInterval.current = setInterval(() => {
-                teleprompterRef.current.scrollBy(0, scrollSpeed);
+                teleprompterRef.current.scrollBy(0, teleprompterSettings.scrollSpeed);
             }, 50);
         }
     };
@@ -88,7 +87,12 @@ const TeleprompterPreview = ({
                 <div
                     className={styles.teleprompter}
                     ref={teleprompterRef}
-                    style={{ fontSize: `${fontSize}px`, overflowY: "auto" }} // ✅ Enables manual scrolling
+                    style={{ 
+                        fontSize: `${teleprompterSettings.fontSize}px`, 
+                        paddingLeft: `${teleprompterSettings.paddingX}px`,
+                        paddingRight: `${teleprompterSettings.paddingX}px`,
+                        overflowY: "auto"
+                    }}
                 >
                     {scriptText.split("\n").map((line, index) => (
                         <p key={index} className={styles.teleprompterText}>{line}</p>
@@ -101,17 +105,25 @@ const TeleprompterPreview = ({
                 <button className={styles.iconButton} onClick={toggleCamera}>🔄</button>
 
                 <div className={styles.fontSizeControls}>
-                    <button onClick={() => adjustFontSize(-2)}>➖</button>
+                    <button onClick={() => updateSetting("fontSize", Math.max(10, teleprompterSettings.fontSize - 2))}>➖</button>
                     <span>Font</span>
-                    <span className={styles.fontSizeValue}>{fontSize}</span>
-                    <button onClick={() => adjustFontSize(2)}>➕</button>
+                    <span className={styles.fontSizeValue}>{teleprompterSettings.fontSize}</span>
+                    <button onClick={() => updateSetting("fontSize", Math.min(80, teleprompterSettings.fontSize + 2))}>➕</button>
                 </div>
 
                 <div className={styles.scrollSpeedControls}>
-                    <button onClick={() => adjustScrollSpeed(-0.1)}>⏪</button> {/* ✅ Smoother Decrease */}
+                    <button onClick={() => updateSetting("scrollSpeed", Math.max(0.1, teleprompterSettings.scrollSpeed - 0.1))}>⏪</button>
                     <span>Speed</span>
-                    <span className={styles.scrollSpeedValue}>{scrollSpeed.toFixed(1)}</span> {/* ✅ Show decimal */}
-                    <button onClick={() => adjustScrollSpeed(0.1)}>⏩</button> {/* ✅ Smoother Increase */}
+                    <span className={styles.scrollSpeedValue}>{teleprompterSettings.scrollSpeed.toFixed(1)}</span>
+                    <button onClick={() => updateSetting("scrollSpeed", Math.min(10, teleprompterSettings.scrollSpeed + 0.1))}>⏩</button>
+                </div>
+
+                {/* ✅ Dynamic Padding Controls */}
+                <div className={styles.paddingControls}>
+                    <button onClick={() => updateSetting("paddingX", Math.max(0, teleprompterSettings.paddingX - 5))}>⬅️</button>
+                    <span>Padding</span>
+                    <span className={styles.paddingValue}>{teleprompterSettings.paddingX}px</span>
+                    <button onClick={() => updateSetting("paddingX", Math.min(300, teleprompterSettings.paddingX + 5))}>➡️</button>
                 </div>
 
                 <button className={styles.iconButton} onClick={isScrolling ? stopScrolling : startScrolling}>

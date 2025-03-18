@@ -1,5 +1,5 @@
 import * as methods from '../../utils/methods';
-import { GET, PUT_FORM_DATA } from '../request';
+import { GET, PUT_FORM_DATA, DELETE } from '../request';
 
 export async function getAllBlogs(payload) {
   const params = methods.convertQueryString(payload);
@@ -8,6 +8,10 @@ export async function getAllBlogs(payload) {
 
 export async function getBlogById(payload) {
   return GET(`/blogs/${payload}`);
+}
+
+export async function deleteBlogVideo(payload) {
+  return DELETE(`/blogs/${payload}/delete-video`);
 }
 
 export async function uploadBlogVideo(payload) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
@@ -27,29 +27,72 @@ const Page = () => {
     const [uploading, setUploading] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
 
-    // ✅ Load settings from localStorage or set defaults
+    // ✅ Generate a unique draft key for each blog
+    const draftKey = useMemo(() => `draft_script_${id}`, [id]);
+
+    // ✅ Load script draft from localStorage (Runs only on mount or id change)
+    useEffect(() => {
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+            setScriptText(savedDraft);
+        }
+    }, [draftKey]);
+
+    // ✅ Save draft when user types (Optimized with `useCallback`)
+    const handleScriptChange = useCallback((newText) => {
+        setScriptText((prevText) => {
+            if (prevText !== newText) {
+                localStorage.setItem(draftKey, newText); // Save draft only if text has changed
+                return newText;
+            }
+            return prevText;
+        });
+    }, [draftKey]);
+
+    // ✅ Ensure draft is **NOT** deleted when pressing "Next"
+    const handleNext = useCallback(() => {
+        setStep((prevStep) => prevStep + 1);
+    }, []);
+
+    // ✅ Remove draft **ONLY AFTER** video upload completes
+    const handleSaveVideo = useCallback(async () => {
+        if (!recordedVideo || !id) return;
+
+        setUploading(true);
+        setLoading(true);
+
+        const payload = { id, file: recordedVideo };
+
+        try {
+            await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload));
+            setStep(0);
+            localStorage.removeItem(draftKey); // ✅ Remove draft only after successful upload
+            setSnackbar({ open: true, message: "Video uploaded successfully!", type: "success" });
+        } catch (error) {
+            setSnackbar({ open: true, message: "Upload failed. Please try again.", type: "error" });
+        } finally {
+            setUploading(false);
+            setLoading(false);
+        }
+    }, [dispatch, id, recordedVideo, draftKey]);
+
+    // ✅ Initialize teleprompter settings (Memoized to prevent unnecessary re-renders)
     const [teleprompterSettings, setTeleprompterSettings] = useState(() => ({
         fontSize: parseFloat(localStorage.getItem("teleprompter_fontSize")) || 16,
         scrollSpeed: parseFloat(localStorage.getItem("teleprompter_scrollSpeed")) || 2,
         paddingX: parseFloat(localStorage.getItem("teleprompter_paddingX")) || 10,
     }));
 
-    // ✅ Show Snackbar Function
-    const showSnackbar = (message, type) => {
-        setSnackbar({ open: true, message, type });
-    };
-
-    // ✅ Remove All <img> Tags from HTML String
+    // ✅ Remove All <img> Tags from HTML String (Optimized)
     const removeImagesFromHTML = useCallback((htmlString) => {
         if (!htmlString) return "";
-
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, "text/html");
         doc.querySelectorAll("img").forEach((img) => img.remove());
         return doc.body.innerHTML;
     }, []);
 
-    // ✅ Fetch Blog Details (Optimized)
+    // ✅ Fetch Blog Details (Preventing Duplicate API Calls)
     const fetchBlogDetails = useCallback(async () => {
         if (!id || loadingRef.current) return;
         loadingRef.current = true;
@@ -64,46 +107,22 @@ const Page = () => {
                 const cleanedHtml = removeImagesFromHTML(res.data.blog_body);
                 const plainText = new DOMParser().parseFromString(cleanedHtml, "text/html").body.textContent;
 
-                // ✅ Avoid unnecessary re-renders
-                if (plainText !== scriptText) {
+                // ✅ Only update if no draft exists
+                if (!localStorage.getItem(draftKey)) {
                     setScriptText(plainText);
                 }
             }
         } catch (error) {
-            showSnackbar("Failed to fetch blog details.", "error");
+            setSnackbar({ open: true, message: "Failed to fetch blog details.", type: "error" });
         } finally {
             setLoading(false);
             loadingRef.current = false;
         }
-    }, [dispatch, id, removeImagesFromHTML]);
+    }, [dispatch, id, removeImagesFromHTML, draftKey]);
 
     useEffect(() => {
         fetchBlogDetails();
     }, [fetchBlogDetails]);
-
-    // ✅ Handle Video Upload
-    const handleSaveVideo = async () => {
-        if (!recordedVideo || !id) return;
-
-        setUploading(true);
-        setLoading(true);
-
-        const payload = {
-            id,
-            file: recordedVideo,
-        };
-
-        try {
-            await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload));
-            setStep(0);
-            showSnackbar("Video uploaded successfully!", "success");
-        } catch (error) {
-            showSnackbar("Upload failed. Please try again.", "error");
-        } finally {
-            setUploading(false);
-            setLoading(false);
-        }
-    };
 
     return (
         <>
@@ -111,7 +130,6 @@ const Page = () => {
                 <LoadingSpinner />
             ) : (
                 <div className={styles.mainContainer}>
-                    {/* ✅ Navbar remains intact */}
                     {step !== 2 && step !== 1 && (
                         <div className={styles.navbar}>
                             <div className={styles.logo}>
@@ -126,22 +144,21 @@ const Page = () => {
                         </div>
                     )}
 
-                    {/* ✅ Main Container Structure Preserved */}
                     <div className={styles.blogContainer}>
                         {blog ? (
                             <div className={styles.contentWrapper}>
                                 {step === 0 && (
                                     <ScriptEditor
                                         scriptText={scriptText}
-                                        setScriptText={setScriptText}
-                                        onNext={() => setStep(1)}
+                                        setScriptText={handleScriptChange}
+                                        onNext={handleNext}
                                     />
                                 )}
                                 {step === 1 && (
                                     <TeleprompterPreview
                                         scriptText={scriptText}
                                         teleprompterSettings={teleprompterSettings}
-                                        setTeleprompterSettings={setTeleprompterSettings} 
+                                        setTeleprompterSettings={setTeleprompterSettings}
                                         onPrev={() => setStep(0)}
                                         onNext={() => setStep(2)}
                                     />
@@ -149,7 +166,7 @@ const Page = () => {
                                 {step === 2 && (
                                     <RecordingSection
                                         scriptText={scriptText}
-                                        teleprompterSettings={teleprompterSettings} 
+                                        teleprompterSettings={teleprompterSettings}
                                         setRecordedVideo={setRecordedVideo}
                                         onPrev={() => setStep(1)}
                                         onNext={() => setStep(3)}
@@ -172,7 +189,6 @@ const Page = () => {
                         )}
                     </div>
 
-                    {/* ✅ Uploading Overlay */}
                     {uploading && (
                         <div className={styles.uploadingOverlay}>
                             <p>Uploading video...</p>
@@ -181,12 +197,11 @@ const Page = () => {
                 </div>
             )}
 
-            {/* ✅ Snackbar for Messages */}
             <DynamicSnackbar
                 open={snackbar.open}
                 message={snackbar.message}
                 type={snackbar.type}
-                onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))} 
             />
         </>
     );

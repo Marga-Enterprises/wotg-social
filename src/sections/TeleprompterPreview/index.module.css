@@ -33,13 +33,13 @@
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 20px;
+    /*padding: 20px;*/
     overflow-y: hidden;
     text-align: justify; /* ✅ Justifies text */
     display: flex;
     flex-direction: column;
     justify-content: flex-start; /* ✅ Ensures text starts at the top */
-    padding-top: 20px; /* ✅ Small padding for breathing space */
+    /*padding-top: 20px; /* ✅ Small padding for breathing space */
     z-index: 2;
     color: rgba(255, 255, 255, 0.7); /* ✅ Slightly brighter for readability */
     font-weight: bold;
@@ -50,7 +50,7 @@
     margin: 5px 0; /* ✅ Reduce gaps between lines */
     line-height: 1.5; /* ✅ Adjust line spacing for readability */
     text-align: justify; /* ✅ Justifies text properly */
-    padding: 0 10px; /* ✅ Small padding on the sides to avoid edge touching */
+    /*padding: 0 10px; /* ✅ Small padding on the sides to avoid edge touching */
 }
 
 /* ✅ Controls below the video */
@@ -81,7 +81,8 @@
 
 /* ✅ Font size & speed controls */
 .fontSizeControls,
-.scrollSpeedControls {
+.scrollSpeedControls,
+.paddingControls {
     display: flex;
     align-items: center;
     margin: 0 10px;
@@ -112,7 +113,8 @@
 
 /* ✅ Show font size and speed values properly */
 .fontSizeValue,
-.scrollSpeedValue {
+.scrollSpeedValue,
+.paddingValue {
     color: rgba(255, 255, 255, 0.9); /* ✅ Brighter white for better visibility */
     font-weight: bold;
     font-size: 18px;

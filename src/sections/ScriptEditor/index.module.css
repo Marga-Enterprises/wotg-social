@@ -31,6 +31,14 @@
     outline: none;
 }
 
+.linksContainer {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+}
+
 .textArea:focus {
     border-color: #e53e3e;
     box-shadow: 0 0 5px rgba(224, 38, 38, 0.5);

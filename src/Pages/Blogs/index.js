@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useDispatch } from "react-redux";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
 import { convertMomentWithFormatWhole } from "../../utils/methods";
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -7,10 +8,9 @@ import styles from "./index.module.css";
 import wotgLogo from "./wotg-logo.webp";
 import wotgLogo1 from "./wotgLogo.webp";
 import prayer from "./prayer.webp";
-import { Link } from "react-router-dom";
 import Cookies from "js-cookie";
 
-// Utility functions (moved outside the component to prevent re-creation)
+// Utility functions
 const stripHtml = (html) => html.replace(/<\/?[^>]+(>|$)/g, "");
 const decodeHtmlEntities = (text) => {
     const textArea = document.createElement("textarea");
@@ -20,51 +20,73 @@ const decodeHtmlEntities = (text) => {
 const truncateText = (text, maxLength) => (text.length <= maxLength ? text : text.substring(0, text.lastIndexOf(" ", maxLength)) + "...");
 
 const Page = () => {
-    const account = Cookies.get("account") ? JSON.parse(Cookies.get("account")) : null;
+    const account = useMemo(() => {
+        return Cookies.get("account") ? JSON.parse(Cookies.get("account")) : null;
+    }, []);
+
     const dispatch = useDispatch();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const loadingRef = useRef(false);
+
+    // ✅ Get the current page from query parameters
+    const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+    const currentPage = useMemo(() => parseInt(queryParams.get("page")) || 1, [queryParams]);
 
     const [blogs, setBlogs] = useState([]);
     const [pageSize] = useState(5);
     const [loading, setLoading] = useState(true);
-    const [pageDetails, setPageDetails] = useState({ totalRecords: 0, pageIndex: 1, totalPages: 0 });
-    const loadingRef = useRef(false); // Prevent unnecessary API calls
+    const [pageDetails, setPageDetails] = useState({ totalRecords: 0, pageIndex: currentPage, totalPages: 0 });
 
-    const backendUrl = process.env.NODE_ENV === "development" ? "http://localhost:5000" : "https://community.wotgonline.com/api";
+    const backendUrl = useMemo(() => {
+        return process.env.NODE_ENV === "development" ? "http://localhost:5000" : "https://community.wotgonline.com/api";
+    }, []);
 
-    const handleBlogList = useCallback(async (pageIndex = 1) => {
-        if (loadingRef.current) return; // Prevent duplicate calls
+    // ✅ Fetch Blog List with Page Index (Optimized)
+    const handleBlogList = useCallback(async (pageIndex) => {
+        if (loadingRef.current) return;
         loadingRef.current = true;
         setLoading(true);
 
         try {
             const res = await dispatch(wotgsocial.blog.getAllBlogsAction({ pageSize, pageIndex }));
             if (res.success && res.data?.blogs) {
-                setBlogs(res.data.blogs);
-                setPageDetails({
+                if (JSON.stringify(res.data.blogs) !== JSON.stringify(blogs)) {
+                    setBlogs(res.data.blogs);
+                }
+                setPageDetails((prev) => ({
+                    ...prev,
                     totalRecords: res.data.totalRecords,
                     pageIndex: res.data.pageIndex,
                     totalPages: res.data.totalPages,
-                });
+                }));
+
+                // ✅ Update URL without causing extra re-renders
+                if (res.data.pageIndex !== currentPage) {
+                    navigate(`/blogs?page=${res.data.pageIndex}`, { replace: true });
+                }
             }
         } finally {
             setLoading(false);
             loadingRef.current = false;
         }
-    }, [dispatch, pageSize]);
+    }, [dispatch, pageSize, blogs, currentPage, navigate]);
 
     useEffect(() => {
-        handleBlogList(1);
-    }, [handleBlogList]);
+        handleBlogList(currentPage);
+    }, [handleBlogList, currentPage]);
 
-    const handleDeleteVideo = async (blogId) => {
+    // ✅ Handle Video Deletion
+    const handleDeleteVideo = useCallback(async (blogId) => {
         if (window.confirm("Are you sure you want to delete this video?")) {
             const res = await dispatch(wotgsocial.blog.deleteBlogVideoAction(blogId));
             if (res.success) {
                 handleBlogList(pageDetails.pageIndex);
             }
         }
-    };
+    }, [dispatch, pageDetails.pageIndex, handleBlogList]);
 
+    // ✅ Memoized Blog Items
     const blogItems = useMemo(() => {
         return blogs.map((blog) => (
             <div key={blog.id} className={styles.blogCard}>
@@ -88,10 +110,14 @@ const Page = () => {
                 <p className={styles.blogBody}>{truncateText(decodeHtmlEntities(stripHtml(blog.blog_body)), 200)}</p>
 
                 <div className={styles.linksContainer}>
-                    <Link to={`/blog/${blog.id}`} className={styles.readMore}>See More</Link>
+                    <Link to={`/blog/${blog.id}?page=${pageDetails.pageIndex}`} className={styles.readMore}>
+                        See More
+                    </Link>
 
                     {account.user_role !== "member" && (
-                        <Link to={`/blog/upload-video/${blog.id}`} className={styles.readMore}>Create Video</Link>
+                        <Link to={`/blog/upload-video/${blog.id}?page=${pageDetails.pageIndex}`} className={styles.readMore}>
+                            Create Video
+                        </Link>
                     )}
 
                     {blog.blog_video && (
@@ -105,7 +131,7 @@ const Page = () => {
                 </div>
             </div>
         ));
-    }, [blogs, account, handleDeleteVideo]);
+    }, [blogs, account, handleDeleteVideo, pageDetails.pageIndex, backendUrl]);
 
     return (
         <>
@@ -139,9 +165,9 @@ const Page = () => {
                         </div>
 
                         <div className={styles.pagination}>
-                            <button className={styles.paginationButton} disabled={pageDetails.pageIndex === 1} onClick={() => handleBlogList(pageDetails.pageIndex - 1)}>Previous</button>
+                            <button className={styles.paginationButton} disabled={pageDetails.pageIndex === 1} onClick={() => handleBlogList(pageDetails.pageIndex - 1)}>⬅ Prev</button>
                             <span className={styles.pageInfo}>Page {pageDetails.pageIndex} of {pageDetails.totalPages}</span>
-                            <button className={styles.paginationButton} disabled={pageDetails.pageIndex >= pageDetails.totalPages} onClick={() => handleBlogList(pageDetails.pageIndex + 1)}>Next</button>
+                            <button className={styles.paginationButton} disabled={pageDetails.pageIndex >= pageDetails.totalPages} onClick={() => handleBlogList(pageDetails.pageIndex + 1)}>Next ➡</button>
                         </div>
                     </div>
                 </div>

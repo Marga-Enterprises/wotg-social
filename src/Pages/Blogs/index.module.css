@@ -116,14 +116,14 @@
 }
 
 .paginationButton {
-    background-color: #007bff;
-    color: white;
+    background-color: transparent;
+    color: darkred;
     border: none;
     padding: 8px 16px;
     margin: 0 5px;
     cursor: pointer;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 16px;
     transition: background-color 0.3s ease;
 }
 
@@ -133,7 +133,7 @@
 }
 
 .paginationButton:hover:not(:disabled) {
-    background-color: #0056b3;
+    color: rgb(58, 4, 4);
 }
 
 .pageInfo {

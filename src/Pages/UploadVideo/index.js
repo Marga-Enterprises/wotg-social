@@ -75,7 +75,7 @@ const Page = () => {
             setLoading(false);
             loadingRef.current = false;
         }
-    }, [dispatch, id, removeImagesFromHTML, scriptText]);
+    }, [dispatch, id, removeImagesFromHTML]);
 
     useEffect(() => {
         fetchBlogDetails();

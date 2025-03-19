@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import styles from './index.module.css';
+
+// FontAwesome Icons (Optimized Import)
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const Page = () => {
     const dispatch = useDispatch();
@@ -17,6 +21,11 @@ const Page = () => {
     const [password, setPassword] = useState('');
     const [errMsg, setErrMsg] = useState('');
     const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    const togglePasswordVisibility = useCallback(() => {
+        setShowPassword((prev) => !prev);
+    }, []);
 
     const handleSubmitSignUp = (event) => {
         event.preventDefault();
@@ -73,13 +82,12 @@ const Page = () => {
                     <h1 className={styles.heading}>Register</h1>
                     <form className={styles.form} onSubmit={handleSubmitSignUp}>
                         <div className={styles.formGroup}>
-                            <label htmlFor="first-name" className={styles.label}>
+                            <label htmlFor="firstName" className={styles.label}>
                                 First Name
                             </label>
                             <input
-                                type="text"
-                                id="first-name"
-                                name="first-name"
+                                id="firstName"
+                                name="firstName"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 className={styles.input}
@@ -87,13 +95,12 @@ const Page = () => {
                             />
                         </div>
                         <div className={styles.formGroup}>
-                            <label htmlFor="last-name" className={styles.label}>
+                            <label htmlFor="lastName" className={styles.label}>
                                 Last Name
                             </label>
                             <input
-                                type="text"
-                                id="last-name"
-                                name="last-name"
+                                id="lastName"
+                                name="lastName"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 className={styles.input}
@@ -120,15 +127,24 @@ const Page = () => {
                             <label htmlFor="password" className={styles.label}>
                                 Password
                             </label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className={styles.input}
-                                required
-                            />
+                            <div className={styles.passwordContainer}>
+                                <input
+                                    type={showPassword ? "" : "password"}
+                                    id="password"
+                                    name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className={styles.input}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    className={styles.eyeButton}
+                                    onClick={togglePasswordVisibility}
+                                >
+                                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                </button>
+                            </div>
                         </div>
 
                         <div className={styles.formGroup}>
@@ -175,4 +191,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default React.memo(Page);

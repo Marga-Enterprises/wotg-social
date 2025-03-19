@@ -11,7 +11,7 @@ const LoadingSpinner = () => {
     setVisible(true); // Ensure visibility
 
     intervalRef.current = setInterval(() => {
-      setProgress((prev) => (prev < 90 ? prev + 10 : prev)); // Increment progress
+      setProgress((prev) => (prev < 90 ? prev + 1 : prev)); // Increment progress
     }, 500);
 
     return () => clearInterval(intervalRef.current); // Cleanup interval

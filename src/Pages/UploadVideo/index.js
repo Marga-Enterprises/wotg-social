@@ -57,24 +57,29 @@ const Page = () => {
     // ✅ Remove draft **ONLY AFTER** video upload completes
     const handleSaveVideo = useCallback(async () => {
         if (!recordedVideo || !id) return;
-
+    
         setUploading(true);
         setLoading(true);
-
+    
         const payload = { id, file: recordedVideo };
-
+    
         try {
-            await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload));
-            setStep(0);
-            localStorage.removeItem(draftKey); // ✅ Remove draft only after successful upload
-            setSnackbar({ open: true, message: "Video uploaded successfully!", type: "success" });
+            const res = await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload));
+    
+            if (res?.success) {
+                setStep(0);
+                // localStorage.removeItem(draftKey); // ✅ Remove draft only after successful upload
+                setSnackbar({ open: true, message: "Video uploaded successfully!", type: "success" });
+            } else {
+                setSnackbar({ open: true, message: res?.message || "Upload failed. Please try again.", type: "error" });
+            }
         } catch (error) {
             setSnackbar({ open: true, message: "Upload failed. Please try again.", type: "error" });
         } finally {
             setUploading(false);
             setLoading(false);
         }
-    }, [dispatch, id, recordedVideo, draftKey]);
+    }, [dispatch, id, recordedVideo, draftKey]);    
 
     // ✅ Initialize teleprompter settings (Memoized to prevent unnecessary re-renders)
     const [teleprompterSettings, setTeleprompterSettings] = useState(() => ({

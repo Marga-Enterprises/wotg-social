@@ -154,3 +154,33 @@
   .smallText {
     font-size: 1rem;
   }
+
+  /* Password Input Container */
+.passwordContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Eye Icon Button */
+.eyeButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem; /* ✅ Matches text size */
+  color: #666;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.eyeButton:hover {
+  color: #333;
+}

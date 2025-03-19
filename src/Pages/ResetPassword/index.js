@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import { useNavigate, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import styles from './index.module.css';
 import LoadingSpinner from "../../components/LoadingSpinner";
+
+// FontAwesome Icons (Optimized Import)
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const Page = () => {
     const {
@@ -17,11 +21,22 @@ const Page = () => {
     const authToken = Cookies.get('token');
 
     const [newPass, setNewPass] = useState('');
-    const [confirmPass, setConfirmNewPass] = useState('');
+    const [confirmPass, setConfirmPass] = useState('');
     const [errMsg, setErrMsg] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
     const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false);
     const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setConfirmShowPassword] = useState(false);
+
+    const togglePasswordVisibility = useCallback(() => {
+        setShowPassword((prev) => !prev);
+    }, []);
+
+    const toggleConfirmPasswordVisibility = useCallback(() => {
+        setConfirmShowPassword((prev) => !prev);
+    }, []);
 
     const handleSubmitResetPass = (event) => {
         event.preventDefault();
@@ -85,29 +100,47 @@ const Page = () => {
                                     <label htmlFor="password" className={styles.label}>
                                         New Password
                                     </label>
-                                    <input
-                                        type="password"
-                                        id="newPass"
-                                        name="newPass"
-                                        value={newPass}
-                                        onChange={(e) => setNewPass(e.target.value)}
-                                        className={styles.input}
-                                        required
-                                    />
+                                    <div className={styles.passwordContainer}>
+                                        <input
+                                            type={showPassword ? "" : "password"}
+                                            id="newPass"
+                                            name="newPass"
+                                            value={newPass}
+                                            onChange={(e) => setNewPass(e.target.value)}
+                                            className={styles.input}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className={styles.eyeButton}
+                                            onClick={togglePasswordVisibility}
+                                        >
+                                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label htmlFor="password" className={styles.label}>
                                         Confirm New Password
                                     </label>
-                                    <input
-                                        type="password"
-                                        id="confirmNewPass"
-                                        name="confirmNewPass"
-                                        value={confirmPass}
-                                        onChange={(e) => setConfirmNewPass(e.target.value)}
-                                        className={styles.input}
-                                        required
-                                    />
+                                    <div className={styles.passwordContainer}>
+                                        <input
+                                            type={showConfirmPassword ? "" : "password"}
+                                            id="confirmPass"
+                                            name="confirmPass"
+                                            value={confirmPass}
+                                            onChange={(e) => setConfirmPass(e.target.value)}
+                                            className={styles.input}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className={styles.eyeButton}
+                                            onClick={toggleConfirmPasswordVisibility}
+                                        >
+                                            <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div>
                                     <button
@@ -140,4 +173,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default React.memo(Page);

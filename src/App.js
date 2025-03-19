@@ -11,7 +11,9 @@ import PrivacyPolicy from './Pages/PrivacyPolicy';
 import Blogs from './Pages/Blogs';
 import BlogDetails from './Pages/BlogDetails';
 import UploadVideo from './Pages/UploadVideo';
-import WatchVideo from './Pages/WatchVideo'
+import WatchVideo from './Pages/WatchVideo';
+import ForgotPassword from './Pages/ForgotPassword';
+import ResetPassword from './Pages/ResetPassword';
 
 // REDUX
 import { useDispatch } from 'react-redux';
@@ -47,6 +49,8 @@ function App() {
             <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
             <Route path="/" element={<AuthRouter><Home /></AuthRouter>} />
             <Route path="/login" element={<SignIn />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/privacypolicy" element={<PrivacyPolicy />} />
             <Route path="*" element={<Default />} />

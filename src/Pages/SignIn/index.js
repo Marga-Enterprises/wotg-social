@@ -6,7 +6,6 @@ import Cookies from 'js-cookie';
 import styles from './index.module.css';
 
 const Page = () => {
-    const { error } = useSelector((state) => state.wotgsocial.user);
     const {
         ui: { loading },
     } = useSelector((state) => state.common);
@@ -112,6 +111,13 @@ const Page = () => {
                         Don't have an account?{' '}
                         <a href="/register" className={styles.link}>
                             Sign Up
+                        </a>
+                    </p>
+
+                    <p className={styles.footerText}>
+                        Forgot password?{' '}
+                        <a href="/forgot-password" className={styles.link}>
+                            Click here
                         </a>
                     </p>
                 </div>

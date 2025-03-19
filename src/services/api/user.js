@@ -38,4 +38,12 @@ export async function updateUser(payload) {
 
 export async function getUser(payload) {
   return GET(`/users/${payload.id}`);
-};
+}
+
+export async function forgotPasswordFunc(payload) {
+  return POST('/auth/forgot-password', payload); // Expects { email }
+}
+
+export async function resetPasswordFunc(payload) {
+  return POST(`/auth/reset-password/${payload.token}`, payload);
+}

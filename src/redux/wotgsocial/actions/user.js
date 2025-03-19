@@ -1,5 +1,7 @@
 // API
-import { loginFunc, registerFunc, getAllUsers, updateUser, getUser, refreshTokenFunc, logoutUser } from '../../../services/api/user';
+import { loginFunc, registerFunc, getAllUsers, updateUser, getUser, refreshTokenFunc, logoutUser,
+    forgotPasswordFunc, resetPasswordFunc
+} from '../../../services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -204,6 +206,57 @@ export const restoreSessionAction = () => async (dispatch) => {
         }
     } catch (err) {
         console.error("Session restore failed:", err);
+    }
+};
+
+export const forgotPasswordAction = (payload) => async (dispatch) => {
+    try {
+        const res = await forgotPasswordFunc(payload);
+
+        if (res.success) {
+        dispatch({
+            type: types.REQUEST_NEW_PASSWORD_SUCCESS,
+            payload: res.message, // Success message
+        });
+        } else {
+        dispatch({
+            type: types.REQUEST_NEW_PASSWORD_FAIL,
+            payload: res.msg || "Failed to send password reset email.",
+        });
+        }
+
+        return res;
+    } catch (err) {
+        return dispatch({
+        type: types.REQUEST_NEW_PASSWORD_FAIL,
+        payload: err.response?.data?.msg || "Error in requesting password reset.",
+        });
+    }
+};
+
+
+export const resetPasswordAction = (payload) => async (dispatch) => {
+    try {
+        const res = await resetPasswordFunc(payload);
+
+        if (res.success) {
+        dispatch({
+            type: types.CHANGE_PASSWORD_SUCCESS,
+            payload: res.message, // Success message
+        });
+        } else {
+        dispatch({
+            type: types.CHANGE_PASSWORD_FAIL,
+            payload: res.msg || "Failed to reset password.",
+        });
+        }
+
+        return res;
+    } catch (err) {
+        return dispatch({
+        type: types.CHANGE_PASSWORD_FAIL,
+        payload: err.response?.data?.msg || "Error in resetting password.",
+        });
     }
 };
 

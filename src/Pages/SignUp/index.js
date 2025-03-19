@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import { useNavigate } from 'react-router-dom';
@@ -48,6 +48,13 @@ const Page = () => {
                 dispatch(common.ui.clearLoading());
             });
     };
+
+    useEffect(() => {
+        const token = Cookies.get('token');
+        if (token) {
+            navigate('/menu');
+        }
+    }, [navigate]);
 
     return (
         <div className={styles.container}>

@@ -6,6 +6,7 @@ import SignIn from './Pages/SignIn';
 import SignUp from './Pages/SignUp';
 import Worship from './Pages/Worship';
 import Menu from './Pages/Menu';
+import Bible from './Pages/Bible';
 import Default from './Pages/Default';
 import PrivacyPolicy from './Pages/PrivacyPolicy';
 import Blogs from './Pages/Blogs';
@@ -44,6 +45,7 @@ function App() {
             <Route path="/worship" element={<AuthRouter><Worship /></AuthRouter>} />
             <Route path="/menu" element={<AuthRouter><Menu /></AuthRouter>} />
             <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
+            <Route path="/bible" element={<AuthRouter><Bible /></AuthRouter>} />
             <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
             <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
             <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />

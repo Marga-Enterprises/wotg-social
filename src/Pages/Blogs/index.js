@@ -110,19 +110,30 @@ const Page = () => {
                 <p className={styles.blogBody}>{truncateText(decodeHtmlEntities(stripHtml(blog.blog_body)), 200)}</p>
 
                 <div className={styles.linksContainer}>
+                    {/* ✅ "See More" Link */}
                     <Link to={`/blog/${blog.id}?page=${pageDetails.pageIndex}`} className={styles.readMore}>
                         See More
                     </Link>
 
-                    {account.user_role !== "member" && (
-                        <Link to={`/blog/upload-video/${blog.id}?page=${pageDetails.pageIndex}`} className={styles.readMore}>
-                            Create Video
-                        </Link>
+                    {/* ✅ Show "Upload" and "Record" only if NO video exists */}
+                    {account.user_role !== "member" && !blog.blog_video && (
+                        <>
+                            <Link to={`/blog/record-video/${blog.id}?page=${pageDetails.pageIndex}`} className={styles.readMore}>
+                                Record Video
+                            </Link>
+
+                            <Link to={`/blog/upload-video/${blog.id}?page=${pageDetails.pageIndex}`} className={styles.readMore}>
+                                Upload Video
+                            </Link>
+                        </>
                     )}
 
+                    {/* ✅ Show "Watch Video" only if there is a video */}
                     {blog.blog_video && (
                         <>
                             <Link to={`/blog/watch-video/${blog.id}`} className={styles.readMore}>Watch Video</Link>
+
+                            {/* ✅ Allow Delete only for admin, owner, or the uploader */}
                             {(account.user_role === "admin" || account.user_role === "owner" || blog.blog_uploaded_by === account.id) && (
                                 <button className={styles.readMore} onClick={() => handleDeleteVideo(blog.id)}>Delete Video</button>
                             )}

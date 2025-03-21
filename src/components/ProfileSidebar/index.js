@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import Cookies from 'js-cookie';
 import { wotgsocial } from '../../redux/combineActions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBroadcastTower, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 const ProfileSidebar = ({ onOpenProfileModal }) => {
   const dispatch = useDispatch();

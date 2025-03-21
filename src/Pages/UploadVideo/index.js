@@ -138,7 +138,7 @@ const Page = () => {
                     {step !== 2 && step !== 1 && (
                         <div className={styles.navbar}>
                             <div className={styles.logo}>
-                                <img src={wotgLogo} alt="WOTG Logo" loading="lazy" />
+                                <img src={wotgLogo} alt="WOTG Logo"/>
                             </div>
 
                             <div className={styles.navLinks}>

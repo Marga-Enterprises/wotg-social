@@ -1,0 +1,172 @@
+/* ✅ Main Container */
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f8f8;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* ✅ Navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgb(197, 31, 31); /* Navbar color */
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Keeps navbar on top */
+}
+
+.navLinks {
+    display: flex;
+    gap: 15px;
+}
+
+/* ✅ Navbar Links */
+.navLink {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 8px 12px;
+    transition: color 0.3s ease;
+}
+
+.navLink:hover {
+    color: rgb(182, 182, 182);
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+/* ✅ Drag & Drop Upload Zone */
+.dropZone {
+    width: 100%;
+    max-width: 600px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    background-color: #fafafa;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 80px; /* Space below navbar */
+}
+
+.dropZone:hover {
+    background-color: #f0f0f0;
+}
+
+.dropZone p {
+    margin: 10px 0;
+    font-size: 16px;
+    color: #666;
+}
+
+/* ✅ Upload Button */
+.uploadButton {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #fff;
+    border: solid 1px #e53e3e;
+    border-radius: 4px;
+    color: #e53e3e;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.uploadButton:hover {
+    background-color: #e53e3e;
+    color: #fff;
+}
+
+.uploadButton:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+/* ✅ Video Preview */
+.videoPreview {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px 0;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #000;
+}
+
+.videoPreview video {
+    width: 100%;
+    display: block;
+}
+
+/* ✅ Upload Progress */
+.progressContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.progressBar {
+    width: 100%;
+    max-width: 600px;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+}
+
+/* ✅ Back Button */
+.backButtonContainer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.buttonContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.backButton {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #e53e3e;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.backButton:hover {
+    background-color: #c53030;
+}
+
+/* ✅ Responsive Design */
+@media (max-width: 768px) {
+    .dropZone {
+        max-width: 90%;
+        padding: 30px;
+    }
+}

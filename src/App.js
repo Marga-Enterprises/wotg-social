@@ -15,6 +15,7 @@ import UploadVideo from './Pages/UploadVideo';
 import WatchVideo from './Pages/WatchVideo';
 import ForgotPassword from './Pages/ForgotPassword';
 import ResetPassword from './Pages/ResetPassword';
+import UploadVideoFromFiles from './Pages/UploadVideoFromFiles';
 
 // REDUX
 import { useDispatch } from 'react-redux';
@@ -47,7 +48,8 @@ function App() {
             <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
             <Route path="/bible" element={<AuthRouter><Bible /></AuthRouter>} />
             <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
-            <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
+            <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
+            <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
             <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
             <Route path="/" element={<AuthRouter><Home /></AuthRouter>} />
             <Route path="/login" element={<SignIn />} />

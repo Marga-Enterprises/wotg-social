@@ -218,24 +218,32 @@ const RecordingSection = ({
                 {!isRecording && !videoReady ? (
                     <>
                         <button className={styles.iconButton} onClick={onPrev}>⬅️</button>
-                        <button className={styles.recordButton} onClick={startRecording}>🔴</button>
+                        <button className={styles.recordButton} onClick={startRecording}>🔴 Start Recording</button>
                     </>
                 ) : isRecording ? (
                     <>
-                        {isPaused ? (
-                            <button className={styles.resumeButton} onClick={resumeRecording}>▶ Resume</button>
-                        ) : (
-                            <button className={styles.pauseButton} onClick={pauseRecording}>⏸ Pause</button>
-                        )}
-                        <button className={styles.stopButton} onClick={stopRecording}>⏹️ Stop</button>
-                        <button className={styles.iconButton} onClick={isScrolling ? stopScrolling : startScrolling}>
-                            {isScrolling ? "⏸" : "▶"}
-                        </button>
+                        <div className={styles.controlGroup}>
+                            {isPaused ? (
+                                <button className={styles.resumeButton} onClick={resumeRecording}>▶ Resume Recording</button>
+                            ) : (
+                                <button className={styles.pauseButton} onClick={pauseRecording}>⏸ Pause Recording</button>
+                            )}
+                        </div>
+
+                        <div className={styles.controlGroup}>
+                            <button className={styles.stopButton} onClick={stopRecording}>⏹️ Stop Recording</button>
+                        </div>
+
+                        <div className={styles.controlGroup}>
+                            <button className={styles.iconButton} onClick={isScrolling ? stopScrolling : startScrolling}>
+                                {isScrolling ? "⏸ Pause Teleprompter" : "▶ Play Teleprompter"}
+                            </button>
+                        </div>
                     </>
                 ) : (
                     <>
                         <button className={styles.iconButton} onClick={onNext}>✅</button>
-                        <button className={styles.iconButton} onClick={resetRecording}>🔄</button>
+                        <button className={styles.iconButton} onClick={resetRecording}>🔄 Restart</button>
                     </>
                 )}
             </div>

@@ -14,6 +14,7 @@ const RecordingSection = ({
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
     const [isRecording, setIsRecording] = useState(false);
+    const [isPaused, setIsPaused] = useState(false); // ✅ New Pause State
     const [cameraStream, setCameraStream] = useState(null);
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const [videoReady, setVideoReady] = useState(false);
@@ -73,6 +74,7 @@ const RecordingSection = ({
             recorder.startRecording();
             setMediaRecorder(recorder);
             setIsRecording(true);
+            setIsPaused(false);
             startScrolling();
 
         } else {
@@ -102,12 +104,39 @@ const RecordingSection = ({
                 recorder.start();
                 setMediaRecorder(recorder);
                 setIsRecording(true);
+                setIsPaused(false);
                 startScrolling();
             } catch (error) {
                 alert("Recording failed. Try restarting browser and allowing permissions.");
             }
         }
-    };    
+    };
+
+    // ✅ Pause Recording Function
+    const pauseRecording = () => {
+        if (!mediaRecorder) return;
+
+        if (isIOS) {
+            mediaRecorder.pauseRecording(); // ✅ iOS RecordRTC pause
+        } else {
+            mediaRecorder.pause(); // ✅ WebM MediaRecorder pause
+        }
+        setIsPaused(true);
+        stopScrolling();
+    };
+
+    // ✅ Resume Recording Function
+    const resumeRecording = () => {
+        if (!mediaRecorder) return;
+
+        if (isIOS) {
+            mediaRecorder.resumeRecording(); // ✅ iOS RecordRTC resume
+        } else {
+            mediaRecorder.resume(); // ✅ WebM MediaRecorder resume
+        }
+        setIsPaused(false);
+        startScrolling();
+    };
 
     const stopRecording = () => {
         if (!mediaRecorder) return;
@@ -123,18 +152,18 @@ const RecordingSection = ({
         }
 
         setIsRecording(false);
+        setIsPaused(false);
         stopScrolling();
     };
 
     const resetRecording = () => {
-        // ✅ Stop current recording if it's running
         if (isRecording) {
             stopRecording();
         }
-        // ✅ Reset all states
         setRecordedVideo(null);
         setVideoReady(false);
         setIsRecording(false);
+        setIsPaused(false);
     };
 
     const stopCamera = () => {
@@ -189,19 +218,32 @@ const RecordingSection = ({
                 {!isRecording && !videoReady ? (
                     <>
                         <button className={styles.iconButton} onClick={onPrev}>⬅️</button>
-                        <button className={styles.recordButton} onClick={startRecording}>🔴</button>
+                        <button className={styles.recordButton} onClick={startRecording}>🔴 Start Recording</button>
                     </>
                 ) : isRecording ? (
                     <>
-                        <button className={styles.stopButton} onClick={stopRecording}>⏹️</button>
-                        <button className={styles.iconButton} onClick={isScrolling ? stopScrolling : startScrolling}>
-                            {isScrolling ? "⏸" : "▶"}
-                        </button>
+                        <div className={styles.controlGroup}>
+                            {isPaused ? (
+                                <button className={styles.resumeButton} onClick={resumeRecording}>▶ Resume Recording</button>
+                            ) : (
+                                <button className={styles.pauseButton} onClick={pauseRecording}>⏸ Pause Recording</button>
+                            )}
+                        </div>
+
+                        <div className={styles.controlGroup}>
+                            <button className={styles.stopButton} onClick={stopRecording}>⏹️ Stop Recording</button>
+                        </div>
+
+                        <div className={styles.controlGroup}>
+                            <button className={styles.iconButton} onClick={isScrolling ? stopScrolling : startScrolling}>
+                                {isScrolling ? "⏸ Pause Teleprompter" : "▶ Play Teleprompter"}
+                            </button>
+                        </div>
                     </>
                 ) : (
                     <>
                         <button className={styles.iconButton} onClick={onNext}>✅</button>
-                        <button className={styles.iconButton} onClick={resetRecording}>🔄</button> {/* ✅ Restart Button */}
+                        <button className={styles.iconButton} onClick={resetRecording}>🔄 Restart</button>
                     </>
                 )}
             </div>

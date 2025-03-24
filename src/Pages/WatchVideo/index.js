@@ -54,7 +54,7 @@ const Page = () => {
                     {/* ✅ Navbar remains intact */}
                     <div className={styles.navbar}>
                         <div className={styles.logo}>
-                            <img src={wotgLogo} alt="WOTG Logo" loading="lazy" />
+                            <img src={wotgLogo} alt="WOTG Logo"/>
                         </div>
                         <div className={styles.navLinks}>
                             <a href="/" className={styles.navLink}>Chat</a>

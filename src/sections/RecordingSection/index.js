@@ -98,6 +98,7 @@ const RecordingSection = ({
                 setIsPaused(false);
                 startScrolling();
             } catch (error) {
+                console.error("Recording failed: ", error);
                 alert("Recording failed. Try restarting browser and allowing permissions.");
             }
         }

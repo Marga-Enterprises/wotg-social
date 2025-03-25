@@ -24,7 +24,7 @@ const RecordingPreview = ({ recordedVideo, onSave, onReRecord }) => {
         <div className={styles.container}>
             <div className={styles.cameraOverlay}>
                 {videoUrl ? (
-                    <video ref={videoRef} src={videoUrl} autoPlay controls className={styles.video} />
+                    <video ref={videoRef} src={videoUrl} autoPlay playsInline controls className={styles.video} />
                 ) : (
                     <p className={styles.noVideoText}>No recorded video available</p> // ✅ Fallback message
                 )}

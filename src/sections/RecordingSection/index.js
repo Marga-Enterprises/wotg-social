@@ -38,21 +38,12 @@ const RecordingSection = ({
 
     const startCamera = async () => {
         try {
-            const constraints = {
-                video: {
-                    facingMode: isFrontCamera ? "user" : "environment",
-                    width: { ideal: isIOS ? 1920 : 1280 },
-                    height: { ideal: isIOS ? 1080 : 720 },
-                },
-                audio: true,
-            };
-
+            const constraints = { video: { facingMode: isFrontCamera ? "user" : "environment" } };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             videoRef.current.srcObject = stream;
-            videoRef.current.muted = true;
             setCameraStream(stream);
         } catch (error) {
-            alert("⚠️ Error accessing camera/microphone. Please allow permissions in settings.");
+            console.error("Error accessing camera: ", error);
         }
     };
 

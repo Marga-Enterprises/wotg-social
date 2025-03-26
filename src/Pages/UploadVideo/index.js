@@ -69,7 +69,7 @@ const Page = () => {
             if (res?.success) {
                 setStep(0);
                 // localStorage.removeItem(draftKey); // ✅ Remove draft only after successful upload
-                setSnackbar({ open: true, message: "Video uploaded successfully!", type: "success" });
+                setSnackbar({ open: true, message: "Video received. Please wait for processing...", type: "success" });
             } else {
                 setSnackbar({ open: true, message: res?.message || "Upload failed. Please try again.", type: "error" });
             }

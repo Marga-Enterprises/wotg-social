@@ -88,7 +88,7 @@ const Page = () => {
             const response = await dispatch(wotgsocial.blog.uploadBlogVideoAction(payload));
     
             if (response?.success) { // Ensure Redux action returns success
-                alert("Video uploaded successfully!");
+                alert("Video received. Please wait for processing...");
     
                 // ✅ Clear file input and preview
                 handleRemoveVideo();

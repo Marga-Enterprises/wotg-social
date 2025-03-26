@@ -45,29 +45,108 @@
     color: rgb(182, 182, 182);
 }
 
-.blogsContainer {
+.bibleReader {
+  padding: 2rem;
+  max-width: 700px;
+  margin: auto;
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.bookTitle {
+  font-weight: bold;
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.verseContainer {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.verseText {
+  margin: 0.5rem 0;
+  text-indent: 1.5rem;
+  position: relative;
+}
+
+.verseNumber {
+  font-size: 0.75rem;
+  vertical-align: super;
+  margin-right: 4px;
+  color: #555;
+}
+
+.mainContainer{
     display: flex;
     gap: 2rem;
     justify-content: center;
     flex-wrap: wrap;
-    border: solid;
     margin-top: 5rem;
 }
 
-@media (max-width: 1000px) {
-
+.navArrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: background 0.2s ease;
 }
 
-@media (max-width: 850px) {
-
+.navArrow:hover:not(:disabled) {
+  background-color: #f1f1f1;
 }
 
-@media (max-width: 600px) {
-
+.navArrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-@media (max-width: 450px) {
+.leftArrow {
+  left: 24px;
+}
 
+.rightArrow {
+  right: 24px;
+}
+
+@media (max-width: 768px) {
+  .bibleReader {
+    padding: 1.5rem 1rem;
+    font-size: 16px;
+  }
+
+  .bookTitle {
+    font-size: 20px;
+  }
+
+  .navArrow {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .bibleReader {
+    font-size: 15px;
+  }
+
+  .verseText {
+    text-indent: 1rem;
+  }
 }
 
 

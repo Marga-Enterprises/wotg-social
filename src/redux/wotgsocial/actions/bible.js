@@ -1,24 +1,24 @@
 import * as types from '../types';
-import axios from 'axios';
+import { getBibleChaptersByParams } from '../../../services/api/bible';
 
-export const getAllBiblesAction = () => async (dispatch) => {
+export const getAllBiblesAction = (payload) => async (dispatch) => {
   try {
-    const response = await axios.get('https://api.scripture.api.bible/v1/bibles', {
-      headers: {
-        'api-key': '3febb9df37ed813743d11611cdfa0786'
-      }
-    });
+    const res = await getBibleChaptersByParams(payload);
+    const { success, data } = res;
 
-    dispatch({
-      type: types.GET_BIBLES_SUCCESS,
-      payload: response.data // The list of Bibles
-    });
+    if (success) {
+      dispatch({
+        type: types.GET_BIBLES_SUCCESS,
+        payload: data.bibles,
+      });
+    }
 
-    return response;
-  } catch (error) {
-    dispatch({
+    return res; // Return the response object in both success and error cases
+
+  } catch (err) {
+    return dispatch({
       type: types.GET_BIBLES_FAIL,
-      payload: error.response ? error.response.data : error.message
+      payload: err.response?.data?.msg || "Something went wrong",
     });
   }
 };

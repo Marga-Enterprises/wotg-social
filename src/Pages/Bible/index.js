@@ -15,6 +15,7 @@ const Page = () => {
     const loadingRef = useRef(false);
     const syncTimeout = useRef(null);
     const longPressTimer = useRef(null);
+    const verseRefs = useRef({});
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -27,6 +28,12 @@ const Page = () => {
     const [verses, setVerses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [verseStyle, setVerseStyle] = useState({
+        fontSize: "20px",
+        fontFamily: "Arial",
+        fontColor: "#000000",
+    });
 
     const bookName = useMemo(() => bibleBooks.find(b => b.id === book)?.name?.[language] || `Book ${book}`, [book, language]);
     const highlightKey = useMemo(() => `highlighted_${book}_${chapter}_${language}`, [book, chapter, language]);
@@ -42,6 +49,18 @@ const Page = () => {
         setChapter(c);
         setLanguage(l);
     }, []);
+
+    useEffect(() => {
+        try {
+          const savedStyle = localStorage.getItem("bible_style");
+          if (savedStyle) {
+            setVerseStyle(JSON.parse(savedStyle));
+          }
+        } catch (e) {
+          console.warn("Invalid style in localStorage");
+        }
+    }, []);
+      
 
     useEffect(() => {
         try {
@@ -88,8 +107,28 @@ const Page = () => {
             console.error("Fetch error:", err);
         }
 
+        //window.scrollTo({ top: 0, behavior: "auto" });
         setLoading(false);
     }, [dispatch, book, chapter, language]);
+
+    useEffect(() => {
+        if (!loading && verses.length) {
+          const storageKey = `highlighted_${book}_${chapter}_${language}`;
+          const scrollToId = localStorage.getItem(`${storageKey}_scrollTo`);
+      
+          if (scrollToId && verseRefs.current) {
+            const target = verseRefs.current[parseInt(scrollToId.split("-")[1])];
+            if (target) {
+              setTimeout(() => {
+                target.scrollIntoView({ behavior: "auto", block: "center" });
+              }, 300);
+            }
+          } else {
+            window.scrollTo({ top: 0, behavior: "auto" });
+          }
+        }
+    }, [loading, verses, book, chapter, language]);
+      
 
     useEffect(() => {
         loadingRef.current = false;
@@ -100,8 +139,6 @@ const Page = () => {
         const currentBook = bibleBooks.find(b => b.id === book);
         if (!currentBook) return;
 
-        window.scrollTo({ top: 0, behavior: "auto" });
-
         if (chapter < currentBook.chapters) {
             setChapter(prev => prev + 1);
         } else if (book < 66) {
@@ -111,8 +148,6 @@ const Page = () => {
     }, [book, chapter]);
 
     const handlePrev = useCallback(() => {
-        window.scrollTo({ top: 0, behavior: "auto" });
-
         if (chapter > 1) {
             setChapter(prev => prev - 1);
         } else if (book > 1) {
@@ -124,35 +159,31 @@ const Page = () => {
         }
     }, [book, chapter]);
 
-    const handlePressStart = (verse, text) => {
+    const handleVerseTap = (verse, text) => {
+        const storageKey = `highlighted_${book}_${chapter}_${language}`;
+      
         longPressTimer.current = setTimeout(() => {
-            const isAlreadyHighlighted = highlightedVerses[verse];
-        
-            if (isAlreadyHighlighted) {
-            // Remove highlight
+          const isAlreadyHighlighted = highlightedVerses[verse];
+      
+          if (isAlreadyHighlighted) {
             const updated = { ...highlightedVerses };
             delete updated[verse];
             setHighlightedVerses(updated);
-            localStorage.setItem(`highlighted_${book}_${chapter}_${language}`, JSON.stringify(updated));
-            } else {
-            // Add highlight + copy
+            localStorage.setItem(storageKey, JSON.stringify(updated));
+            localStorage.removeItem(`${storageKey}_scrollTo`);
+          } else {
             const newHighlights = { ...highlightedVerses, [verse]: true };
             setHighlightedVerses(newHighlights);
-            localStorage.setItem(`highlighted_${book}_${chapter}_${language}`, JSON.stringify(newHighlights));
-        
+            localStorage.setItem(storageKey, JSON.stringify(newHighlights));
+            localStorage.setItem(`${storageKey}_scrollTo`, `verse-${verse}`);
+      
             navigator.clipboard.writeText(`${bookName} ${chapter}:${verse} — ${text}`);
             setCopiedVerse(verse);
             setTimeout(() => setCopiedVerse(null), 2000);
-            }
-        }, 1000); // 800ms long press
+          }
+        }, 500);
     };
       
-      
-      
-    const handlePressEnd = () => {
-        clearTimeout(longPressTimer.current);
-    };
-
     const isFirstChapter = book === 1 && chapter === 1;
     const isLastChapter = book === 66 && chapter === bibleBooks.find(b => b.id === 66)?.chapters;
 
@@ -184,6 +215,7 @@ const Page = () => {
                 onBookChange={setBook}
                 onChapterChange={setChapter}
                 onLanguageChange={setLanguage}
+                onStyleChange={(style) => setVerseStyle((prev) => ({ ...prev, ...style }))}
             />
 
             <div className={styles.bibleReader}>
@@ -213,13 +245,11 @@ const Page = () => {
                     <div className={styles.verseContainer}>
                         {verses.map(({ verse, text }) => (
                             <p
-                              key={verse}
-                              className={`${styles.verseText} ${highlightedVerses[verse] ? styles.highlighted : ""}`}
-                              onTouchStart={() => handlePressStart(verse, text)}
-                              onTouchEnd={handlePressEnd}
-                              onMouseDown={() => handlePressStart(verse, text)}
-                              onMouseUp={handlePressEnd}
-                              onMouseLeave={handlePressEnd}
+                                key={verse}
+                                ref={(el) => verseRefs.current[verse] = el}
+                                style={verseStyle} // ⬅️ add this!
+                                className={`${styles.verseText} ${highlightedVerses[verse] ? styles.highlighted : ""}`}
+                                onClick={() => handleVerseTap(verse, text)}
                             >
                                 <sup className={styles.verseNumber}>{verse}</sup> {text}
                             </p>

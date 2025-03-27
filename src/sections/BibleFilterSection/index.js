@@ -2,6 +2,10 @@ import React, { useMemo, useState } from "react";
 import styles from "./index.module.css";
 import bibleBooks from "../../Pages/Bible/data";
 import BookAndChapterSelectModal from "../../components/BookAndChapterSelectModal";
+import BibleSettingsModal from "../../components/BibleSettingsModal";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons";
 
 const BibleFilterSection = ({
   book,
@@ -10,8 +14,10 @@ const BibleFilterSection = ({
   onBookChange,
   onChapterChange,
   onLanguageChange,
+  onStyleChange, 
 }) => {
   const [showModal, setShowModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false); // 🆕 For settings
   const currentBook = useMemo(() => bibleBooks.find((b) => b.id === book), [book]);
 
   return (
@@ -43,6 +49,22 @@ const BibleFilterSection = ({
           <option value="eng">World English Bible - WEB</option>
           <option value="fil">Pagibig ng Diyos - PND</option>
         </select>
+
+        {/* Gear Icon */}
+        <button className={styles.gearButton} onClick={() => setShowSettings(true)}>
+          <FontAwesomeIcon icon={faGear} />
+        </button>
+
+        {/* Bible Settings Modal */}
+        {showSettings && (
+          <BibleSettingsModal
+            onClose={() => setShowSettings(false)}
+            onApply={(style) => {
+              onStyleChange(style); // send it to Page
+              setShowSettings(false);
+            }}
+          />
+        )}
       </div>
     </div>
   );

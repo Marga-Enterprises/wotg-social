@@ -137,9 +137,8 @@ const Page = () => {
           // ✅ Show message
           setCopiedVerse(verse);
           setTimeout(() => setCopiedVerse(null), 2000); // Reset after 2s
-        }, 600);
-      };
-      
+        }, 3000); // ⏱️ Changed from 600ms to 3000ms
+    };
       
     const handlePressEnd = () => {
         clearTimeout(longPressTimer.current);

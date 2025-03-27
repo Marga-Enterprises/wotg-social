@@ -11,6 +11,7 @@ const Page = () => {
                     <li><a href="/worship">Worship</a></li>
                     <li><a href="/">Chat</a></li>
                     <li><a href="/blogs">Devotion</a></li>
+                    <li><a href="/bible">Bible</a></li>
                 </ul>
             </div>
         </div>

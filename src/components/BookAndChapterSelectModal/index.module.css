@@ -73,6 +73,28 @@
   background: #e0e0e0;
 }
 
+.searchInput {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+}
+
+.searchInput:focus {
+  border-color: #aaa;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+.noResults {
+  padding: 0.5rem;
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
 
 /* MEDIA QUERIES */
 @media (max-width: 450px) {

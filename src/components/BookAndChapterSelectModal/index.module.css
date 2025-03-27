@@ -1,0 +1,82 @@
+.modal {
+  background: white;
+  width: 100%;
+  max-width: 20rem;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  z-index: 999;
+  margin-top: 0.5rem;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.modalEnter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.cancel {
+  background: none;
+  border: none;
+  color: gray;
+  cursor: pointer;
+}
+
+.content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.bookList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bookItem {
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bookItem:hover {
+  background: #f0f0f0;
+}
+
+.chapterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: 10px;
+}
+
+.chapterItem {
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  background: #f8f8f8;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chapterItem:hover {
+  background: #e0e0e0;
+}
+
+
+/* MEDIA QUERIES */
+@media (max-width: 450px) {
+  .modal {
+    left: 0;
+  }  
+}

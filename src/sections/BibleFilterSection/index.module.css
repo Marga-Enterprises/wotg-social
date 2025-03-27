@@ -1,31 +1,66 @@
 .filterSection {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
+  padding: 1.5rem;
+  width: 100%;
+  align-items: stretch;
+  position: fixed;
+  background: #fff;
+  z-index: 1000;
+  margin-top: -20px;
+  border-bottom: #b4b4b4 1px solid;
 }
 
-.filterControls {
+.filterControlsRow {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
   align-items: center;
+  gap: 2rem;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
-/* Shared styles for all dropdowns */
-.select {
-  padding: 8px 12px;
+/* Book + Chapter Selector Button */
+.selectorButton {
+  display: flex;
+  align-items: center;
+  background: none;
   font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  font-family: inherit;
+  width: 100%;
+  color: #000;
+  border-bottom: 1px solid #ccc;
+  padding: 4px 0;
+  cursor: pointer;
+  min-width: 200px;
 }
 
-@media (max-width: 600px) {
-  .filterControls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .select {
-    width: 100%;
-  }
+.selectorButton::after {
+  content: "▼";
+  font-size: 10px;
+  margin-left: 6px;
+  color: #555;
 }
+
+/* Language Dropdown */
+.select {
+  background: none;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 16px;
+  padding: 4px 0;
+  font-family: inherit;
+  max-width: 200px;
+  color: #000;
+  border-radius: 0%;
+  appearance: none;
+  cursor: pointer;
+  margin: 0;
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+

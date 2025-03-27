@@ -126,35 +126,27 @@ const Page = () => {
 
     const handlePressStart = (verse, text) => {
         longPressTimer.current = setTimeout(() => {
-            const isHighlighted = highlightedVerses[verse];
-            const newHighlights = { ...highlightedVerses };
+            const isAlreadyHighlighted = highlightedVerses[verse];
         
-            if (isHighlighted) {
-            delete newHighlights[verse]; // 🔻 Remove highlight only
+            if (isAlreadyHighlighted) {
+            // Remove highlight
+            const updated = { ...highlightedVerses };
+            delete updated[verse];
+            setHighlightedVerses(updated);
+            localStorage.setItem(`highlighted_${book}_${chapter}_${language}`, JSON.stringify(updated));
+            } else {
+            // Add highlight + copy
+            const newHighlights = { ...highlightedVerses, [verse]: true };
             setHighlightedVerses(newHighlights);
-            localStorage.setItem(
-                `highlighted_${book}_${chapter}_${language}`,
-                JSON.stringify(newHighlights)
-            );
-            return; // 🚫 Skip copy & toast
-            }
+            localStorage.setItem(`highlighted_${book}_${chapter}_${language}`, JSON.stringify(newHighlights));
         
-            // ✅ Add highlight
-            newHighlights[verse] = true;
-            setHighlightedVerses(newHighlights);
-            localStorage.setItem(
-            `highlighted_${book}_${chapter}_${language}`,
-            JSON.stringify(newHighlights)
-            );
-        
-            // ✅ Copy to clipboard
             navigator.clipboard.writeText(`${bookName} ${chapter}:${verse} — ${text}`);
-        
-            // ✅ Show toast
             setCopiedVerse(verse);
             setTimeout(() => setCopiedVerse(null), 2000);
-        }, 2000); // ⏱️ 2-second hold
+            }
+        }, 1000); // 800ms long press
     };
+      
       
       
     const handlePressEnd = () => {
@@ -221,13 +213,13 @@ const Page = () => {
                     <div className={styles.verseContainer}>
                         {verses.map(({ verse, text }) => (
                             <p
-                            key={verse}
-                            className={`${styles.verseText} ${highlightedVerses[verse] ? styles.highlighted : ""}`}
-                            onMouseDown={() => handlePressStart(verse, text)}
-                            onTouchStart={() => handlePressStart(verse, text)}                            
-                            onMouseUp={handlePressEnd}
-                            onMouseLeave={handlePressEnd}
-                            onTouchEnd={handlePressEnd}
+                              key={verse}
+                              className={`${styles.verseText} ${highlightedVerses[verse] ? styles.highlighted : ""}`}
+                              onTouchStart={() => handlePressStart(verse, text)}
+                              onTouchEnd={handlePressEnd}
+                              onMouseDown={() => handlePressStart(verse, text)}
+                              onMouseUp={handlePressEnd}
+                              onMouseLeave={handlePressEnd}
                             >
                                 <sup className={styles.verseNumber}>{verse}</sup> {text}
                             </p>

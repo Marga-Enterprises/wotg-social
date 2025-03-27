@@ -25,7 +25,7 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const bookName = bibleBooks.find(b => b.id === book)?.name || `Book ${book}`;
+    const bookName = bibleBooks.find(b => b.id === book)?.name?.[language] || `Book ${book}`;
 
     // ✅ Load initial state from URL params
     useEffect(() => {

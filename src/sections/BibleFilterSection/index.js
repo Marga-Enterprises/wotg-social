@@ -19,11 +19,12 @@ const BibleFilterSection = ({
       <div className={styles.filterControlsRow}>
         <div>
           <button className={styles.selectorButton} onClick={() => setShowModal(true)}>
-            {currentBook?.name} {chapter}
+            {currentBook?.name[language] || currentBook.name.eng} Chapter - {chapter}
           </button>
 
           {showModal && (
             <BookAndChapterSelectModal
+              language={language}
               onSelect={({ bookId, chapter }) => {
                 onBookChange(bookId);
                 onChapterChange(chapter);
@@ -39,8 +40,8 @@ const BibleFilterSection = ({
           value={language}
           onChange={(e) => onLanguageChange(e.target.value)}
         >
-          <option value="eng">English</option>
-          <option value="fil">Filipino</option>
+          <option value="eng">World English Bible - WEB</option>
+          <option value="fil">Pagibig ng Diyos - PND</option>
         </select>
       </div>
     </div>

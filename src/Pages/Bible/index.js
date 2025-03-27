@@ -126,19 +126,36 @@ const Page = () => {
 
     const handlePressStart = (verse, text) => {
         longPressTimer.current = setTimeout(() => {
-          // ✅ Highlight
-          const newHighlights = { ...highlightedVerses, [verse]: true };
-          setHighlightedVerses(newHighlights);
-          localStorage.setItem(`highlighted_${book}_${chapter}_${language}`, JSON.stringify(newHighlights));
-      
-          // ✅ Copy to clipboard
-          navigator.clipboard.writeText(`${bookName} ${chapter}:${verse} — ${text}`);
-      
-          // ✅ Show message
-          setCopiedVerse(verse);
-          setTimeout(() => setCopiedVerse(null), 2000); // Reset after 2s
-        }, 2000); // ⏱️ Changed from 600ms to 3000ms
+            const isHighlighted = highlightedVerses[verse];
+            const newHighlights = { ...highlightedVerses };
+        
+            if (isHighlighted) {
+            delete newHighlights[verse]; // 🔻 Remove highlight only
+            setHighlightedVerses(newHighlights);
+            localStorage.setItem(
+                `highlighted_${book}_${chapter}_${language}`,
+                JSON.stringify(newHighlights)
+            );
+            return; // 🚫 Skip copy & toast
+            }
+        
+            // ✅ Add highlight
+            newHighlights[verse] = true;
+            setHighlightedVerses(newHighlights);
+            localStorage.setItem(
+            `highlighted_${book}_${chapter}_${language}`,
+            JSON.stringify(newHighlights)
+            );
+        
+            // ✅ Copy to clipboard
+            navigator.clipboard.writeText(`${bookName} ${chapter}:${verse} — ${text}`);
+        
+            // ✅ Show toast
+            setCopiedVerse(verse);
+            setTimeout(() => setCopiedVerse(null), 2000);
+        }, 2000); // ⏱️ 2-second hold
     };
+      
       
     const handlePressEnd = () => {
         clearTimeout(longPressTimer.current);

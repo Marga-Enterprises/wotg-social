@@ -125,14 +125,38 @@
   right: 24px;
 }
 
+.highlighted {
+  background-color: #fff89a; /* soft yellow */
+  transition: background 0.3s ease;
+}
+
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  z-index: 1000;
+  opacity: 0.9;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+
+
 @media (max-width: 768px) {
   .bibleReader {
     padding: 1.5rem 1rem;
-    font-size: 16px;
-  }
-
-  .bookTitle {
-    font-size: 20px;
   }
 
   .navArrow {
@@ -142,7 +166,6 @@
 
 @media (max-width: 500px) {
   .bibleReader {
-    font-size: 15px;
     margin-top: 10rem;
   }
 

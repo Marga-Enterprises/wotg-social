@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { wotgsocial } from "../../redux/combineActions";
 import LoadingSpinner from "../../components/LoadingSpinner";
@@ -14,18 +14,22 @@ const Page = () => {
     const dispatch = useDispatch();
     const loadingRef = useRef(false);
     const syncTimeout = useRef(null);
+    const longPressTimer = useRef(null);
+
     const location = useLocation();
     const navigate = useNavigate();
 
     const [book, setBook] = useState(1);
     const [chapter, setChapter] = useState(1);
     const [language, setLanguage] = useState("eng");
-
+    const [highlightedVerses, setHighlightedVerses] = useState({});
+    const [copiedVerse, setCopiedVerse] = useState(null);
     const [verses, setVerses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const bookName = bibleBooks.find(b => b.id === book)?.name?.[language] || `Book ${book}`;
+    const bookName = useMemo(() => bibleBooks.find(b => b.id === book)?.name?.[language] || `Book ${book}`, [book, language]);
+    const highlightKey = useMemo(() => `highlighted_${book}_${chapter}_${language}`, [book, chapter, language]);
 
     // ✅ Load initial state from URL params
     useEffect(() => {
@@ -38,6 +42,16 @@ const Page = () => {
         setChapter(c);
         setLanguage(l);
     }, []);
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem(highlightKey);
+            setHighlightedVerses(stored ? JSON.parse(stored) : {});
+        } catch {
+            setHighlightedVerses({});
+        }
+    }, [highlightKey]);
+      
 
     // ✅ Sync to URL on change
     useEffect(() => {
@@ -110,6 +124,27 @@ const Page = () => {
         }
     }, [book, chapter]);
 
+    const handlePressStart = (verse, text) => {
+        longPressTimer.current = setTimeout(() => {
+          // ✅ Highlight
+          const newHighlights = { ...highlightedVerses, [verse]: true };
+          setHighlightedVerses(newHighlights);
+          localStorage.setItem(`highlighted_${book}_${chapter}_${language}`, JSON.stringify(newHighlights));
+      
+          // ✅ Copy to clipboard
+          navigator.clipboard.writeText(`${bookName} ${chapter}:${verse} — ${text}`);
+      
+          // ✅ Show message
+          setCopiedVerse(verse);
+          setTimeout(() => setCopiedVerse(null), 2000); // Reset after 2s
+        }, 600);
+      };
+      
+      
+    const handlePressEnd = () => {
+        clearTimeout(longPressTimer.current);
+    };
+
     const isFirstChapter = book === 1 && chapter === 1;
     const isLastChapter = book === 66 && chapter === bibleBooks.find(b => b.id === 66)?.chapters;
 
@@ -169,10 +204,24 @@ const Page = () => {
                 ) : (
                     <div className={styles.verseContainer}>
                         {verses.map(({ verse, text }) => (
-                            <p key={verse} className={styles.verseText}>
+                            <p
+                            key={verse}
+                            className={`${styles.verseText} ${highlightedVerses[verse] ? styles.highlighted : ""}`}
+                            onMouseDown={() => handlePressStart(verse, text)}
+                            onTouchStart={() => handlePressStart(verse, text)}                            
+                            onMouseUp={handlePressEnd}
+                            onMouseLeave={handlePressEnd}
+                            onTouchEnd={handlePressEnd}
+                            >
                                 <sup className={styles.verseNumber}>{verse}</sup> {text}
                             </p>
                         ))}
+                    </div>
+                )}
+
+                {copiedVerse && (
+                    <div className={styles.toast}>
+                        Verse Copied to clipboard
                     </div>
                 )}
             </div>

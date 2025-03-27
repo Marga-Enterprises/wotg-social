@@ -71,6 +71,11 @@
   margin: 0.5rem 0;
   text-indent: 1rem;
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
 }
 
 .verseNumber {

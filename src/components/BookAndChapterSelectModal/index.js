@@ -20,6 +20,17 @@ const BookAndChapterSelectModal = ({ onClose, onSelect, language }) => {
   }, [searchInput]);
 
   useEffect(() => {
+    // Disable background scroll
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      // Re-enable scroll when modal unmounts
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+
+  useEffect(() => {
     const timer = setTimeout(() => setEntering(false), 200);
     return () => clearTimeout(timer);
   }, []);

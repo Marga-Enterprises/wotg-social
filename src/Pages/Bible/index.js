@@ -9,12 +9,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 // SECTIONS
 import BibleFilterSection from "../../sections/BibleFilterSection";
+import BibleVersesAction from "../../sections/BibleVersesAction";
 
 const Page = () => {
     const dispatch = useDispatch();
     const loadingRef = useRef(false);
     const syncTimeout = useRef(null);
-    const longPressTimer = useRef(null);
     const verseRefs = useRef({});
 
     const location = useLocation();
@@ -24,10 +24,9 @@ const Page = () => {
     const [chapter, setChapter] = useState(1);
     const [language, setLanguage] = useState("eng");
     const [highlightedVerses, setHighlightedVerses] = useState({});
-    const [copiedVerse, setCopiedVerse] = useState(null);
     const [verses, setVerses] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [activeVerse, setActiveVerse] = useState(null); // 👈 New
 
     const [verseStyle, setVerseStyle] = useState({
         fontSize: "20px",
@@ -90,7 +89,7 @@ const Page = () => {
         if (loadingRef.current) return;
         loadingRef.current = true;
         setLoading(true);
-        setError(null);
+        // setError(null);
 
         try {
             const payload = { book, chapter, language };
@@ -103,7 +102,7 @@ const Page = () => {
                 throw new Error("Invalid or empty response.");
             }
         } catch (err) {
-            setError("⚠️ Failed to load verses.");
+            // setError("⚠️ Failed to load verses.");
             console.error("Fetch error:", err);
         }
 
@@ -159,111 +158,110 @@ const Page = () => {
         }
     }, [book, chapter]);
 
-    const handleVerseTap = (verse, text) => {
-        const storageKey = `highlighted_${book}_${chapter}_${language}`;
-      
-        longPressTimer.current = setTimeout(() => {
-          const isAlreadyHighlighted = highlightedVerses[verse];
-      
-          if (isAlreadyHighlighted) {
-            const updated = { ...highlightedVerses };
-            delete updated[verse];
-            setHighlightedVerses(updated);
-            localStorage.setItem(storageKey, JSON.stringify(updated));
-            localStorage.removeItem(`${storageKey}_scrollTo`);
-          } else {
-            const newHighlights = { ...highlightedVerses, [verse]: true };
-            setHighlightedVerses(newHighlights);
-            localStorage.setItem(storageKey, JSON.stringify(newHighlights));
-            localStorage.setItem(`${storageKey}_scrollTo`, `verse-${verse}`);
-      
-            navigator.clipboard.writeText(`${bookName} ${chapter}:${verse} — ${text}`);
-            setCopiedVerse(verse);
-            setTimeout(() => setCopiedVerse(null), 2000);
-          }
-        }, 500);
+    const handleVerseTap = (verseNumber, text) => {
+        setActiveVerse({
+            verse: verseNumber,
+            text,
+            book,
+            chapter,
+            language
+          });          
+    };      
+
+    const handleHighlight = (verseNum, color) => {
+        const updated = { ...highlightedVerses, [verseNum]: color };
+        setHighlightedVerses(updated);
+        localStorage.setItem(highlightKey, JSON.stringify(updated));
     };
+      
       
     const isFirstChapter = book === 1 && chapter === 1;
     const isLastChapter = book === 66 && chapter === bibleBooks.find(b => b.id === 66)?.chapters;
 
     return (
-        <div className={styles.mainContainer}>
-            <div className={styles.navbar}>
-                <div className={styles.logo}>
-                    <img src={wotgLogo} alt="WOTG Logo" />
-                </div>
-                <div className={styles.navLinks}>
-                    <a href="/" className={styles.navLink}>Chat</a>
-                    <a href="/blogs" className={styles.navLink}>Devotion</a>
-                    <a href="/worship" className={styles.navLink}>Worship</a>
-                    <a
-                        href="https://wotgonline.com/donate/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.navLink}
-                    >
-                        Give
-                    </a>
-                </div>
-            </div>
-
-            <BibleFilterSection
-                book={book}
-                chapter={chapter}
-                language={language}
-                onBookChange={setBook}
-                onChapterChange={setChapter}
-                onLanguageChange={setLanguage}
-                onStyleChange={(style) => setVerseStyle((prev) => ({ ...prev, ...style }))}
-            />
-
-            <div className={styles.bibleReader}>
-                <h2 className={styles.bookTitle}>{bookName} - Chapter {chapter}</h2>
-
-                <button
-                    className={`${styles.navArrow} ${styles.leftArrow}`}
-                    onClick={handlePrev}
-                    disabled={isFirstChapter}
-                >
-                    &#8592;
-                </button>
-
-                <button
-                    className={`${styles.navArrow} ${styles.rightArrow}`}
-                    onClick={handleNext}
-                    disabled={isLastChapter}
-                >
-                    &#8594;
-                </button>
-
-                {loading ? (
-                    <LoadingSpinner />
-                ) : error ? (
-                    <p style={{ color: "red" }}>{error}</p>
-                ) : (
-                    <div className={styles.verseContainer}>
-                        {verses.map(({ verse, text }) => (
-                            <p
-                                key={verse}
-                                ref={(el) => verseRefs.current[verse] = el}
-                                style={verseStyle} // ⬅️ add this!
-                                className={`${styles.verseText} ${highlightedVerses[verse] ? styles.highlighted : ""}`}
-                                onClick={() => handleVerseTap(verse, text)}
+        <>
+            { loading ? (
+                <LoadingSpinner />
+            ) : (
+                <div className={styles.mainContainer}>
+                    <div className={styles.navbar}>
+                        <div className={styles.logo}>
+                            <img src={wotgLogo} alt="WOTG Logo" />
+                        </div>
+                        <div className={styles.navLinks}>
+                            <a href="/" className={styles.navLink}>Chat</a>
+                            <a href="/blogs" className={styles.navLink}>Devotion</a>
+                            <a href="/worship" className={styles.navLink}>Worship</a>
+                            <a
+                                href="https://wotgonline.com/donate/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={styles.navLink}
                             >
-                                <sup className={styles.verseNumber}>{verse}</sup> {text}
-                            </p>
-                        ))}
+                                Give
+                            </a>
+                        </div>
                     </div>
-                )}
 
-                {copiedVerse && (
-                    <div className={styles.toast}>
-                        Verse Copied to clipboard
+                    <div className={styles.bibleReader}>
+                        <h2 className={styles.bookTitle}>{bookName} - Chapter {chapter}</h2>
+
+                        <button
+                            className={`${styles.navArrow} ${styles.leftArrow}`}
+                            onClick={handlePrev}
+                            disabled={isFirstChapter}
+                        >
+                            &#8592;
+                        </button>
+
+                        <button
+                            className={`${styles.navArrow} ${styles.rightArrow}`}
+                            onClick={handleNext}
+                            disabled={isLastChapter}
+                        >
+                            &#8594;
+                        </button>
+
+                        <div className={styles.verseContainer}>
+                            {verses.map(({ verse, text }) => (
+                                <p
+                                    key={verse}
+                                    ref={(el) => verseRefs.current[verse] = el}
+                                    style={{
+                                        ...verseStyle,
+                                        backgroundColor: highlightedVerses[verse] || "transparent"
+                                    }}
+                                    onClick={() => handleVerseTap(verse, text)}
+                                >
+                                    <sup className={styles.verseNumber}>{verse}</sup> {text}
+                                </p>
+                            ))}
+                        </div>
                     </div>
-                )}
-            </div>
-        </div>
+
+
+                    {!activeVerse && (
+                        <BibleFilterSection
+                            book={book}
+                            chapter={chapter}
+                            language={language}
+                            onBookChange={setBook}
+                            onChapterChange={setChapter}
+                            onLanguageChange={setLanguage}
+                            onStyleChange={(style) => setVerseStyle((prev) => ({ ...prev, ...style }))}
+                        />
+                    )}
+
+                    {activeVerse !== null && (
+                        <BibleVersesAction
+                            verse={activeVerse}
+                            onHighlight={handleHighlight}
+                            onClose={() => setActiveVerse(null)}
+                        />
+                    )}
+                </div>
+            )}
+        </>
     );
 };
 

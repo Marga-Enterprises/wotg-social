@@ -1,14 +1,16 @@
 .filterSection {
+  position: sticky;
+  bottom: 0; /* ✅ stick to bottom instead of top */
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border-top: 1px solid #b4b4b4; /* ✅ top border now (instead of bottom) */
+  padding: 1.5rem;
   display: flex;
   justify-content: center;
-  padding: 1.5rem;
-  width: 100%;
   align-items: stretch;
-  position: fixed;
-  background: #fff;
-  z-index: 1000;
-  margin-top: -20px;
-  border-bottom: #b4b4b4 1px solid;
+  width: 100%;
 }
 
 .filterControlsRow {
@@ -62,7 +64,6 @@
   outline: none;
   box-shadow: none;
 }
-
 
 .gearButton {
   font-size: 1.5rem;

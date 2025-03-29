@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 const highlightColors = ["#ffff99", "#ffd9e1", "#ccffcc", "#cce5ff", "#ffcccc"];
 
-const BibleVersesAction = ({ verse, onClose, onHighlight }) => {
+const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) => {
   const [copied, setCopied] = useState(false);
 
   const handleColorSelect = useCallback(
@@ -95,14 +95,18 @@ const BibleVersesAction = ({ verse, onClose, onHighlight }) => {
             Copy
           </button>
 
-          <button className={styles.iconButton} onClick={handleRemoveHighlight}>
+          <button
+            className={styles.iconButton}
+            onClick={handleRemoveHighlight}
+            disabled={!highlightedVerses?.[verse.verse]}
+          >
             <FontAwesomeIcon icon={faTrashAlt} />
-            Remove
+            Remove Highlight
           </button>
         </div>
       </div>
 
-      {copied && <div className={styles.toast}>📋 Verse copied!</div>}
+      {copied && <div className={styles.toast}>Verse copied!</div>}
     </>
   );
 };

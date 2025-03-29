@@ -253,6 +253,7 @@ const Page = () => {
                         <BibleVersesAction
                             verse={activeVerse}
                             onHighlight={handleHighlight}
+                            highlightedVerses={highlightedVerses}
                             onClose={() => setActiveVerse(null)}
                         />
                     )}

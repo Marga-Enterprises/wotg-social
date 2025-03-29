@@ -51,6 +51,7 @@
   margin: auto;
   font-size: 20px;
   line-height: 1.8;
+  margin-top: 4rem;
 }
 
 .bookTitle {
@@ -161,6 +162,7 @@
 @media (max-width: 768px) {
   .bibleReader {
     padding: 1.5rem 1rem;
+    margin-top: 10rem;
   }
 
   .navArrow {

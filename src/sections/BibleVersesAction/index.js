@@ -1,8 +1,13 @@
 import React, { useCallback, useState } from "react";
 import styles from "./index.module.css";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faNoteSticky, faCommentDots } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCopy,
+  faNoteSticky,
+  faCommentDots,
+  faTrashAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const highlightColors = ["#ffff99", "#ffd9e1", "#ccffcc", "#cce5ff", "#ffcccc"];
 
@@ -14,8 +19,12 @@ const BibleVersesAction = ({ verse, onClose, onHighlight }) => {
       const storageKey = `highlighted_${verse.book}_${verse.chapter}_${verse.language}`;
       const scrollKey = `${storageKey}_scrollTo`;
 
-      onHighlight(verse.verse, color);
+      const updated = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      updated[verse.verse] = color;
+      localStorage.setItem(storageKey, JSON.stringify(updated));
       localStorage.setItem(scrollKey, `verse-${verse.verse}`);
+
+      onHighlight(verse.verse, color);
       onClose();
     },
     [verse, onHighlight, onClose]
@@ -24,13 +33,28 @@ const BibleVersesAction = ({ verse, onClose, onHighlight }) => {
   const handleCopy = () => {
     const copyText = verse.text;
 
-    navigator.clipboard.writeText(copyText).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    }).catch((err) => {
-      console.error("❌ Copy failed:", err);
-    });
+    navigator.clipboard
+      .writeText(copyText)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch((err) => {
+        console.error("❌ Copy failed:", err);
+      });
   };
+
+  const handleRemoveHighlight = () => {
+    const storageKey = `highlighted_${verse.book}_${verse.chapter}_${verse.language}`;
+    const updated = JSON.parse(localStorage.getItem(storageKey) || "{}");
+    delete updated[verse.verse];
+    localStorage.setItem(storageKey, JSON.stringify(updated));
+    localStorage.removeItem(`${storageKey}_scrollTo`);
+    onHighlight(verse.verse, null);
+    onClose();
+  };  
+
+  const { book, chapter, verse: verseNum, language } = verse;
 
   return (
     <>
@@ -50,19 +74,30 @@ const BibleVersesAction = ({ verse, onClose, onHighlight }) => {
             />
           ))}
 
-          <button className={styles.iconButton}>
+          <Link
+            to={`#`}
+            className={styles.iconButton}
+          >
             <FontAwesomeIcon icon={faCommentDots} />
             Commentary
-          </button>
+          </Link>
 
-          <button className={styles.iconButton}>
+          <Link
+            to={`#`}
+            className={styles.iconButton}
+          >
             <FontAwesomeIcon icon={faNoteSticky} />
             Journal
-          </button>
+          </Link>
 
           <button className={styles.iconButton} onClick={handleCopy}>
             <FontAwesomeIcon icon={faCopy} />
             Copy
+          </button>
+
+          <button className={styles.iconButton} onClick={handleRemoveHighlight}>
+            <FontAwesomeIcon icon={faTrashAlt} />
+            Remove
           </button>
         </div>
       </div>

@@ -203,6 +203,16 @@ const Page = () => {
                         </div>
                     </div>
 
+                    <BibleFilterSection
+                        book={book}
+                        chapter={chapter}
+                        language={language}
+                        onBookChange={setBook}
+                        onChapterChange={setChapter}
+                        onLanguageChange={setLanguage}
+                        onStyleChange={(style) => setVerseStyle((prev) => ({ ...prev, ...style }))}
+                    />
+
                     <div className={styles.bibleReader}>
                         <h2 className={styles.bookTitle}>{bookName} - Chapter {chapter}</h2>
 
@@ -238,19 +248,6 @@ const Page = () => {
                             ))}
                         </div>
                     </div>
-
-
-                    {!activeVerse && (
-                        <BibleFilterSection
-                            book={book}
-                            chapter={chapter}
-                            language={language}
-                            onBookChange={setBook}
-                            onChapterChange={setChapter}
-                            onLanguageChange={setLanguage}
-                            onStyleChange={(style) => setVerseStyle((prev) => ({ ...prev, ...style }))}
-                        />
-                    )}
 
                     {activeVerse !== null && (
                         <BibleVersesAction

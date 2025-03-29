@@ -1,11 +1,12 @@
 .filterSection {
-  position: sticky;
-  bottom: 0; /* ✅ stick to bottom instead of top */
+  position: fixed;
+  top: 0; /* 🔼 Stick to the top instead of bottom */
   left: 0;
+  margin-top: 3rem;
   right: 0;
   z-index: 1000;
   background: #fff;
-  border-top: 1px solid #b4b4b4; /* ✅ top border now (instead of bottom) */
+  border-bottom: 1px solid #b4b4b4; /* 🔽 bottom border instead of top */
   padding: 1.5rem;
   display: flex;
   justify-content: center;
@@ -16,7 +17,7 @@
 .filterControlsRow {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: .5rem;
   justify-content: center;
   width: 100%;
   flex-wrap: wrap;
@@ -27,14 +28,15 @@
   display: flex;
   align-items: center;
   background: none;
-  font-size: 16px;
+  font-size: 12px;
+  font-weight: bold;
   font-family: inherit;
   width: 100%;
   color: #000;
-  border-bottom: 1px solid #ccc;
-  padding: 4px 0;
   cursor: pointer;
-  min-width: 200px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 2rem;
 }
 
 .selectorButton::after {
@@ -48,13 +50,15 @@
 .select {
   background: none;
   border: none;
-  border-bottom: 1px solid #ccc;
-  font-size: 16px;
+  border: 1px solid #ccc;
+  font-size: 12px;
+  font-weight: bold;
   padding: 4px 0;
+  border-radius: 2rem;
+  padding: 10px;
   font-family: inherit;
-  max-width: 200px;
+  max-width: 100px;
   color: #000;
-  border-radius: 0%;
   appearance: none;
   cursor: pointer;
   margin: 0;
@@ -66,6 +70,6 @@
 }
 
 .gearButton {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: #444141;
 }

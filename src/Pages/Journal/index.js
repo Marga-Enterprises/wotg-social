@@ -19,6 +19,7 @@ const Page = () => {
 
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
+  const [showCommentary, setShowCommentary] = useState(false);
 
   const { book, chapter, verse, language } = useParams();
 
@@ -100,6 +101,7 @@ const Page = () => {
   };
 
   const verseText = location.state?.verseText || "";
+  const commentary = location.state?.commentary || "";
 
   return (
     <>
@@ -127,7 +129,29 @@ const Page = () => {
 
           <div className={styles.field}>
             <label htmlFor="sinabi">1. Ano ang sinabi ng Diyos?</label>
-            <p>{verseText}</p>
+            <p className={styles.headingVerse}>"{verseText}"</p>
+
+            {commentary && (
+              <>
+                <button
+                  className={styles.commentaryToggle}
+                  onClick={() => setShowCommentary((prev) => !prev)}
+                >
+                  <span className={styles.toggleIcon}>
+                    {showCommentary ? "▲" : "▼"}
+                  </span>
+                  {showCommentary ? "Hide Commentary" : "Show Commentary"}
+                </button>
+
+                <div
+                  className={`${styles.commentaryBox} ${
+                    showCommentary ? styles.commentaryVisible : ""
+                  }`}
+                >
+                  <p>{commentary}</p>
+                </div>
+              </>
+            )}
           </div>
 
           <div className={styles.field}>

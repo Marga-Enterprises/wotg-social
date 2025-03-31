@@ -126,8 +126,68 @@ textarea:focus {
   font-weight: 600;
 }
 
+.commentaryToggle {
+  margin-top: 1rem;
+  width: 100%;
+  padding: .5rem;
+  background-color: rgb(197, 31, 31);
+  color: white;
+  font-size: .85rem;
+  font-weight: 500;
+  text-align: center;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.commentaryToggle:hover {
+  background-color: rgb(165, 25, 25);
+}
+
+.toggleIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+
+.commentaryToggle:hover {
+  background-color: rgb(165, 25, 25);
+}
+
+.commentaryBox {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+  margin-top: 1rem;
+  background-color: #f9f9f9;
+  padding: 0 1rem;
+  border-left: 4px solid rgb(197, 31, 31);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.commentaryVisible {
+  max-height: 1000px; /* allow expansion */
+  opacity: 1;
+  padding: 1rem;
+}
+
+
 .goBackButton:hover {
   text-decoration: underline;
+}
+
+.headingVerse {
+  font-size: 1.5rem;
+  color: #707070;
+  font-style: italic;
 }
 
 .heading {

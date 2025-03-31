@@ -96,7 +96,6 @@ const Page = () => {
             const response = await dispatch(wotgsocial.bible.getAllBiblesAction(payload));
 
             if (response?.data?.verses?.length) {
-                console.log('[[[[DATAAAAAAAAAA]]]]', response.data.verses)
                 setVerses(response.data.verses);
             } else {
                 setVerses([]);

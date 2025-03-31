@@ -6,6 +6,7 @@ import {
   faNoteSticky,
   faCommentDots,
   faTrashAlt,
+  faBook
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
@@ -54,7 +55,7 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
     onClose();
   };  
 
-  const { book, chapter, verse: verseNum, language } = verse;
+  // const { book, chapter, verse: verseNum, language } = verse;
 
   return (
     <>
@@ -74,27 +75,6 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
             />
           ))}
 
-          <Link
-            to={`#`}
-            className={styles.iconButton}
-          >
-            <FontAwesomeIcon icon={faCommentDots} />
-            Commentary
-          </Link>
-
-          <Link
-            to={`#`}
-            className={styles.iconButton}
-          >
-            <FontAwesomeIcon icon={faNoteSticky} />
-            Journal
-          </Link>
-
-          <button className={styles.iconButton} onClick={handleCopy}>
-            <FontAwesomeIcon icon={faCopy} />
-            Copy
-          </button>
-
           <button
             className={styles.iconButton}
             onClick={handleRemoveHighlight}
@@ -102,6 +82,36 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
           >
             <FontAwesomeIcon icon={faTrashAlt} />
             Remove Highlight
+          </button>
+
+          <Link
+            to={`/journal/${verse.book}/${verse.chapter}/${verse.verse}/${verse.language}`}
+            state={{ verseText: verse.text }} // 👈 passing as route state
+            className={styles.iconButton}
+          >
+            <FontAwesomeIcon icon={faNoteSticky} />
+            Journal
+          </Link>
+
+          <Link
+            to={`/your-journals/`}
+            className={styles.iconButton}
+          >
+            <FontAwesomeIcon icon={faBook} />
+            View Your Journals
+          </Link>
+
+          <Link
+            to={`/commentary/${verse.book}/${verse.chapter}/${verse.verse}/${verse.language}`}
+            className={styles.iconButton}
+          >
+            <FontAwesomeIcon icon={faCommentDots} />
+            Commentary
+          </Link>
+
+          <button className={styles.iconButton} onClick={handleCopy}>
+            <FontAwesomeIcon icon={faCopy} />
+            Copy
           </button>
         </div>
       </div>

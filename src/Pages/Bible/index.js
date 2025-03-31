@@ -214,7 +214,7 @@ const Page = () => {
                     />
 
                     <div className={styles.bibleReader}>
-                        <h2 className={styles.bookTitle}>{bookName} - Chapter {chapter}</h2>
+                        <h2 className={styles.bookTitle}>{bookName} {chapter}</h2>
 
                         <button
                             className={`${styles.navArrow} ${styles.leftArrow}`}

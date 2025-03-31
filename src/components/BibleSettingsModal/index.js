@@ -45,8 +45,6 @@ const BibleSettingsModal = ({ onApply, onClose }) => {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true">
       <div className={styles.modal}>
-        <h3>Bible Reader Settings</h3>
-
         <label>
           Font Size
           <input

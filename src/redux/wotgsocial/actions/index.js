@@ -4,7 +4,8 @@ import * as message from './message';
 import * as subscription from './subscription';
 import * as worship from './worship';
 import * as blog from './blog';
-import * as bible from './bible' ;
+import * as bible from './bible';
+import * as journal from './journal';
 
 export {
   user,
@@ -13,5 +14,6 @@ export {
   subscription,
   worship,
   blog,
-  bible
+  bible,
+  journal
 };

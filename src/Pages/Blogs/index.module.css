@@ -161,6 +161,34 @@
     z-index: 1000; /* Ensures navbar stays on top of all elements */
 }
 
+/* Logo Styling */
+.logo {
+    border-radius: 10rem;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+/* Container for links */
+.navLinks {
+    display: flex;
+}
+
+/* Styling for links */
+.navLink {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 8px 12px;
+    transition: color 0.3s ease;
+}
+
+.navLink:hover {
+    color: rgb(182, 182, 182);
+}
+
 .banner {
     width: 100%;
     height: 100svh; /* Adjust height as needed */
@@ -222,30 +250,4 @@
 }
 
 
-/* Logo Styling */
-.logo {
-    border-radius: 10rem;
-}
 
-.logo img {
-    height: 40px;
-    width: auto;
-}
-
-/* Container for links */
-.navLinks {
-    display: flex;
-}
-
-/* Styling for links */
-.navLink {
-    color: #fff;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 8px 12px;
-    transition: color 0.3s ease;
-}
-
-.navLink:hover {
-    color: rgb(182, 182, 182);
-}

@@ -51,7 +51,7 @@
   margin: auto;
   font-size: 20px;
   line-height: 1.8;
-  margin-top: 5rem;
+  margin-top: 3rem;
 }
 
 .bookTitle {
@@ -170,10 +170,6 @@
 }
 
 @media (max-width: 500px) {
-  .bibleReader {
-    margin-top: 10rem;
-  }
-
   .verseText {
     text-indent: 1rem;
   }

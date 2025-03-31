@@ -171,7 +171,7 @@ const bibleBooks = [
     id: 22,
     name: {
       eng: "Song of Solomon",
-      fil: "Kanta ni Solomon"
+      fil: "Awit ni Solomon"
     },
     chapters: 8
   },

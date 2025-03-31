@@ -1,0 +1,90 @@
+
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+    padding: 2rem;
+}
+
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgb(197, 31, 31);
+  padding: 10px 20px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.logo img {
+  height: 40px;
+}
+
+.navLinks {
+  display: flex;
+  gap: 15px;
+}
+
+.navLink {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.navLink:hover {
+  color: #ddd;
+}
+
+.goBackWrapper {
+  margin-top: 70px;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.goBackButton {
+  background: transparent;
+  border: none;
+  color: rgb(197, 31, 31);
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1.5rem 2rem;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  text-align: justify;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #333;
+}
+
+
+
+.content h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: rgb(197, 31, 31);
+}
+
+.content p {
+  white-space: pre-wrap;
+  font-size: 1.5rem;
+  color: #222;
+}
+
+.empty {
+  color: #777;
+  font-style: italic;
+}

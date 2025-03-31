@@ -96,6 +96,7 @@ const Page = () => {
             const response = await dispatch(wotgsocial.bible.getAllBiblesAction(payload));
 
             if (response?.data?.verses?.length) {
+                console.log('[[[[DATAAAAAAAAAA]]]]', response.data.verses)
                 setVerses(response.data.verses);
             } else {
                 setVerses([]);
@@ -158,10 +159,11 @@ const Page = () => {
         }
     }, [book, chapter]);
 
-    const handleVerseTap = (verseNumber, text) => {
+    const handleVerseTap = (verseNumber, text, commentary) => {
         setActiveVerse({
             verse: verseNumber,
             text,
+            commentary,
             book,
             chapter,
             language
@@ -233,7 +235,7 @@ const Page = () => {
                         </button>
 
                         <div className={styles.verseContainer}>
-                            {verses.map(({ verse, text }) => (
+                            {verses.map(({ verse, text, commentary }) => (
                                 <p
                                     key={verse}
                                     ref={(el) => verseRefs.current[verse] = el}
@@ -241,7 +243,7 @@ const Page = () => {
                                         ...verseStyle,
                                         backgroundColor: highlightedVerses[verse] || "transparent"
                                     }}
-                                    onClick={() => handleVerseTap(verse, text)}
+                                    onClick={() => handleVerseTap(verse, text, commentary)}
                                 >
                                     <sup className={styles.verseNumber}>{verse}</sup> {text}
                                 </p>

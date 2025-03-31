@@ -86,7 +86,7 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
 
           <Link
             to={`/journal/${verse.book}/${verse.chapter}/${verse.verse}/${verse.language}`}
-            state={{ verseText: verse.text }} // 👈 passing as route state
+            state={{ verseText: verse.text, commentary: verse.commentary }} 
             className={styles.iconButton}
           >
             <FontAwesomeIcon icon={faNoteSticky} />
@@ -101,13 +101,25 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
             View Your Journals
           </Link>
 
-          <Link
-            to={`/commentary/${verse.book}/${verse.chapter}/${verse.verse}/${verse.language}`}
-            className={styles.iconButton}
-          >
-            <FontAwesomeIcon icon={faCommentDots} />
-            Commentary
-          </Link>
+          {verse.commentary ? (
+            <Link
+              to={`/commentary/${verse.book}/${verse.chapter}/${verse.verse}/${verse.language}`}
+              state={{ commentary: verse.commentary }} 
+              className={styles.iconButton}
+            >
+              <FontAwesomeIcon icon={faCommentDots} />
+              Commentary
+            </Link>
+          ) : (
+            <button
+              className={styles.iconButton}
+              disabled
+              title="No commentary available for this verse"
+            >
+              <FontAwesomeIcon icon={faCommentDots} />
+              Commentary
+            </button>
+          )}
 
           <button className={styles.iconButton} onClick={handleCopy}>
             <FontAwesomeIcon icon={faCopy} />

@@ -1,6 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./index.module.css";
 import wotgLogo from "./wotg-logo.webp";
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 const Page = () => {
   const location = useLocation();
@@ -38,7 +40,15 @@ const Page = () => {
       <div className={styles.content}>
         <h2>Commentary</h2>
         {commentary ? (
-          <p>{commentary}</p>
+          <div className={styles.markdownWrapper}>
+            <ReactMarkdown
+              children={commentary}
+              remarkPlugins={[remarkBreaks]} // optional if you want single line breaks
+              components={{
+                p: ({ node, ...props }) => <p style={{ marginBottom: '1.5rem' }} {...props} />,
+              }}
+            />
+          </div>        
         ) : (
           <p className={styles.empty}>No commentary available for this verse.</p>
         )}

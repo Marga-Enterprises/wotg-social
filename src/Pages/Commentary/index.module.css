@@ -71,7 +71,6 @@
 }
 
 
-
 .content h2 {
   font-size: 1.6rem;
   margin-bottom: 1rem;
@@ -87,4 +86,15 @@
 .empty {
   color: #777;
   font-style: italic;
+}
+
+
+@media (max-width: 500px) {
+  .content {
+    text-align: left;
+  }
+
+  .content p {
+    font-size: 1.2rem;
+  }
 }

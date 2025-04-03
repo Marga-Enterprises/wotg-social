@@ -7,8 +7,6 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import DynamicSnackbar from "../../components/DynamicSnackbar";
 import Cookies from "js-cookie";
 
-import wotgLogo from "./wotg-logo.webp";
-
 import bibleBooks from "../Bible/data";
 
 const Page = () => {
@@ -87,20 +85,6 @@ const Page = () => {
         <LoadingSpinner />
       ) : (
         <div className={styles.journalWrapper}>
-          {/* Navbar */}
-          <div className={styles.navbar}>
-            <div className={styles.logo}>
-              <img src={wotgLogo} alt="WOTG Logo" />
-            </div>
-            <div className={styles.navLinks}>
-              <a href="/" className={styles.navLink}>Chat</a>
-              <a href="/bible" className={styles.navLink}>Bible</a>
-              <a href="/worship" className={styles.navLink}>Worship</a>
-              <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
-            </div>
-          </div>
-
-          {/* Heading */}
           <h2 className={styles.heading}>Your Journals</h2>
 
           <div className={styles.goBackWrapper}>

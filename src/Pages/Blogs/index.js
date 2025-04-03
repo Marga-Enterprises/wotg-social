@@ -5,8 +5,6 @@ import { wotgsocial } from "../../redux/combineActions";
 import { convertMomentWithFormatWhole } from "../../utils/methods";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
-import wotgLogo from "./wotg-logo.webp";
-import wotgLogo1 from "./wotgLogo.webp";
 import prayer from "./prayer.webp";
 import Cookies from "js-cookie";
 
@@ -101,7 +99,7 @@ const Page = () => {
                 <div className={styles.blogImageContainer} style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}>
                     <img
                         loading="lazy"
-                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : wotgLogo1}
+                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : "/wotgLogo.webp"}
                         alt={blog.blog_title}
                         className={styles.blogImage}
                     />
@@ -150,18 +148,6 @@ const Page = () => {
                 <LoadingSpinner />
             ) : (
                 <div className={styles.mainContainer}>
-                    <div className={styles.navbar}>
-                        <div className={styles.logo}>
-                            <img src={wotgLogo} alt="WOTG Logo" />
-                        </div>
-                        <div className={styles.navLinks}>
-                            <a href="/" className={styles.navLink}>Chat</a>
-                            <a href="/bible" className={styles.navLink}>Bible</a>
-                            <a href="/worship" className={styles.navLink}>Worship</a>
-                            <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
-                        </div>
-                    </div>
-
                     <div className={styles.banner}>
                         <img src={prayer} alt="Banner" loading="lazy" className={styles.bannerImage} />
                         <div className={styles.overlay}></div>

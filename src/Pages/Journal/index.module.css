@@ -22,7 +22,7 @@ label {
   color: #333;
 }
 
-textarea {
+.field textarea {
   width: 100%;
   padding: 1rem;
   border: 1px solid #ccc;
@@ -36,7 +36,7 @@ textarea {
   background-color: #fafafa;
 }
 
-textarea:focus {
+.field textarea:focus {
   border-color: rgb(197, 31, 31);
   outline: none;
   box-shadow: 0 0 0 2px rgba(197, 31, 31, 0.2);

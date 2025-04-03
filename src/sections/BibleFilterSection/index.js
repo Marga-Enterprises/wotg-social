@@ -20,6 +20,11 @@ const BibleFilterSection = ({
   const [showSettings, setShowSettings] = useState(false); // 🆕 For settings
   const currentBook = useMemo(() => bibleBooks.find((b) => b.id === book), [book]);
 
+  const handleLanguageChange = (language) => {
+    localStorage.setItem('bible_language', language);
+    onLanguageChange(language);
+  };
+
   return (
     <div className={styles.filterSection}>
       <div className={styles.filterControlsRow}>
@@ -44,7 +49,7 @@ const BibleFilterSection = ({
         <select
           className={styles.select}
           value={language}
-          onChange={(e) => onLanguageChange(e.target.value)}
+          onChange={(e) => handleLanguageChange(e.target.value)}
         >
           <option value="eng">WEB</option>
           <option value="fil">PND</option>

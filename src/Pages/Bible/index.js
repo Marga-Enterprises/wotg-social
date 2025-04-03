@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { wotgsocial } from "../../redux/combineActions";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
-import wotgLogo from "./wotg-logo.webp";
 import bibleBooks from "./data";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -40,14 +39,27 @@ const Page = () => {
     // ✅ Load initial state from URL params
     useEffect(() => {
         const params = new URLSearchParams(location.search);
+      
         const b = parseInt(params.get("book")) || 1;
         const c = parseInt(params.get("chapter")) || 1;
-        const l = params.get("language") || "eng";
-
+      
+        // Get from localStorage first
+        const storedLang = localStorage.getItem("bible_language");
+        const paramLang = params.get("language");
+        const lang = storedLang || paramLang || "eng";
+      
         setBook(b);
         setChapter(c);
-        setLanguage(l);
-    }, []);
+        setLanguage(lang);
+      
+        // Sync URL with stored language if it's different
+        if (storedLang && storedLang !== paramLang) {
+            params.set("language", storedLang);
+            if (paramLang !== storedLang) {
+              window.history.replaceState({}, "", `${location.pathname}?${params.toString()}`);
+            }
+        }          
+    }, []); 
 
     useEffect(() => {
         try {
@@ -185,25 +197,6 @@ const Page = () => {
                 <LoadingSpinner />
             ) : (
                 <div className={styles.mainContainer}>
-                    <div className={styles.navbar}>
-                        <div className={styles.logo}>
-                            <img src={wotgLogo} alt="WOTG Logo" />
-                        </div>
-                        <div className={styles.navLinks}>
-                            <a href="/" className={styles.navLink}>Chat</a>
-                            <a href="/blogs" className={styles.navLink}>Devotion</a>
-                            <a href="/worship" className={styles.navLink}>Worship</a>
-                            <a
-                                href="https://wotgonline.com/donate/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={styles.navLink}
-                            >
-                                Give
-                            </a>
-                        </div>
-                    </div>
-
                     <BibleFilterSection
                         book={book}
                         chapter={chapter}

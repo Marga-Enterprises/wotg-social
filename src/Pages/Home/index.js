@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
-import { useSelector } from 'react-redux';
 
 import { requestForToken } from "../../firebase";
 
@@ -38,8 +37,6 @@ const Page = () => {
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
 
     const setHideNavbar = useSetHideNavbar();
-
-    // const { setHideNavbar } = useContext(NavbarContext);
 
     // Fetch user details and authentication status from cookies
     useEffect(() => {

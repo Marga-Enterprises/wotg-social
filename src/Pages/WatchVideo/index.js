@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { useDispatch } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
-import wotgLogo from "./wotg-logo.webp";
-import wotgLogo1 from "./wotgLogo.webp";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
@@ -51,19 +49,6 @@ const Page = () => {
                 <LoadingSpinner />
             ) : (
                 <div className={styles.mainContainer}>
-                    {/* ✅ Navbar remains intact */}
-                    <div className={styles.navbar}>
-                        <div className={styles.logo}>
-                            <img src={wotgLogo} alt="WOTG Logo"/>
-                        </div>
-                        <div className={styles.navLinks}>
-                            <a href="/" className={styles.navLink}>Chat</a>
-                            <a href="/worship" className={styles.navLink}>Worship</a>
-                            <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
-                        </div>
-                    </div>
-
-                    {/* ✅ Blog Content Section */}
                     <div className={styles.blogContainer}>
                         {blog ? (
                             <div className={styles.blogContent}>
@@ -80,7 +65,7 @@ const Page = () => {
                                                         setVideoLoaded(true);
                                                     }
                                                 }}
-                                                poster={wotgLogo1}
+                                                poster={"/wotgLogo.webp"}
                                                 preload="metadata" // ✅ Faster page load
                                             >
                                                 <source src={`${backendUrl}/uploads/${blog.blog_video}`} type="video/webm" />

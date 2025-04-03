@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./index.module.css";
-import wotgLogo from "./wotg-logo.webp";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 
@@ -16,20 +15,6 @@ const Page = () => {
 
   return (
     <div className={styles.mainContainer}>
-      {/* Navbar */}
-      <div className={styles.navbar}>
-        <div className={styles.logo}>
-          <img src={wotgLogo} alt="WOTG Logo" />
-        </div>
-        <div className={styles.navLinks}>
-          <a href="/" className={styles.navLink}>Chat</a>
-          <a href="/bible" className={styles.navLink}>Bible</a>
-          <a href="/worship" className={styles.navLink}>Worship</a>
-          <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
-        </div>
-      </div>
-
-      {/* Go Back */}
       <div className={styles.goBackWrapper}>
         <button onClick={handleGoBack} className={styles.goBackButton}>
           ← Back

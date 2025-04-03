@@ -5,7 +5,6 @@ import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 import styles from './index.module.css';
 import ChatWindowStream from '../../components/ChatWindowStream';
-import wotgLogo from './wotgLogo.webp';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 
@@ -233,23 +232,6 @@ const Page = () => {
     <div className={styles.container}>
       {/* Right Column */}
       <div className={styles.rightColumn}>
-
-        {/* Navbar at the Top */}
-        <div className={styles.navbar}>
-          {/* Logo on the Left */}
-          <div className={styles.logo}>
-            <img src={wotgLogo} alt="WOTG Logo"/>
-          </div>
-
-          {/* Links on the Right */}
-          <div className={styles.navLinks}>
-            <a href="/" className={styles.navLink}>Chat</a>
-            <a href="/bible" className={styles.navLink}>Bible</a>
-            <a href="/blogs" className={styles.navLink}>Devotion</a>
-            <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
-          </div>
-        </div>
-
         {/* Livestream Section */}
         <div className={styles.streamSection}>
           <iframe 

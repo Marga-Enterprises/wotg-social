@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
-import wotgLogo from "./wotg-logo.webp";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudUploadAlt, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
@@ -108,18 +107,6 @@ const Page = () => {
 
     return (
         <div className={styles.mainContainer}>
-            {/* ✅ Navbar */}
-            <div className={styles.navbar}>
-                <div className={styles.logo}>
-                    <img src={wotgLogo} alt="WOTG Logo"/>
-                </div>
-                <div className={styles.navLinks}>
-                    <a href="/" className={styles.navLink}>Chat</a>
-                    <a href="/worship" className={styles.navLink}>Worship</a>
-                    <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
-                </div>
-            </div>
-
             {/* ✅ Drag and Drop File Upload */}
             <div 
                 className={styles.dropZone} 

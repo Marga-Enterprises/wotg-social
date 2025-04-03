@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { io } from 'socket.io-client';
 import { wotgsocial, common } from '../../redux/combineActions';
@@ -13,17 +13,14 @@ import ChatWindow from '../../components/ChatWindow';
 import ProfileSidebar from '../../components/ProfileSidebar';
 import ProfileModal from '../../components/ProfileModal';
 import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
-import SuccessSnackbar from '../../components/SuccessSnackbar';
-import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 import AddParticipantsInChatroomForm from '../../components/AddParticpantsInChatroomForm';
 
+// CONTEXT
+import { useSetHideNavbar } from "../../contexts/NavbarContext";
+
 const Page = () => {
     const dispatch = useDispatch();
-
-    const {
-      ui: { loading },
-    } = useSelector((state) => state.common);
 
     // Local state
     const [user, setUser] = useState(null);
@@ -40,6 +37,9 @@ const Page = () => {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
 
+    const setHideNavbar = useSetHideNavbar();
+
+    // const { setHideNavbar } = useContext(NavbarContext);
 
     // Fetch user details and authentication status from cookies
     useEffect(() => {
@@ -52,6 +52,11 @@ const Page = () => {
             setIsAuthenticated(false);
         }
     }, []);
+
+    useEffect(() => {
+        setHideNavbar(true);
+        return () => setHideNavbar(false);
+    }, [setHideNavbar]);
 
     // Detect screen size (mobile or not)
     useEffect(() => {

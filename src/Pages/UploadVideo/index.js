@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
-import wotgLogo from "./wotg-logo.webp";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
 import DynamicSnackbar from "../../components/DynamicSnackbar";
@@ -11,6 +10,8 @@ import RecordingPreview from "../../sections/RecordingPreview";
 import RecordingSection from "../../sections/RecordingSection";
 import ScriptEditor from "../../sections/ScriptEditor";
 import TeleprompterPreview from "../../sections/TeleprompterPreview";
+
+import { useSetHideNavbar } from "../../contexts/NavbarContext";
 
 import styles from "./index.module.css";
 
@@ -27,6 +28,8 @@ const Page = () => {
     const [uploading, setUploading] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
 
+    const setHideNavbar = useSetHideNavbar();
+
     // ✅ Generate a unique draft key for each blog
     const draftKey = useMemo(() => `draft_script_${id}`, [id]);
 
@@ -37,6 +40,17 @@ const Page = () => {
             setScriptText(savedDraft);
         }
     }, [draftKey]);
+
+    useEffect(() => {
+        if (step === 1 || step === 2) {
+          setHideNavbar(true);
+        } else {
+          setHideNavbar(false);
+        }
+      
+        // Optional cleanup to reset on unmount
+        return () => setHideNavbar(false);
+    }, [step, setHideNavbar]);
 
     // ✅ Save draft when user types (Optimized with `useCallback`)
     const handleScriptChange = useCallback((newText) => {
@@ -135,7 +149,7 @@ const Page = () => {
                 <LoadingSpinner />
             ) : (
                 <div className={styles.mainContainer}>
-                    {step !== 2 && step !== 1 && (
+                    {/*step !== 2 && step !== 1 && (
                         <div className={styles.navbar}>
                             <div className={styles.logo}>
                                 <img src={wotgLogo} alt="WOTG Logo"/>
@@ -147,7 +161,7 @@ const Page = () => {
                                 <a href="https://wotgonline.com/donate/" target="_blank" rel="noopener noreferrer" className={styles.navLink}>Give</a>
                             </div>
                         </div>
-                    )}
+                    )*/}
 
                     <div className={styles.blogContainer}>
                         {blog ? (

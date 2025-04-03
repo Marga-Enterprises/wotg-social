@@ -2,7 +2,8 @@
 .container {
   display: flex;
   width: 100%;
-  height: 100svh;
+  height: 93.7svh;
+  margin-top: 3.78rem;
   background-color: #121212; /* Dark mode background */
 }
 
@@ -10,7 +11,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100svh;
+  height: 93.5svh;
   background-color: #121212; /* Dark mode background */
 }
 
@@ -55,7 +56,7 @@
 .chatSection {
   background-color: #181818;
   display: flex;
-  height: 100svh;
+  height: 93.5svh;
   flex-direction: column;
   overflow: hidden;
 }
@@ -74,42 +75,6 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 12px;
-}
-
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #f5f5f5;
-  padding: 10px 20px;
-  border-bottom: 2px solid #cfcaca;
-}
-
-/* Logo Styling */
-.logo {
-  border-radius: 10rem;
-}
-
-.logo img {
-  height: 40px;
-  width: auto;
-}
-
-.navLinks {
-  display: flex;
-}
-
-/* Styling for links */
-.navLink {
-  color: #616161;
-  text-decoration: none;
-  font-size: 16px;
-  padding: 8px 12px;
-  transition: color 0.3s ease;
-}
-
-.navLink:hover {
-  color: rgb(56, 56, 56);
 }
 
 .hide-title iframe {
@@ -236,6 +201,6 @@
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
   .container {
-    height: 100svh;
+    height: 93.5svh;
   }
 }

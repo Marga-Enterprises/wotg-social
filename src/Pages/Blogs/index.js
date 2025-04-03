@@ -5,8 +5,8 @@ import { wotgsocial } from "../../redux/combineActions";
 import { convertMomentWithFormatWhole } from "../../utils/methods";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
-import prayer from "./prayer.webp";
 import Cookies from "js-cookie";
+import wotgLogo from "../../images/wotgLogo.webp";
 
 // Utility functions
 const stripHtml = (html) => html.replace(/<\/?[^>]+(>|$)/g, "");
@@ -99,7 +99,7 @@ const Page = () => {
                 <div className={styles.blogImageContainer} style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}>
                     <img
                         loading="lazy"
-                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : "/wotgLogo.webp"}
+                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : wotgLogo}
                         alt={blog.blog_title}
                         className={styles.blogImage}
                     />
@@ -149,7 +149,7 @@ const Page = () => {
             ) : (
                 <div className={styles.mainContainer}>
                     <div className={styles.banner}>
-                        <img src={prayer} alt="Banner" loading="lazy" className={styles.bannerImage} />
+                        <img src="./prayer.webp" alt="Banner" loading="lazy" className={styles.bannerImage} />
                         <div className={styles.overlay}></div>
                         <div className={styles.bannerContent}>
                             <h2>Romans 1:16</h2>

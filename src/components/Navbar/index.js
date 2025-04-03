@@ -5,7 +5,7 @@ function Navbar({ onToggleMenu  }) {
   return (
     <div className={styles.navbar}>
       <div className={styles.logo}>
-          <img src="./wotg-logo.webp" alt="WOTG Logo" />
+        <img key={Date.now()} src="/wotg-logo.webp" alt="WOTG Logo" />
       </div>
       <div className={styles.navLinks}>
           <a href="/" className={styles.navLink}>Chat</a>

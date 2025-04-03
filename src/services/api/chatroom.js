@@ -1,7 +1,7 @@
 // utils
 import * as methods from '../../utils/methods';
 
-import { GET, POST, PUT, DELETE } from '../request';
+import { GET, POST } from '../request';
 
 
 export async function getAllChatrooms(payload) {

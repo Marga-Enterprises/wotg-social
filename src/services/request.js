@@ -13,7 +13,7 @@ axios.defaults.headers.common.Authorization = storedToken === undefined ? null :
 // console.log('BEARERRRR TOKEN', axios.defaults.headers.common.Authorization)
 const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://community.wotgonline.com/api';
 
-console.log('[[STATUS]]', process.env.NODE_ENV)
+// console.log('[[STATUS]]', process.env.NODE_ENV)
 
 
 /**

@@ -6,8 +6,10 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import styles from './index.module.css';
 import DynamicSnackbar from "../../components/DynamicSnackbar";
-
 import bibleBooks from "../Bible/data";
+
+import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -134,7 +136,13 @@ const Page = () => {
                     showCommentary ? styles.commentaryVisible : ""
                   }`}
                 >
-                  <p>{commentary}</p>
+                  <ReactMarkdown
+                    children={commentary}
+                    remarkPlugins={[remarkBreaks]} // optional if you want single line breaks
+                    components={{
+                      p: ({ node, ...props }) => <p style={{ marginBottom: '1.5rem' }} {...props} />,
+                    }}
+                  />
                 </div>
               </>
             )}

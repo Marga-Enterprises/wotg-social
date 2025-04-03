@@ -229,18 +229,19 @@ const Page = () => {
                         <div className={styles.verseContainer}>
                             {verses.map(({ verse, text, commentary }) => (
                                 <p
-                                key={verse}
-                                ref={(el) => verseRefs.current[verse] = el}
-                                style={{
-                                    ...verseStyle,
-                                    backgroundColor: highlightedVerses[verse] || "transparent",
-                                    textDecoration: activeVerse?.verse === verse ? "underline dotted" : "none",
-                                    textUnderlineOffset: "4px",
-                                    cursor: "pointer"
-                                }}
-                                onClick={() => handleVerseTap(verse, text, commentary)}
+                                    key={verse}
+                                    ref={(el) => verseRefs.current[verse] = el}
+                                    className={`
+                                        ${styles.verse}
+                                        ${activeVerse?.verse === verse ? styles.activeVerse : ""}
+                                    `}
+                                    style={{
+                                        ...verseStyle,
+                                        backgroundColor: highlightedVerses[verse] || "transparent"
+                                    }}
+                                    onClick={() => handleVerseTap(verse, text, commentary)}
                                 >
-                                <sup className={styles.verseNumber}>{verse}</sup> {text}
+                                    <sup className={styles.verseNumber}>{verse}</sup> {text}
                                 </p>
                             ))}
                         </div>

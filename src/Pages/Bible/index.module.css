@@ -109,6 +109,18 @@
   animation: fadeInOut 2s ease-in-out;
 }
 
+.verse {
+  cursor: pointer;
+}
+
+.activeVerse {
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+  -webkit-text-decoration-style: dotted; /* iOS Safari support */
+  -webkit-text-underline-position: under; /* better positioning for Safari */
+}
+
+
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
   10% { opacity: 1; transform: translateX(-50%) translateY(0); }

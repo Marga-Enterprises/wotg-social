@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useHideNavbar } from "./contexts/NavbarContext";
 import { wotgsocial } from "./redux/combineActions";
+import Cookies from 'js-cookie';
 
 // Components
 import Navbar from "./components/Navbar";
@@ -35,6 +36,8 @@ import UploadVideoFromFiles from "./Pages/UploadVideoFromFiles";
 function AppRoutes() {
   const dispatch = useDispatch();
   const hideNavbar = useHideNavbar();
+  
+  const token = Cookies.get('token');
 
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -44,7 +47,7 @@ function AppRoutes() {
 
   return (
     <div className="grid-container">
-      {!hideNavbar && <Navbar onToggleMenu={() => setMenuOpen(true)} />}
+      {!hideNavbar && token && <Navbar onToggleMenu={() => setMenuOpen(true)} />}
 
       <AnimatePresence>
         {menuOpen && <BurgerMenu onClose={() => setMenuOpen(false)} />}

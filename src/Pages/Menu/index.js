@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSetHideNavbar } from "../../contexts/NavbarContext";
 
 import styles from './index.module.css';
 
 const Page = () => {
+    const setHideNavbar = useSetHideNavbar();
+
+    useEffect(() => {
+        setHideNavbar(true);
+        return () => setHideNavbar(false);
+    }, [setHideNavbar]);
+
     return (
         <div className={styles.container}> 
             <div className={styles.menu}>

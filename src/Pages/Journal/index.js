@@ -151,7 +151,7 @@ const Page = () => {
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="gagawin">3. Ano ang aking ginawa?</label>
+            <label htmlFor="gagawin">3. Ano ang aking gagawin?</label>
             <textarea
               id="gagawin"
               rows="4"

@@ -8,39 +8,6 @@
     padding: 2rem;
 }
 
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgb(197, 31, 31);
-  padding: 10px 20px;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-}
-
-.logo img {
-  height: 40px;
-}
-
-.navLinks {
-  display: flex;
-  gap: 15px;
-}
-
-.navLink {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.navLink:hover {
-  color: #ddd;
-}
-
 .goBackWrapper {
   margin-top: 70px;
   margin-bottom: 1rem;

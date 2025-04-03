@@ -29,46 +29,6 @@
     all: revert; /* Resets all Tailwind styles to browser defaults */
 }
 
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: rgb(197, 31, 31); /* Navbar color */
-    padding: 10px 20px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000; /* Ensures navbar stays on top of all elements */
-}
-
-.navLinks {
-    display: flex;
-}
-
-/* Styling for links */
-.navLink {
-    color: #fff;
-    text-decoration: none;
-    font-size: 16px;
-    padding: 8px 12px;
-    transition: color 0.3s ease;
-}
-
-.navLink:hover {
-    color: rgb(182, 182, 182);
-}
-
-.logo {
-    border-radius: 10rem;
-}
-
-.logo img {
-    height: 40px;
-    width: auto;
-}
-
-
 /* ✅ Responsive Design */
 @media (max-width: 768px) {
     .blogContainer {

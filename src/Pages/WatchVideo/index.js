@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { useDispatch } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
-
+import wotgLogo from "../../images/wotgLogo.webp";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
 
@@ -65,7 +65,7 @@ const Page = () => {
                                                         setVideoLoaded(true);
                                                     }
                                                 }}
-                                                poster={"/wotgLogo.webp"}
+                                                poster={wotgLogo}
                                                 preload="metadata" // ✅ Faster page load
                                             >
                                                 <source src={`${backendUrl}/uploads/${blog.blog_video}`} type="video/webm" />

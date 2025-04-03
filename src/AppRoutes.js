@@ -1,6 +1,6 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useHideNavbar } from "./contexts/NavbarContext";
 import { wotgsocial } from "./redux/combineActions";

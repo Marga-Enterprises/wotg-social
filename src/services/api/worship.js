@@ -1,5 +1,3 @@
-import * as methods from '../../utils/methods';
-
 import { GET, POST } from '../request';
 
 export async function getWorshipService() {

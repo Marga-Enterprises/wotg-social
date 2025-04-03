@@ -37,7 +37,7 @@ const BurgerMenu = ({ onClose }) => {
           className={styles.menuItem}
           onClick={onClose}
         >
-          Give
+          Partner
         </a>
       </nav>
     </motion.div>

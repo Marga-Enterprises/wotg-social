@@ -26,12 +26,16 @@
     display: flex;
 }
 
+.navLinks1 {
+    display: none;
+}
+
 /* Styling for links */
 .navLink {
     color: #fff;
     text-decoration: none;
     font-size: 16px;
-    padding: 8px 12px;
+    padding: 5px 10px;
     transition: color 0.3s ease;
 }
 
@@ -40,13 +44,13 @@
 }
 
 .burger {
-    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     height: 100%;
     z-index: 11;
+    margin-left: 1rem;
 }
 
 /* The 3 bars */
@@ -55,15 +59,18 @@
     width: 2rem;
     height: 4px;
     background-color: white;
-    margin: 3px 0;
+    margin: 5px 0;
     border-radius: 3px;
     transition: 0.3s ease;
 }
 
 
+
 @media (max-width: 600px) {
-    .burger {
+    .navLinks1 {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .navLinks {

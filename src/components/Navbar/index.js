@@ -19,14 +19,26 @@ function Navbar({ onToggleMenu  }) {
               rel="noopener noreferrer"
               className={styles.navLink}
           >
-              Give
+              Partner
           </a>
       </div>
 
-      <div className={styles.burger} onClick={onToggleMenu}>
-        <span></span>
-        <span></span>
-        <span></span>
+      <div className={styles.navLinks1}>
+          <a href="/blogs" className={styles.navLink}>Devotion</a>
+          <a
+              href="https://wotgonline.com/donate/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.navLink}
+          >
+              Partner
+          </a>
+
+          <div className={styles.burger} onClick={onToggleMenu}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
       </div>
   </div>
   );

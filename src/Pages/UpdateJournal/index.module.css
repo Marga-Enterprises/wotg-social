@@ -1,0 +1,193 @@
+.journalWrapper {
+  max-width: 1200px;
+  margin: 4rem auto 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  border-radius: 8px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.field textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 200px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: #fafafa;
+}
+
+.field textarea:focus {
+  border-color: rgb(197, 31, 31);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(197, 31, 31, 0.2);
+}
+
+.submitWrapper {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.discardButton {
+  background-color: #ffeaea;
+  color: #a00000;
+  padding: 0.5rem 1rem;
+  border: 1px solid #a00000;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.discardButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitButton {
+  background-color: rgb(197, 31, 31);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-weight: 600;
+}
+
+.submitButton:hover {
+  background-color: rgb(160, 24, 24);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.goBackWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+}
+
+.goBackButton {
+  background-color: transparent;
+  color: rgb(197, 31, 31);
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 600;
+}
+
+.commentaryToggle {
+  margin-top: 1rem;
+  width: 100%;
+  padding: .5rem;
+  background-color: rgb(197, 31, 31);
+  color: white;
+  font-size: .85rem;
+  font-weight: 500;
+  text-align: center;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.commentaryToggle:hover {
+  background-color: rgb(165, 25, 25);
+}
+
+.toggleIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+
+.commentaryToggle:hover {
+  background-color: rgb(165, 25, 25);
+}
+
+.commentaryBox {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+  margin-top: 1rem;
+  background-color: #f9f9f9;
+  padding: 0 1rem;
+  border-left: 4px solid rgb(197, 31, 31);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.commentaryVisible {
+  max-height: 1000px; /* allow expansion */
+  opacity: 1;
+  padding: 1rem;
+}
+
+
+.goBackButton:hover {
+  text-decoration: underline;
+}
+
+.headingVerse {
+  font-size: 1.5rem;
+  color: #707070;
+  font-style: italic;
+}
+
+.heading {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #707070;
+}
+
+/* 🧠 Mobile Responsive */
+@media (max-width: 600px) {
+  .journalWrapper {
+    margin: 4rem 1rem 2rem 1rem;
+    padding: 1.5rem;
+  }
+
+  .submitButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  label {
+    font-size: 0.95rem;
+  }
+
+  textarea {
+    font-size: 0.95rem;
+  }
+}

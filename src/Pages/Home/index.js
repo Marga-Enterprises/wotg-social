@@ -18,7 +18,7 @@ import AddParticipantsInChatroomForm from '../../components/AddParticpantsInChat
 // CONTEXT
 import { useSetHideNavbar } from "../../contexts/NavbarContext";
 
-const Page = () => {
+const Page = ({ onToggleMenu  }) => {
     const dispatch = useDispatch();
 
     // Local state
@@ -469,7 +469,8 @@ const Page = () => {
                     <>
                         <ProfileSidebar onOpenProfileModal={handleOpenProfileModal}/>
                         <ChatSidebar 
-                            chatrooms={chatrooms} 
+                            chatrooms={chatrooms}
+                            toggleMenu={onToggleMenu} 
                             onSelectChatroom={handleSelectChatroom} 
                             onOpenCreateChatroomModal={handleOpenCreateChatroomModal}
                             currentUserId={user?.id}

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './index.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 
 const ChatSidebar = ({ 
   chatrooms, 
@@ -7,7 +9,8 @@ const ChatSidebar = ({
   onOpenCreateChatroomModal,
   currentUserId, 
   onSearchChange,
-  selectedChatroom
+  selectedChatroom,
+  toggleMenu
 }) => {
 
   const [maxLength, setMaxLength] = useState(100);
@@ -47,20 +50,26 @@ const ChatSidebar = ({
             <h2 className={styles.title}>MESSAGES</h2>
           </div>*/}
           <div header className={styles.headerContentLeft}>
-            <svg 
-              onClick={onOpenCreateChatroomModal} 
-              xmlns="http://www.w3.org/2000/svg" 
+            <FontAwesomeIcon
+              icon={faCirclePlus}
               className={styles.newChatButton}
-              fill="none" 
-              viewBox="0 0 24 24" 
-              strokeWidth="1.5" 
-              stroke="currentColor" 
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>
-            <a className={styles.worshipLink} href="/bible">Bible</a>
-            <a className={styles.worshipLink} href="/worship">Worship</a>
-            <a className={styles.worshipLink} href="/blogs">Devotion</a>
+              onClick={onOpenCreateChatroomModal}
+              title="Add New Chat"
+            />
+
+            <div>
+              <FontAwesomeIcon
+                icon={faBars}
+                className={styles.menuButton}
+                onClick={toggleMenu}
+                title="Open Menu"
+              />
+
+              <a className={styles.worshipLink} href="/bible">Bible</a>
+              <a className={styles.worshipLink} href="/worship">Worship</a>
+              <a className={styles.worshipLink} href="/blogs">Devotion</a>
+              <a className={styles.worshipLink} href="/your-journals">Journals</a>
+            </div>
           </div>
         </div>
 

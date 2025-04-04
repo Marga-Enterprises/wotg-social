@@ -29,9 +29,9 @@ import ForgotPassword from "./Pages/ForgotPassword";
 import ResetPassword from "./Pages/ResetPassword";
 import Journal from "./Pages/Journal";
 import YourJournals from "./Pages/YourJournals";
-import AllJournals from "./Pages/AllJournals";
 import Commentary from "./Pages/Commentary";
 import UploadVideoFromFiles from "./Pages/UploadVideoFromFiles";
+import ViewJournalPage from "./Pages/ViewJournalPage";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -63,7 +63,7 @@ function AppRoutes() {
           <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
           <Route path="/journal/:book/:chapter/:verse/:language/" element={<AuthRouter><Journal /></AuthRouter>} />
           <Route path="/your-journals" element={<AuthRouter><YourJournals /></AuthRouter>} />
-          <Route path="/all-journals" element={<AuthRouter><AllJournals /></AuthRouter>} />
+          <Route path="/view-journal/:id" element={<AuthRouter><ViewJournalPage /></AuthRouter>} />
           <Route path="/commentary/:book/:chapter/:verse/:language/" element={<AuthRouter><Commentary /></AuthRouter>} />
           <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
           <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />

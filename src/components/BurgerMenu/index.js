@@ -1,10 +1,20 @@
 import { useEffect, memo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+
+import { useDispatch } from 'react-redux';
+import { wotgsocial } from '../../redux/combineActions';
+
 import styles from "./index.module.css";
 
 const BurgerMenu = ({ onClose }) => {
-  // Prevent background scroll when menu is open
+  const dispatch = useDispatch();
+
+  const handleSignOut = () => {
+    dispatch(wotgsocial.user.userLogout());
+    onClose();
+  };
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -39,6 +49,7 @@ const BurgerMenu = ({ onClose }) => {
         >
           Partner
         </a>
+        <Link className={styles.menuItem} onClick={handleSignOut}>Logout</Link>
       </nav>
     </motion.div>
   );

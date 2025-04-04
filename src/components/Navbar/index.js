@@ -1,7 +1,19 @@
 import React from 'react';
 import styles from './index.module.css';
 
+import { useDispatch } from 'react-redux';
+import { wotgsocial } from '../../redux/combineActions';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+
 function Navbar({ onToggleMenu  }) {
+  const dispatch = useDispatch();
+
+  const handleSignOut = () => {
+    dispatch(wotgsocial.user.userLogout());
+  };
+
   return (
     <div className={styles.navbar}>
       <div className={styles.logo}>
@@ -21,6 +33,12 @@ function Navbar({ onToggleMenu  }) {
           >
               Partner
           </a>
+          <FontAwesomeIcon 
+            icon={faRightFromBracket} 
+            size="2x" 
+            className={styles.headerIcon}
+            onClick={handleSignOut}
+          />
       </div>
 
       <div className={styles.navLinks1}>

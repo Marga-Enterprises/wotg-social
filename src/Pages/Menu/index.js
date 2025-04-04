@@ -20,6 +20,7 @@ const Page = () => {
                     <li><a href="/">Chat</a></li>
                     <li><a href="/blogs">Devotion</a></li>
                     <li><a href="/bible">Bible</a></li>
+                    <li><a href="/your-journals">Journals</a></li>
                 </ul>
             </div>
         </div>

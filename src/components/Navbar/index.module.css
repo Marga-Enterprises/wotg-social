@@ -24,6 +24,7 @@
 /* Container for links */
 .navLinks {
     display: flex;
+    align-items: center;
 }
 
 .navLinks1 {
@@ -64,7 +65,15 @@
     transition: 0.3s ease;
 }
 
-
+.headerIcon {
+  padding: 0;
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  border-radius: 100%;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
 
 @media (max-width: 600px) {
     .navLinks1 {

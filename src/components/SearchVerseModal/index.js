@@ -45,7 +45,10 @@ const SearchVerseModal = ({ onApply, onClose }) => {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true">
       <div className={styles.modal}>
-        <h3>Search Verse</h3>
+        <p className={styles.instruction}>
+          Type a verse reference like <strong>John 3:16</strong> or a chapter like{" "}
+          <strong>Genesis 1</strong>.
+        </p>
         <input
           type="text"
           placeholder="e.g. Genesis 1:1 or John chapter 3"

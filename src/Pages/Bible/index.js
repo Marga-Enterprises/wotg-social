@@ -123,23 +123,23 @@ const Page = () => {
     }, [dispatch, book, chapter, language]);
 
     useEffect(() => {
-        if (!loading && verses.length) {
-            const storageKey = `highlighted_${book}_${chapter}_${language}`;
-            const scrollToId = localStorage.getItem(`${storageKey}_scrollTo`);
-
-            if (scrollToId && verseRefs.current) {
-            const target = verseRefs.current[parseInt(scrollToId.split("-")[1])];
-            if (target) {
-                setTimeout(() => {
-                target.scrollIntoView({ behavior: "auto", block: "center" });
-                }, 300);
-            }
+        const scrollKey = `highlighted_${book}_${chapter}_${language}_scrollTo`;
+        const scrollToId = localStorage.getItem(scrollKey);
+      
+        if (!loading && verses.length && scrollToId) {
+          const targetVerse = parseInt(scrollToId.split("-")[1]);
+      
+          setTimeout(() => {
+            const el = verseRefs.current[targetVerse];
+            if (el) {
+              el.scrollIntoView({ behavior: "auto", block: "center" });
+              console.log(`✅ Scrolled to verse ${targetVerse}`);
             } else {
-            window.scrollTo({ top: 0, behavior: "auto" });
+              console.warn(`❌ Verse ${targetVerse} not found in refs.`);
             }
+          }, 500);
         }
-    }, [loading, verses, book, chapter, language]);
-
+    }, [loading, verses, book, chapter, language]);  
 
     useEffect(() => {
         loadingRef.current = false;
@@ -208,18 +208,27 @@ const Page = () => {
                         onSearchVerse={({ bookId, chapter, verse }) => {
                             setBook(bookId);
                             setChapter(chapter);
-
-                            // Save target verse to localStorage for auto-scroll/highlight
+                          
                             const scrollKey = `highlighted_${bookId}_${chapter}_${language}_scrollTo`;
+                            const highlightKey = `highlighted_${bookId}_${chapter}_${language}`;
+                          
                             if (verse) {
-                                localStorage.setItem(scrollKey, `verse-${verse}`);
+                              // 🟡 Highlight that verse
+                              const newHighlights = { [verse]: "#fffaa0" };
+                          
+                              localStorage.setItem(highlightKey, JSON.stringify(newHighlights));
+                              setHighlightedVerses(newHighlights);
+                          
+                              // 🟢 Scroll to that verse
+                              localStorage.setItem(scrollKey, `verse-${verse}`);
                             } else {
-                                localStorage.removeItem(scrollKey);
+                              localStorage.removeItem(scrollKey);
+                              localStorage.removeItem(highlightKey);
+                              setHighlightedVerses({});
                             }
-
-                            // Optional: Reset previously activeVerse so new one stands out after scroll
+                          
                             setActiveVerse(null);
-                        }}
+                        }}  
                     />
 
                     <div className={styles.bibleReader}>

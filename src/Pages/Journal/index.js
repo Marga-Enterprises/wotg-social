@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
 import LoadingSpinner from "../../components/LoadingSpinner";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-
-import styles from './index.module.css';
 import DynamicSnackbar from "../../components/DynamicSnackbar";
-import bibleBooks from "../Bible/data";
-
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import bibleBooks from "../Bible/data";
+
+import styles from "./index.module.css";
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -17,25 +16,40 @@ const Page = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [loading, setLoading] = useState(true);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
-  const [showCommentary, setShowCommentary] = useState(false);
-
   const { book, chapter, verse, language } = useParams();
-  const bookData = bibleBooks.find(b => b.id === parseInt(book));
+  const bookData = useMemo(() => bibleBooks.find(b => b.id === parseInt(book)), [book]);
   const bookName = bookData?.name?.[language] || `Book ${book}`;
 
   const verseText = location.state?.verseText || "";
   const commentary = location.state?.commentary || "";
 
-  // Form state (renamed to match backend fields)
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [showCommentary, setShowCommentary] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
+
   const [question2, setQuestion2] = useState("");
   const [question3, setQuestion3] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
+  const draftKey = useMemo(() => `journal-draft-${book}-${chapter}-${verse}-${language}`, [book, chapter, verse, language]);
+  const saveInterval = useRef(null);
+
+  // ✅ Load draft on mount
   useEffect(() => {
+    const draft = JSON.parse(localStorage.getItem(draftKey) || "{}");
+    if (draft.question2) setQuestion2(draft.question2);
+    if (draft.question3) setQuestion3(draft.question3);
     setTimeout(() => setLoading(false), 300);
-  }, []);
+  }, [draftKey]);
+
+  // ✅ Autosave every 2s
+  useEffect(() => {
+    saveInterval.current = setInterval(() => {
+      localStorage.setItem(draftKey, JSON.stringify({ question2, question3 }));
+    }, 2000);
+
+    return () => clearInterval(saveInterval.current);
+  }, [question2, question3, draftKey]);
 
   const handleSubmit = useCallback(async () => {
     if (loadingRef.current || submitting) return;
@@ -61,44 +75,46 @@ const Page = () => {
     setLoading(false);
 
     if (res.success) {
-      setSnackbar({
-        open: true,
-        message: "✅ Journal saved successfully!",
-        type: "success"
-      });
-
-      setTimeout(() => {
-        navigate("/your-journals");
-      }, 2000);
-
-      // Clear form
-      setQuestion2("");
-      setQuestion3("");
+      localStorage.removeItem(draftKey);
+      setSnackbar({ open: true, message: "Journal saved successfully!", type: "success" });
+      setTimeout(() => navigate("/your-journals"), 2000);
     } else {
-      setSnackbar({
-        open: true,
-        message: res.msg || "❌ Failed to save journal.",
-        type: "error"
-      });
+      setSnackbar({ open: true, message: res.msg || "❌ Failed to save journal.", type: "error" });
     }
-  }, [book, chapter, verse, language, question2, question3, verseText, dispatch, navigate, submitting]);
+  }, [book, chapter, verse, language, verseText, question2, question3, dispatch, navigate, submitting, draftKey]);
+
+  const handleDiscard = () => {
+    localStorage.removeItem(draftKey);
+    setQuestion2("");
+    setQuestion3("");
+    setSnackbar({ open: true, message: "🗑 Draft discarded.", type: "info" });
+  };
+
+  const isDiscardDisabled = useMemo(() => {
+    const draftRaw = localStorage.getItem(draftKey);
+    if (!draftRaw) return true;
+
+    try {
+      const draft = JSON.parse(draftRaw);
+      return !draft.question2 && !draft.question3;
+    } catch {
+      return true;
+    }
+  }, [draftKey]);
 
   const handleGoBack = () => {
-    if (location.key !== 'default') {
-      navigate(-1);
-    } else {
-      navigate("/");
-    }
+    if (location.key !== 'default') navigate(-1);
+    else navigate("/");
   };
 
   return (
     <>
-      {loading ? <LoadingSpinner /> : (
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
         <div className={styles.journalWrapper}>
           <div className={styles.goBackWrapper}>
-            <button onClick={handleGoBack} className={styles.goBackButton}>
-              ← Go Back
-            </button>
+            <button onClick={handleGoBack} className={styles.goBackButton}>← Go Back</button>
           </div>
 
           <h2 className={styles.heading}>Conversation Time {bookName} {chapter}:{verse} ({language.toUpperCase()})</h2>
@@ -113,9 +129,7 @@ const Page = () => {
                   className={styles.commentaryToggle}
                   onClick={() => setShowCommentary((prev) => !prev)}
                 >
-                  <span className={styles.toggleIcon}>
-                    {showCommentary ? "▲" : "▼"}
-                  </span>
+                  <span className={styles.toggleIcon}>{showCommentary ? "▲" : "▼"}</span>
                   {showCommentary ? "Hide Commentary" : "Show Commentary"}
                 </button>
 
@@ -160,6 +174,15 @@ const Page = () => {
             >
               {submitting ? "Saving..." : "Save"}
             </button>
+
+            <button
+              onClick={handleDiscard}
+              disabled={isDiscardDisabled}
+              className={styles.discardButton}
+              title={isDiscardDisabled ? "No unsaved draft to discard" : "Discard current draft"}
+            >
+              Discard Draft
+            </button>
           </div>
         </div>
       )}
@@ -168,7 +191,7 @@ const Page = () => {
         open={snackbar.open}
         message={snackbar.message}
         type={snackbar.type}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       />
     </>
   );

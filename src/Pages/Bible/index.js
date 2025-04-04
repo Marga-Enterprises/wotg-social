@@ -124,22 +124,22 @@ const Page = () => {
 
     useEffect(() => {
         if (!loading && verses.length) {
-          const storageKey = `highlighted_${book}_${chapter}_${language}`;
-          const scrollToId = localStorage.getItem(`${storageKey}_scrollTo`);
-      
-          if (scrollToId && verseRefs.current) {
+            const storageKey = `highlighted_${book}_${chapter}_${language}`;
+            const scrollToId = localStorage.getItem(`${storageKey}_scrollTo`);
+
+            if (scrollToId && verseRefs.current) {
             const target = verseRefs.current[parseInt(scrollToId.split("-")[1])];
             if (target) {
-              setTimeout(() => {
+                setTimeout(() => {
                 target.scrollIntoView({ behavior: "auto", block: "center" });
-              }, 300);
+                }, 300);
             }
-          } else {
+            } else {
             window.scrollTo({ top: 0, behavior: "auto" });
-          }
+            }
         }
     }, [loading, verses, book, chapter, language]);
-      
+
 
     useEffect(() => {
         loadingRef.current = false;
@@ -205,6 +205,21 @@ const Page = () => {
                         onChapterChange={setChapter}
                         onLanguageChange={setLanguage}
                         onStyleChange={(style) => setVerseStyle((prev) => ({ ...prev, ...style }))}
+                        onSearchVerse={({ bookId, chapter, verse }) => {
+                            setBook(bookId);
+                            setChapter(chapter);
+
+                            // Save target verse to localStorage for auto-scroll/highlight
+                            const scrollKey = `highlighted_${bookId}_${chapter}_${language}_scrollTo`;
+                            if (verse) {
+                                localStorage.setItem(scrollKey, `verse-${verse}`);
+                            } else {
+                                localStorage.removeItem(scrollKey);
+                            }
+
+                            // Optional: Reset previously activeVerse so new one stands out after scroll
+                            setActiveVerse(null);
+                        }}
                     />
 
                     <div className={styles.bibleReader}>

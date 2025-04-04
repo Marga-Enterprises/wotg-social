@@ -1,21 +1,22 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { wotgsocial } from "../../redux/combineActions";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./index.module.css";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import DynamicSnackbar from "../../components/DynamicSnackbar";
 import Cookies from "js-cookie";
-
 import bibleBooks from "../Bible/data";
+
+import { convertMomentWithFormatWhole } from "../../utils/methods";
 
 const Page = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const fetchTimeout = useRef(null);
   const loadingRef = useRef(false);
-
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const account = useMemo(() => {
     try {
@@ -27,55 +28,78 @@ const Page = () => {
 
   const userId = account?.id;
 
-  const [loading, setLoading] = useState(true);
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const initialPage = useMemo(() => parseInt(queryParams.get("page")) || 1, [queryParams]);
+
+  const [pageIndex, setPageIndex] = useState(initialPage);
+  const [pageSize] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
   const [journals, setJournals] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
 
-  const [pageIndex, setPageIndex] = useState(1);
-  const [pageSize] = useState(10); // Fixed size
-  const [totalPages, setTotalPages] = useState(1);
-
-  const fetchJournals = useCallback(async () => {
+  const fetchJournals = useCallback(async (page) => {
     if (!userId || loadingRef.current) return;
 
     loadingRef.current = true;
     setLoading(true);
 
-    const payload = { pageIndex, pageSize, userId };
-    const res = await dispatch(wotgsocial.journal.getAllJournalsAction(payload));
+    try {
+      const payload = { pageIndex: page, pageSize, userId };
+      const res = await dispatch(wotgsocial.journal.getAllJournalsAction(payload));
 
-    if (res.success) {
-      setJournals(res.data.journals);
-      setTotalPages(res.data.totalPages);
-    } else {
-      setSnackbar({
-        open: true,
-        message: res.msg || "❌ Failed to load journals.",
-        type: "error",
-      });
+      if (res.success) {
+        setJournals(res.data.journals);
+        setTotalPages(res.data.totalPages);
+      } else {
+        setSnackbar({
+          open: true,
+          message: res.msg || "❌ Failed to load journals.",
+          type: "error",
+        });
+      }
+    } finally {
+      setLoading(false);
+      loadingRef.current = false;
     }
+  }, [dispatch, userId, pageSize]);
 
-    setLoading(false);
-    loadingRef.current = false;
-  }, [dispatch, pageIndex, pageSize, userId]);
-
+  // Sync journals with pageIndex
   useEffect(() => {
     if (fetchTimeout.current) clearTimeout(fetchTimeout.current);
+
     fetchTimeout.current = setTimeout(() => {
-      fetchJournals();
-    }, 250); // slight debounce for smoother UX
+      fetchJournals(pageIndex);
+    }, 150); // Faster debounce
 
     return () => clearTimeout(fetchTimeout.current);
-  }, [fetchJournals]);
+  }, [fetchJournals, pageIndex]);
 
-  const handlePrevPage = () => pageIndex > 1 && setPageIndex((prev) => prev - 1);
-  const handleNextPage = () => pageIndex < totalPages && setPageIndex((prev) => prev + 1);
+  // Sync pageIndex with URL
+  useEffect(() => {
+    const urlPage = parseInt(queryParams.get("page")) || 1;
+    if (urlPage !== pageIndex) {
+      setPageIndex(urlPage);
+    }
+  }, [queryParams, pageIndex]);
+
+  const handlePrevPage = () => {
+    if (pageIndex > 1) {
+      navigate(`/your-journals?page=${pageIndex - 1}`);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (pageIndex < totalPages) {
+      navigate(`/your-journals?page=${pageIndex + 1}`);
+    }
+  };
 
   const handleGoBack = () => {
-    if (location.key !== 'default') {
-      navigate(-1); // Go back to previous page
+    if (location.key !== "default") {
+      navigate(-1);
     } else {
-      navigate("/"); // Fallback if no history
+      navigate("/");
     }
   };
 
@@ -89,20 +113,10 @@ const Page = () => {
 
           <div className={styles.goBackWrapper}>
             <button onClick={handleGoBack} className={styles.goBackButton}>
-               ← Go Back
+              ← Go Back
             </button>
-
-            <div className={styles.viewAllWrapper}>
-              <button
-                className={styles.viewAllButton}
-                onClick={() => navigate("/all-journals")}
-              >
-                View All Journals
-              </button>
-            </div>
           </div>
 
-          {/* Journal List */}
           {journals.length === 0 ? (
             <p>No journals found.</p>
           ) : (
@@ -113,17 +127,28 @@ const Page = () => {
 
                 return (
                   <li key={j.id} className={styles.journalItem}>
-                    <strong>
-                      {bookName} {j.chapter}:{j.verse} ({j.language?.toUpperCase()})
-                    </strong>
-                    <p>{j.content.slice(0, 200)}...</p>
+                    <Link
+                      to={`/view-journal/${j.id}?page=${pageIndex}`}
+                      className={styles.journalLink}
+                    >
+                      <strong>
+                        {bookName} {j.chapter}:{j.verse} ({j.language?.toUpperCase()})
+                      </strong>
+
+                      <div className={styles.journalDate}>
+                        <b>Date Saved:</b> {convertMomentWithFormatWhole(j.createdAt)}
+                      </div>
+
+                      <div className={styles.journalPreview}>
+                        {`${j.question1 || ""} ${j.question2 || ""} ${j.question3 || ""}`.slice(0, 300)}...
+                      </div>
+                    </Link>
                   </li>
                 );
               })}
             </ul>
           )}
 
-          {/* Pagination */}
           <div className={styles.pagination}>
             <button onClick={handlePrevPage} disabled={pageIndex === 1}>Previous</button>
             <span>Page {pageIndex} of {totalPages}</span>
@@ -132,7 +157,6 @@ const Page = () => {
         </div>
       )}
 
-      {/* Snackbar */}
       <DynamicSnackbar
         open={snackbar.open}
         message={snackbar.message}

@@ -120,3 +120,15 @@
   font-weight: bold;
   color: #707070;
 }
+
+.journalDate {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.520rem;
+}
+
+.journalPreview {
+  font-size: 1.3rem;
+  color: #464646;
+  margin-top: 0.520rem;
+}

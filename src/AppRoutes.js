@@ -32,6 +32,7 @@ import YourJournals from "./Pages/YourJournals";
 import Commentary from "./Pages/Commentary";
 import UploadVideoFromFiles from "./Pages/UploadVideoFromFiles";
 import ViewJournalPage from "./Pages/ViewJournalPage";
+import UpdateJournal from "./Pages/UpdateJournal";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -55,7 +56,7 @@ function AppRoutes() {
 
       <main>
         <Routes>
-          <Route path="/" element={<AuthRouter><Home /></AuthRouter>} />
+          <Route path="/" element={<AuthRouter><Home onToggleMenu={() => setMenuOpen(true)} /></AuthRouter>} />
           <Route path="/worship" element={<AuthRouter><Worship /></AuthRouter>} />
           <Route path="/menu" element={<AuthRouter><Menu /></AuthRouter>} />
           <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
@@ -64,6 +65,7 @@ function AppRoutes() {
           <Route path="/journal/:book/:chapter/:verse/:language/" element={<AuthRouter><Journal /></AuthRouter>} />
           <Route path="/your-journals" element={<AuthRouter><YourJournals /></AuthRouter>} />
           <Route path="/view-journal/:id" element={<AuthRouter><ViewJournalPage /></AuthRouter>} />
+          <Route path="/update-journal/:id" element={<AuthRouter><UpdateJournal /></AuthRouter>} />
           <Route path="/commentary/:book/:chapter/:verse/:language/" element={<AuthRouter><Commentary /></AuthRouter>} />
           <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
           <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />

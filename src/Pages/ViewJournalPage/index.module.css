@@ -18,9 +18,10 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1.5rem;
+  gap: 1rem;
 }
 
-.copyButton {
+.iconButton {
   background: none;
   border: none;
   cursor: pointer;
@@ -29,7 +30,7 @@
   transition: background-color 0.2s ease;
 }
 
-.copyButton:hover {
+.iconButton:hover {
   color: #727272;
 }
 

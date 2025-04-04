@@ -158,7 +158,7 @@ const Page = () => {
               disabled={submitting}
               className={styles.submitButton}
             >
-              {submitting ? "Saving..." : "Submit Journal"}
+              {submitting ? "Saving..." : "Save"}
             </button>
           </div>
         </div>

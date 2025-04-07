@@ -114,12 +114,13 @@
 }
 
 .activeVerse {
-  text-decoration: underline dotted;
+  text-decoration: underline;
   text-underline-offset: 4px;
-  -webkit-text-decoration-style: dotted; /* iOS Safari support */
-  -webkit-text-underline-position: under; /* better positioning for Safari */
-}
 
+  /* Ensure compatibility with iOS Safari */
+  text-underline-position: under;
+  -webkit-text-underline-position: under;
+}
 
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
@@ -127,8 +128,6 @@
   90% { opacity: 1; }
   100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
 }
-
-
 
 @media (max-width: 768px) {
   .bibleReader {

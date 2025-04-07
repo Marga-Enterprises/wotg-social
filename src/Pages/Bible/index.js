@@ -10,7 +10,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import BibleFilterSection from "../../sections/BibleFilterSection";
 import BibleVersesAction from "../../sections/BibleVersesAction";
 
+// UTILS
+import { useScrollRestore } from "../../utils/methods";
+
 const Page = () => {
+    useScrollRestore(); 
+    
     const dispatch = useDispatch();
     const loadingRef = useRef(false);
     const syncTimeout = useRef(null);
@@ -25,7 +30,7 @@ const Page = () => {
     const [highlightedVerses, setHighlightedVerses] = useState({});
     const [verses, setVerses] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeVerse, setActiveVerse] = useState(null); // 👈 New
+    const [activeVerses, setActiveVerses] = useState([]); // 👈 New
 
     const [verseStyle, setVerseStyle] = useState({
         fontSize: "20px",
@@ -171,22 +176,34 @@ const Page = () => {
     }, [book, chapter]);
 
     const handleVerseTap = (verseNumber, text, commentary) => {
-        setActiveVerse({
-            verse: verseNumber,
-            text,
-            commentary,
-            book,
-            chapter,
-            language
-          });          
-    };      
-
-    const handleHighlight = (verseNum, color) => {
-        const updated = { ...highlightedVerses, [verseNum]: color };
-        setHighlightedVerses(updated);
-        localStorage.setItem(highlightKey, JSON.stringify(updated));
+        setActiveVerses((prev) => {
+            const current = Array.isArray(prev) ? prev : [];
+            const exists = current.find((v) => v.verse === verseNumber);
+        
+            if (exists) {
+            return current.filter((v) => v.verse !== verseNumber);
+            } else {
+            return [
+                ...current,
+                { verse: verseNumber, text, commentary, book, chapter, language },
+            ];
+            }
+        });
     };
+
+    const handleHighlight = (verseNumber, color) => {
+        setHighlightedVerses((prev) => {
+          const updated = { ...prev };
       
+          if (color) {
+            updated[verseNumber] = color;
+          } else {
+            delete updated[verseNumber];
+          }
+      
+          return updated;
+        });
+    };
       
     const isFirstChapter = book === 1 && chapter === 1;
     const isLastChapter = book === 66 && chapter === bibleBooks.find(b => b.id === 66)?.chapters;
@@ -227,7 +244,7 @@ const Page = () => {
                               setHighlightedVerses({});
                             }
                           
-                            setActiveVerse(null);
+                            setActiveVerses(null);
                         }}  
                     />
 
@@ -251,32 +268,37 @@ const Page = () => {
                         </button>
 
                         <div className={styles.verseContainer}>
-                            {verses.map(({ verse, text, commentary }) => (
+                            {verses.map(({ verse, text, commentary }) => {
+                                const isActive = activeVerses.some((v) => v.verse === verse);
+                                const isHighlighted = highlightedVerses[verse];
+
+                                return (
                                 <p
                                     key={verse}
                                     ref={(el) => verseRefs.current[verse] = el}
                                     className={`
                                         ${styles.verse}
-                                        ${activeVerse?.verse === verse ? styles.activeVerse : ""}
+                                        ${isActive ? styles.activeVerse : ""}
                                     `}
                                     style={{
                                         ...verseStyle,
-                                        backgroundColor: highlightedVerses[verse] || "transparent"
+                                        backgroundColor: isHighlighted || "transparent",
                                     }}
                                     onClick={() => handleVerseTap(verse, text, commentary)}
                                 >
                                     <sup className={styles.verseNumber}>{verse}</sup> {text}
                                 </p>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
-                    {activeVerse !== null && (
+                    {activeVerses.length > 0 && (
                         <BibleVersesAction
-                            verse={activeVerse}
+                            verses={activeVerses}
+                            onClose={() => setActiveVerses([])}
                             onHighlight={handleHighlight}
                             highlightedVerses={highlightedVerses}
-                            onClose={() => setActiveVerse(null)}
                         />
                     )}
                 </div>

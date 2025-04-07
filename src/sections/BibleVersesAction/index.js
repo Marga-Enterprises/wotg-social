@@ -9,30 +9,48 @@ import {
   faBook
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { saveScrollPosition } from "../../utils/methods";
 
 const highlightColors = ["#ffff99", "#ffd9e1", "#ccffcc", "#cce5ff", "#ffcccc"];
 
-const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) => {
+const BibleVersesAction = ({ verses = [], onClose, onHighlight, highlightedVerses }) => {
   const [copied, setCopied] = useState(false);
+  const firstVerse = verses[0]; // Used for journal and commentary
 
   const handleColorSelect = useCallback(
     (color) => {
-      const storageKey = `highlighted_${verse.book}_${verse.chapter}_${verse.language}`;
+      const storageKey = `highlighted_${firstVerse.book}_${firstVerse.chapter}_${firstVerse.language}`;
       const scrollKey = `${storageKey}_scrollTo`;
-
       const updated = JSON.parse(localStorage.getItem(storageKey) || "{}");
-      updated[verse.verse] = color;
-      localStorage.setItem(storageKey, JSON.stringify(updated));
-      localStorage.setItem(scrollKey, `verse-${verse.verse}`);
 
-      onHighlight(verse.verse, color);
+      verses.forEach((v) => {
+        updated[v.verse] = color;
+        onHighlight(v.verse, color);
+      });
+
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+      localStorage.setItem(scrollKey, `verse-${firstVerse.verse}`);
       onClose();
     },
-    [verse, onHighlight, onClose]
+    [verses, firstVerse, onHighlight, onClose]
   );
 
+  const handleRemoveHighlight = () => {
+    const storageKey = `highlighted_${firstVerse.book}_${firstVerse.chapter}_${firstVerse.language}`;
+    const updated = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+    verses.forEach((v) => {
+      delete updated[v.verse];
+      onHighlight(v.verse, null);
+    });
+
+    localStorage.setItem(storageKey, JSON.stringify(updated));
+    localStorage.removeItem(`${storageKey}_scrollTo`);
+    onClose();
+  };
+
   const handleCopy = () => {
-    const copyText = verse.text;
+    const copyText = verses.map((v) => v.text).join("\n");
 
     navigator.clipboard
       .writeText(copyText)
@@ -45,23 +63,11 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
       });
   };
 
-  const handleRemoveHighlight = () => {
-    const storageKey = `highlighted_${verse.book}_${verse.chapter}_${verse.language}`;
-    const updated = JSON.parse(localStorage.getItem(storageKey) || "{}");
-    delete updated[verse.verse];
-    localStorage.setItem(storageKey, JSON.stringify(updated));
-    localStorage.removeItem(`${storageKey}_scrollTo`);
-    onHighlight(verse.verse, null);
-    onClose();
-  };  
-
-  // const { book, chapter, verse: verseNum, language } = verse;
-
   return (
     <>
       <div className={styles.footerAction}>
         <div className={styles.actionHeader}>
-          <strong>Actions</strong>
+          <strong>Actions ({verses.length})</strong>
           <button onClick={onClose}>✕</button>
         </div>
 
@@ -78,16 +84,16 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
           <button
             className={styles.iconButton}
             onClick={handleRemoveHighlight}
-            disabled={!highlightedVerses?.[verse.verse]}
+            disabled={verses.every((v) => !highlightedVerses?.[v.verse])}
           >
             <FontAwesomeIcon icon={faTrashAlt} />
             Remove Highlight
           </button>
 
           <Link
-            to={`/journal/${verse.book}/${verse.chapter}/${verse.verse}/${verse.language}`}
-            state={{ verseText: verse.text, commentary: verse.commentary }} 
+            to={`/journal/${firstVerse.book}/${firstVerse.chapter}/${firstVerse.verse}/${firstVerse.language}`}
             className={styles.iconButton}
+            onClick={saveScrollPosition}
           >
             <FontAwesomeIcon icon={faNoteSticky} />
             Journal
@@ -101,11 +107,12 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
             View Your Journals
           </Link>
 
-          {verse.commentary ? (
+          {firstVerse.commentary ? (
             <Link
-              to={`/commentary/${verse.book}/${verse.chapter}/${verse.verse}/${verse.language}`}
-              state={{ commentary: verse.commentary }} 
+              to={`/commentary/${firstVerse.book}/${firstVerse.chapter}/${firstVerse.verse}/${firstVerse.language}`}
+              state={{ verses }}
               className={styles.iconButton}
+              onClick={saveScrollPosition}
             >
               <FontAwesomeIcon icon={faCommentDots} />
               Commentary
@@ -134,8 +141,8 @@ const BibleVersesAction = ({ verse, onClose, onHighlight, highlightedVerses  }) 
 };
 
 export default React.memo(BibleVersesAction, (prev, next) => (
-  prev.verse?.verse === next.verse?.verse &&
-  prev.verse?.text === next.verse?.text &&
+  prev.verses?.length === next.verses?.length &&
+  prev.verses.every((v, i) => v.verse === next.verses[i]?.verse) &&
   prev.onClose === next.onClose &&
   prev.onHighlight === next.onHighlight
 ));

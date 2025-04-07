@@ -1,5 +1,5 @@
 import moment from 'moment';
-
+import { useEffect } from 'react';
 /**
  * convert object to query string
  * @param {*} params
@@ -47,4 +47,33 @@ export const convertQueryString = (params) => {
   };
 
   return `${capitalize(firstName)} ${capitalize(lastName)}`;
+};
+
+export const useScrollRestore = (key = "bibleScrollY", delay = 50) => {
+  useEffect(() => {
+    let scrollY = null;
+
+    try {
+      scrollY = sessionStorage.getItem(key);
+    } catch (err) {
+      console.warn("Scroll restore failed: sessionStorage not available", err);
+    }
+
+    if (scrollY !== null) {
+      const scrollTo = parseInt(scrollY, 10);
+
+      if (!isNaN(scrollTo)) {
+        const timeout = setTimeout(() => {
+          window.scrollTo({ top: scrollTo, behavior: "auto" });
+          sessionStorage.removeItem(key);
+        }, delay);
+
+        return () => clearTimeout(timeout); // Cleanup timeout on unmount
+      }
+    }
+  }, [key, delay]);
+};
+
+export const saveScrollPosition = (key = "bibleScrollY") => {
+  sessionStorage.setItem(key, window.scrollY.toString());
 };

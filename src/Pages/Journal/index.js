@@ -20,27 +20,45 @@ const Page = () => {
   const bookData = useMemo(() => bibleBooks.find(b => b.id === parseInt(book)), [book]);
   const bookName = bookData?.name?.[language] || `Book ${book}`;
 
-  const verseText = location.state?.verseText || "";
-  const commentary = location.state?.commentary || "";
-
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showCommentary, setShowCommentary] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
 
+  const [commentary, setCommentary] = useState("");
+  const [verseText, setVerseText] = useState("");
   const [question2, setQuestion2] = useState("");
   const [question3, setQuestion3] = useState("");
 
   const draftKey = useMemo(() => `journal-draft-${book}-${chapter}-${verse}-${language}`, [book, chapter, verse, language]);
   const saveInterval = useRef(null);
 
-  // ✅ Load draft on mount
+  // ✅ Load draft and fetch verse + commentary
   useEffect(() => {
-    const draft = JSON.parse(localStorage.getItem(draftKey) || "{}");
-    if (draft.question2) setQuestion2(draft.question2);
-    if (draft.question3) setQuestion3(draft.question3);
-    setTimeout(() => setLoading(false), 300);
-  }, [draftKey]);
+    const loadData = async () => {
+      const payload = { book, chapter, verse, language };
+
+      const draft = JSON.parse(localStorage.getItem(draftKey) || "{}");
+      if (draft.question2) setQuestion2(draft.question2);
+      if (draft.question3) setQuestion3(draft.question3);
+
+      if (!loadingRef.current) {
+        loadingRef.current = true;
+
+        const res = await dispatch(wotgsocial.bible.getBibleVersesAction(payload));
+        const fetchedCommentary = res?.data?.commentary || "";
+        const fetchedVerseText = res?.data?.text || "";
+
+        setCommentary(fetchedCommentary);
+        setVerseText(fetchedVerseText);
+
+        loadingRef.current = false;
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [book, chapter, verse, language, dispatch, draftKey]);
 
   // ✅ Autosave every 2s
   useEffect(() => {
@@ -102,10 +120,20 @@ const Page = () => {
     }
   }, [draftKey]);
 
-  const handleGoBack = () => {
+  const handleGoBack = useCallback(() => {
     if (location.key !== 'default') navigate(-1);
     else navigate("/");
-  };
+  }, [navigate, location.key]);
+
+  const markdownMemo = useMemo(() => (
+    <ReactMarkdown
+      children={commentary}
+      remarkPlugins={[remarkBreaks]}
+      components={{
+        p: ({ node, ...props }) => <p style={{ marginBottom: '1.5rem' }} {...props} />
+      }}
+    />
+  ), [commentary]);
 
   return (
     <>
@@ -127,20 +155,14 @@ const Page = () => {
               <>
                 <button
                   className={styles.commentaryToggle}
-                  onClick={() => setShowCommentary((prev) => !prev)}
+                  onClick={() => setShowCommentary(prev => !prev)}
                 >
                   <span className={styles.toggleIcon}>{showCommentary ? "▲" : "▼"}</span>
                   {showCommentary ? "Hide Commentary" : "Show Commentary"}
                 </button>
 
                 <div className={`${styles.commentaryBox} ${showCommentary ? styles.commentaryVisible : ""}`}>
-                  <ReactMarkdown
-                    children={commentary}
-                    remarkPlugins={[remarkBreaks]}
-                    components={{
-                      p: ({ node, ...props }) => <p style={{ marginBottom: '1.5rem' }} {...props} />
-                    }}
-                  />
+                  {markdownMemo}
                 </div>
               </>
             )}
@@ -191,7 +213,7 @@ const Page = () => {
         open={snackbar.open}
         message={snackbar.message}
         type={snackbar.type}
-        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
       />
     </>
   );

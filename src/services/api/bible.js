@@ -7,6 +7,6 @@ export async function getBibleChaptersByParams(payload) {
   return GET(`/bibles?${params}`);
 }
 
-export async function getBibleVerses(payload) {
+export async function getBibleVerse(payload) {
   return GET(`/bibles/${payload.book}/${payload.chapter}/${payload.verse}/${payload.language}`);
 } 

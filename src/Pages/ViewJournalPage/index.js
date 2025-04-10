@@ -67,7 +67,7 @@ const Page = () => {
     journal ? [
       { title: "1. Ano ang sinabi ng Diyos?", content: journal.question1 },
       { title: "2. Ano ang aking pagkaintindi?", content: journal.question2 },
-      { title: "3. Ano ang aking ginawa?", content: journal.question3 }
+      { title: "3. Ano ang aking gagawin?", content: journal.question3 }
     ] : []
   ), [journal]);
 
@@ -76,7 +76,7 @@ const Page = () => {
 
     const fullText = `1. Ano ang sinabi ng Diyos?\n${journal.question1 || ""}\n\n` +
                      `2. Ano ang aking pagkaintindi?\n${journal.question2 || ""}\n\n` +
-                     `3. Ano ang aking ginawa?\n${journal.question3 || ""}`;
+                     `3. Ano ang aking gagawin?\n${journal.question3 || ""}`;
 
     navigator.clipboard.writeText(fullText).then(() => {
       showToast("Journal copied to clipboard!");

@@ -5,8 +5,9 @@ const storedToken = Cookies.get('token');
 const bearerToken = `Bearer ${storedToken}`;
 
 // request header configuration
-axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
-axios.defaults.headers.post.Accept = 'application/json';
+axios.defaults.headers.common['Accept'] = 'application/json';
+axios.defaults.headers.common['Authorization'] = storedToken ? bearerToken : null;
+// ❌ DO NOT set default Content-Type for POST globally
 axios.defaults.headers.common.Authorization = storedToken === undefined ? null : bearerToken;
 
 

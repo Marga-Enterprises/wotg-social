@@ -151,17 +151,20 @@ const ChatSidebar = ({
                         : chat.name || "Unnamed Chat"}
                     </p>
                     <p className={styles.chatMessage}>
-                      {chat.RecentMessage
-                        ? chat.RecentMessage.senderId === currentUserId
-                          ? `You: ${
-                              chat.RecentMessage.content.length > maxLength
-                                ? `${chat.RecentMessage.content.substring(0, maxLength)}...`
-                                : chat.RecentMessage.content
-                            }`
-                          : chat.RecentMessage.content.length > maxLength
+                      {chat.RecentMessage ? (() => {
+                        const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(chat.RecentMessage.content);
+                        const sender = chat.Participants?.find(p => p.user.id === chat.RecentMessage.senderId)?.user;
+
+                        if (isImage) {
+                          return `${sender?.user_fname || 'Someone'} sent an image.`;
+                        }
+
+                        const trimmedContent = chat.RecentMessage.content.length > maxLength
                           ? `${chat.RecentMessage.content.substring(0, maxLength)}...`
-                          : chat.RecentMessage.content
-                        : ""}
+                          : chat.RecentMessage.content;
+
+                        return trimmedContent;
+                      })() : ''}
                     </p>
                   </div>
                 </div>

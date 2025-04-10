@@ -2,28 +2,31 @@ import React, { useEffect, useRef, useState } from 'react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFaceSmile, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faFaceSmile, faPaperPlane, faPaperclip, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './index.module.css';
-import { chatroom } from '../../redux/wotgsocial/actions';
+// import { chatroom } from '../../redux/wotgsocial/actions';
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal, onMessageReaction, userDetails }) => {
+const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal, onMessageReaction, userDetails }) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
     : 'https://community.wotgonline.com/api';
     
   const [message, setMessage] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [activeMessageId, setActiveMessageId] = useState(null);
   const [showMessageReactors, setShowMessageReactors] = useState(false);
   const [selectedMessageReactions, setSelectedMessageReactions] = useState([]);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const longPressTimeout = useRef(null);
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
   const emojiPickerRef = useRef(null); 
+  const fileInputRef = useRef(null);
 
   // Sync initial messages with realtimeMessages
   useEffect(() => {
@@ -37,46 +40,63 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     }
   }, [realtimeMessages,]); // Trigger scroll when messages are updated
 
-  // Listen for real-time messages
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on('new_message', (newMessage) => {
-      if (newMessage.chatroomId === selectedChatroom) {
-        // Avoid duplicate messages for the same chatroom
-        setRealtimeMessages((prev) => [...prev, newMessage]);
-      }
-    });
-
-    return () => {
-      socket.off('new_message');
-    };
-  }, [socket, selectedChatroom]);
-
+  const handleFileIconClick = () => {
+    fileInputRef.current?.click();
+  };
+  
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+  
+  const removePreview = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+  };
+  
   // Handle Send Message
   const handleSend = () => {
-    if (message.trim() && selectedChatroom) {
-      onSendMessage(message); // Send the message
-      setMessage(''); // Clear the input field
+    if ((!message.trim() && !selectedFile) || !selectedChatroom) return;
   
-      // Reset the textarea height to 1 row
-      const textarea = document.querySelector(`.${styles.messageTextarea}`);
-      if (textarea) {
-        textarea.style.height = 'auto'; // Force height reset
-      }
+    // Pass both message and file to the parent handler
+    onSendMessage(message, selectedFile);
+  
+    setMessage(''); // Clear input
+    setSelectedFile(null); // Reset file selection
+  
+    // Reset textarea height
+    const textarea = document.querySelector(`.${styles.messageTextarea}`);
+    if (textarea) {
+      textarea.style.height = 'auto';
     }
-  };  
+  };   
 
   const renderMessageContent = (content) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g; // Regex to detect URLs
+    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(content); // Check if content is an image path
+  
+    if (isImage) {
+      return (
+        <img
+          src={`${backendUrl}${content}`} // Use full path
+          alt="sent-img"
+          className={styles.chatImage}
+        />
+      );
+    }
+  
+    // Otherwise, handle URLs and plain text
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
     return content.split(urlRegex).map((part, index) =>
       urlRegex.test(part) ? (
         <a
           key={index}
           href={part}
-          target="_blank" // Open in a new tab
-          rel="noopener noreferrer" // Prevent security vulnerabilities
-          style={{ color: '#007bff', textDecoration: 'underline' }} // Optional link styling
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#007bff', textDecoration: 'underline' }}
         >
           {part}
         </a>
@@ -84,7 +104,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
         part
       )
     );
-  };
+  };  
 
   const handleShowMessageReactors = (messageId) => {
     const message = messages.find((msg) => msg.id === messageId);
@@ -376,7 +396,16 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
             </div>
 
             <div className={styles.inputContainer}>
-              <div className={styles.textareaWrapper}> {/* Wrapper for positioning */}
+              {previewUrl && (
+                <div className={styles.previewWrapper}>
+                  <img src={previewUrl} alt="Preview" className={styles.previewImage} />
+                  <button className={styles.removePreview} onClick={removePreview} title="Remove image">
+                    <FontAwesomeIcon icon={faTimes} />
+                  </button>
+                </div>
+              )}
+
+              <div className={styles.textareaWrapper}>
                 <textarea
                   value={message}
                   onChange={handleTextareaChange}
@@ -386,25 +415,36 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                   onKeyDown={handleKeyDown}
                 ></textarea>
 
-                <button
-                  className={styles.emojiButton}  
-                >
-                  <FontAwesomeIcon onClick={toggleEmojiPicker} icon={faFaceSmile} className={styles.sendIcon}/>
-                </button>
+                <div className={styles.inputIcons}>
+                  {/* 📎 Attach Icon */}
+                  <button className={styles.attachButton} onClick={handleFileIconClick} title="Attach file">
+                    <FontAwesomeIcon icon={faPaperclip} className={styles.sendIcon} />
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+
+                  {/* 😊 Emoji */}
+                  <button className={styles.emojiButton}>
+                    <FontAwesomeIcon onClick={toggleEmojiPicker} icon={faFaceSmile} className={styles.sendIcon} />
+                  </button>
+
+                  {/* 📨 Send */}
+                  <button className={styles.sendButton}>
+                    <FontAwesomeIcon onClick={handleSend} icon={faPaperPlane} className={styles.sendIcon} />
+                  </button>
+                </div>
               </div>
 
               {showEmojiPicker && (
                 <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
-                  <Picker 
-                    data={data} 
-                    onEmojiSelect={handleEmojiSelect} 
-                  />
+                  <Picker data={data} onEmojiSelect={handleEmojiSelect} />
                 </div>
               )}
-
-              <button className={styles.sendButton}>
-                <FontAwesomeIcon onClick={handleSend} icon={faPaperPlane} className={styles.sendIcon} />
-              </button>
             </div>
 
             {showMessageReactors && (

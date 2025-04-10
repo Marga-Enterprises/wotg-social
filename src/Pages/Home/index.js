@@ -435,24 +435,30 @@ const Page = ({ onToggleMenu  }) => {
     };
     
     // Handle sending a message
-    const handleSendMessage = (messageContent) => {
+    const handleSendMessage = async (messageContent, selectedFile) => {
         if (!selectedChatroom || !user) return;
 
-        const message = {
+        console.log('[[[[[[SELECTED FILE MAIN]]]]]]', selectedFile);
+      
+        if (selectedFile) {
+          const message = {
+            file: selectedFile, // Attach the selected file
+            senderId: user.id,
+            chatroomId: selectedChatroom,
+          };
+          await dispatch(wotgsocial.message.sendFileMessageAction(message));
+        } else if (messageContent?.trim()) {
+          // ✉️ Regular text message
+          const message = {
             content: messageContent,
             senderId: user.id,
             chatroomId: selectedChatroom,
-        };
-
-        // Emit the message to the server via socket
-        socket.emit('send_message', message);
-
-        // Optionally, update local state immediately for UI feedback
-        // setMessages((prevMessages) => [...prevMessages]);
-
-        // If you want to also update via API (or you can choose one):
-        dispatch(wotgsocial.message.sendMessageAction(message));
-    };
+          };
+      
+          await dispatch(wotgsocial.message.sendMessageAction(message));
+        }
+      };
+      
 
     // If the user is authenticated, subscribe them to push notifications
     useEffect(() => {

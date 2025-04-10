@@ -278,51 +278,42 @@ const Page = ({ onToggleMenu  }) => {
     useEffect(() => {
         if (!socket) return;
     
-        // Listen for new messages
         socket.on('new_message', (message) => {
-            // Update the messages state with the new message
+            if (!message?.id || !message?.chatroomId || !message?.senderId) return;
+    
             setMessages((prevMessages) => {
                 const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
                 if (isDuplicate) return prevMessages;
     
-                const updatedMessages = [message, ...prevMessages];
-                // Sort messages in descending order based on createdAt timestamp
-                updatedMessages.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                return updatedMessages;
+                return [message, ...prevMessages].sort((a, b) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
             });
     
-            // Update chatrooms with the new message
             setChatrooms((prevChatrooms) => {
-                const updatedChatrooms = prevChatrooms.map((chat) => {
-                    if (chat.id === message.chatroomId) {
-                        const isUnread = message.senderId !== user?.id; // Check if the message is unread for the current user
-                        return {
-                            ...chat,
-                            RecentMessage: message,
-                            unreadCount: isUnread ? chat.unreadCount + 1 : chat.unreadCount,
-                            hasUnread: chat.hasUnread || isUnread,
-                        };
-                    }
-                    return chat;
+                const updated = prevChatrooms.map((chat) => {
+                    if (chat.id !== message.chatroomId) return chat;
+    
+                    const isUnread = message.senderId !== user?.id;
+                    return {
+                        ...chat,
+                        RecentMessage: message,
+                        unreadCount: isUnread ? (chat.unreadCount || 0) + 1 : chat.unreadCount || 0,
+                        hasUnread: chat.hasUnread || isUnread,
+                    };
                 });
     
-                // Sort chatrooms based on the most recent message's timestamp
-                updatedChatrooms.sort((a, b) => {
-                    const dateA = new Date(a.RecentMessage?.createdAt || 0).getTime();
-                    const dateB = new Date(b.RecentMessage?.createdAt || 0).getTime();
-                    return dateB - dateA; // Sort in descending order (most recent first)
-                });
-    
-                return updatedChatrooms;
+                return updated.sort((a, b) =>
+                    new Date(b.RecentMessage?.createdAt || 0) - new Date(a.RecentMessage?.createdAt || 0)
+                );
             });
         });
     
         return () => {
-            socket.off('new_message'); // Cleanup the listener
+            socket.off('new_message');
         };
     }, [socket, user?.id]);
     
-
     useEffect(() => {
         if (!socket) return;
     

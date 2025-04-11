@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import data from '@emoji-mart/data';
-import Picker from '@emoji-mart/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFaceSmile, faPaperPlane, faPaperclip, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
-
+import debounce from 'lodash/debounce';
 import styles from './index.module.css';
 // import { chatroom } from '../../redux/wotgsocial/actions';
+
+const Picker = React.lazy(() => import('@emoji-mart/react'));
 
 const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal, onMessageReaction, userDetails }) => {
   const backendUrl =
@@ -28,6 +29,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
   const emojiPickerRef = useRef(null); 
   const fileInputRef = useRef(null);
 
+
   // Sync initial messages with realtimeMessages
   useEffect(() => {
     setRealtimeMessages([...messages]);
@@ -44,13 +46,13 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
     fileInputRef.current?.click();
   };
   
-  const handleFileChange = (e) => {
+  const handleFileChange = useCallback(debounce((e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
-  };
+  }, 300), []);  
   
   const removePreview = () => {
     setSelectedFile(null);
@@ -74,45 +76,40 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
     }
   };   
 
-  const renderMessageContent = (content) => {
-    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(content); // Check if content is an image path
-  
+  const renderMessageContent = useCallback((content) => {
+    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(content);
     if (isImage) {
       return (
         <img
-          src={`${backendUrl}${content}`} // Use full path
+          src={`${backendUrl}${content}`}
           alt="sent-img"
           className={styles.chatImage}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
         />
       );
     }
   
-    // Otherwise, handle URLs and plain text
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     return content.split(urlRegex).map((part, index) =>
       urlRegex.test(part) ? (
-        <a
-          key={index}
-          href={part}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: '#007bff', textDecoration: 'underline' }}
-        >
+        <a key={index} href={part} target="_blank" rel="noopener noreferrer">
           {part}
         </a>
       ) : (
         part
       )
     );
-  };  
+  }, [backendUrl]);  
 
-  const handleShowMessageReactors = (messageId) => {
+  const handleShowMessageReactors = useCallback((messageId) => {
     const message = messages.find((msg) => msg.id === messageId);
     if (message && message.reactions.length > 0) {
       setSelectedMessageReactions(message.reactions);
       setShowMessageReactors(true);
     }
-  };
+  }, [messages]);
 
   const closeMessageReactors = () => {
     setShowMessageReactors(false);
@@ -145,14 +142,106 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
     setMessage(textarea.value); // Update the message state
   };
 
-  const handleLongPress = (e, messageId) => {
-    e.preventDefault();
+  const handleShowMessageReacts = useCallback((messageId) => {
+    setActiveMessageId((prevId) => (prevId === messageId ? null : messageId));
+  }, []);
+  
+  const participantsMap = useMemo(() => {
+    const map = new Map();
+    selectedChatroomDetails?.Participants?.forEach(participant => {
+      map.set(participant.user.id, participant.user);
+    });
+    return map;
+  }, [selectedChatroomDetails?.Participants]);
+  
 
-    // Set timeout to trigger after 600ms (adjust as needed)
+  const renderedMessages = useMemo(() => {
+    return realtimeMessages.map((msg, index) => {
+      const isSender = msg.senderId === userId;
+  
+      const receiver = participantsMap.get(msg.senderId);
+  
+      const groupedReactions = msg?.reactions?.reduce((acc, reaction) => {
+        acc[reaction.react] = (acc[reaction.react] || 0) + 1;
+        return acc;
+      }, {});
+  
+      return (
+        <div key={msg.id || index} className={isSender ? styles.messageSender : styles.messageReceiver}>
+          {!isSender && (
+            <img
+              loading="lazy"
+              src={receiver?.user?.user_profile_picture
+                ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
+                : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
+              alt={receiver?.user?.user_fname || "User Avatar"}
+              className={styles.receiverAvatar}
+            />
+          )}
+  
+          <div
+            className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
+            {...(!isSender && {
+              onMouseDown: (e) => handleLongPress(e, msg.id),
+              onTouchStart: (e) => handleLongPress(e, msg.id),
+            })}
+          >
+            {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
+              <p className={styles.senderName}>{msg.sender.user_fname} {msg.sender.user_lname}</p>
+            )}
+            {msg?.content ? renderMessageContent(msg.content) : "No content available"}
+  
+            {msg?.reactions?.length > 0 && (
+              <div
+                onClick={() => handleShowMessageReactors(msg.id)}
+                className={styles.reactionDisplay}
+              >
+                {Object.entries(groupedReactions).map(([type, count], i) => (
+                  <span key={i} className={styles.reactionItem}>
+                    {type === "heart" && "❤️"}
+                    {type === "clap" && "👏"}
+                    {type === "pray" && "🙏"}
+                    {type === "praise" && "🙌"}
+                  </span>
+                ))}
+                <span className={styles.totalReactionCount}>{msg?.reactions?.length}</span>
+              </div>
+            )}
+          </div>
+  
+          {!isSender && (
+            <div>
+              <FontAwesomeIcon
+                onClick={() => handleShowMessageReacts(msg.id)}
+                icon={faFaceSmileRegular}
+                className={styles.messageReactIcon}
+              />
+            </div>
+          )}
+  
+          {activeMessageId === msg.id && !isSender && (
+            <div className={styles.messageReactions}>
+              {["heart", "clap", "pray", "praise"].map((reaction) => (
+                <button key={reaction} onClick={() => handleMessageReaction(reaction, msg.id)}>
+                  {reaction === "heart" && "❤️"}
+                  {reaction === "clap" && "👏"}
+                  {reaction === "pray" && "🙏"}
+                  {reaction === "praise" && "🙌"}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    });
+  }, [realtimeMessages, userId, selectedChatroomDetails, activeMessageId]);  
+
+  const handleLongPress = useCallback((e, messageId) => {
+    e.preventDefault();
     longPressTimeout.current = setTimeout(() => {
       handleShowMessageReacts(messageId);
     }, 600);
-  };
+  }, [handleShowMessageReacts]);  
 
   // Cancel long press if user releases early
   const cancelLongPress = () => {
@@ -208,17 +297,12 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
     };
   }, [showEmojiPicker]);
 
-  const handleMessageReaction = (reaction, messageId) => {
+  const handleMessageReaction = useCallback((reaction, messageId) => {
     if (onMessageReaction) {
-      onMessageReaction(messageId, reaction); 
+      onMessageReaction(messageId, reaction);
     }
-
     setActiveMessageId(null);
-  };
-
-  const handleShowMessageReacts = (messageId) => {
-    setActiveMessageId(activeMessageId === messageId ? null : messageId);
-  };
+  }, [onMessageReaction]);
 
   useEffect(() => {
     if (selectedChatroom === null && isMobile) {
@@ -308,88 +392,8 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
             </div>
             <div ref={messagesEndRef} />
             <div className={styles.messageContainer}>
-              {realtimeMessages.length > 0 ? (
-                realtimeMessages.map((msg, index) => {
-                  const isSender = msg.senderId === userId;
-                  const receiver = selectedChatroomDetails?.Participants?.find(
-                    (participant) => participant.user.id === msg.senderId
-                  );
-
-                  const groupedReactions = msg?.reactions?.reduce((acc, reaction) => {
-                    acc[reaction.react] = (acc[reaction.react] || 0) + 1;
-                    return acc;
-                  }, {});
-
-                  return (
-                    <div key={index} className={isSender ? styles.messageSender : styles.messageReceiver}>
-                      {!isSender && (
-                        <img
-                          loading="lazy"
-                          src={receiver?.user?.user_profile_picture
-                            ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
-                            : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
-                          alt={receiver?.user?.user_fname || "User Avatar"}
-                          className={styles.receiverAvatar}
-                        />
-                      )}
-                      <div
-                        className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
-                        {...(!isSender && {
-                          onMouseDown: (e) => handleLongPress(e, msg.id),
-                          onTouchStart: (e) => handleLongPress(e, msg.id),
-                        })}
-                      >
-                        {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
-                          <p className={styles.senderName}>{msg.sender.user_fname} {msg.sender.user_lname}</p>
-                        )}
-                        {msg?.content ? renderMessageContent(msg.content) : "No content available"}
-
-                        {msg?.reactions?.length > 0 && (
-                          <div
-                            onClick={() => handleShowMessageReactors(msg.id)}
-                            className={styles.reactionDisplay}
-                          >
-                            {Object.entries(groupedReactions).map(([type, count], i) => (
-                              <span key={i} className={styles.reactionItem}>
-                                {type === "heart" && "❤️"}
-                                {type === "clap" && "👏"}
-                                {type === "pray" && "🙏"}
-                                {type === "praise" && "🙌"}
-                              </span>
-                            ))}
-
-                            {/* Display total count of reactions */}
-                            <span className={styles.totalReactionCount}>{msg?.reactions?.length}</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {!isSender && (
-                        <div>
-                          <FontAwesomeIcon
-                            onClick={() => handleShowMessageReacts(msg.id)}
-                            icon={faFaceSmileRegular}
-                            className={styles.messageReactIcon}
-                          />
-                        </div>
-                      )}
-
-                      {/* Reaction Drawer (Only Visible for Active Message) */}
-                      {activeMessageId === msg.id && !isSender && (
-                        <div className={styles.messageReactions}>
-                          {["heart", "clap", "pray", "praise"].map((reaction) => (
-                            <button key={reaction} onClick={() => handleMessageReaction(reaction, msg.id)}>
-                              {reaction === "heart" && "❤️"}
-                              {reaction === "clap" && "👏"}
-                              {reaction === "pray" && "🙏"}
-                              {reaction === "praise" && "🙌"}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
+              {renderedMessages.length > 0 ? (
+                renderedMessages
               ) : (
                 <div className={styles.noMessages}><p>Say 'Hi' and start messaging</p></div>
               )}
@@ -442,7 +446,9 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
 
               {showEmojiPicker && (
                 <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
-                  <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+                  </Suspense>
                 </div>
               )}
             </div>
@@ -498,4 +504,4 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackC
    
 };
 
-export default ChatWindow;
+export default React.memo(ChatWindow);

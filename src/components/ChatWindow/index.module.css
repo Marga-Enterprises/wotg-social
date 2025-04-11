@@ -187,11 +187,11 @@
   transition: opacity 0.3s ease-in-out;
   opacity: 1; /* Start transparent */
   background-color: #e0e0e0; /* Soft gray while loading */
+  cursor: pointer;
 }
 
-/* When loaded */
-.loaded {
-  opacity: 1;
+.chatImage:hover {
+  opacity: 0.7; /* Slightly transparent on hover */
 }
 
 

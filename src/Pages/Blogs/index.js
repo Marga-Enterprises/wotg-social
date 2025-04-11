@@ -89,13 +89,6 @@ const Page = () => {
         return blogs.map((blog) => (
             <div key={blog.id} className={styles.blogCard}>
                 <h3 className={styles.blogTitle}>{blog.blog_title}</h3>
-
-                {account.user_role !== "member" && (
-                    <h3 className={styles.blogRelease}>
-                        Release Date: {convertMomentWithFormatWhole(blog.blog_release_date_and_time)}
-                    </h3>
-                )}
-
                 <div className={styles.blogImageContainer} style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}>
                     <img
                         loading="lazy"
@@ -104,6 +97,10 @@ const Page = () => {
                         className={styles.blogImage}
                     />
                 </div>
+
+                <h3 className={styles.blogRelease}>
+                    Date: {convertMomentWithFormatWhole(blog.blog_release_date_and_time)}
+                </h3>
 
                 <p className={styles.blogBody}>{truncateText(decodeHtmlEntities(stripHtml(blog.blog_body)), 200)}</p>
 

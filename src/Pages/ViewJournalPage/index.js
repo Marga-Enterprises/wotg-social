@@ -139,7 +139,7 @@ const Page = () => {
             <center>
               <div className={styles.backButtonContainer}>
                 <Link to={`/your-journals?page=${page}`} className={styles.backButton}>
-                  ⬅ Back to Journals
+                  ⬅ Back to Journal
                 </Link>
               </div>
             </center>

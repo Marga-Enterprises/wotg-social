@@ -68,7 +68,7 @@ const ChatSidebar = ({
               <a className={styles.worshipLink} href="/bible">Bible</a>
               <a className={styles.worshipLink} href="/worship">Worship</a>
               <a className={styles.worshipLink} href="/blogs">Devotion</a>
-              <a className={styles.worshipLink} href="/your-journals">Journals</a>
+              <a className={styles.worshipLink} href="/your-journals">Journal</a>
             </div>
           </div>
         </div>

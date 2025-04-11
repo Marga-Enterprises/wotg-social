@@ -109,7 +109,7 @@ const Page = () => {
         <LoadingSpinner />
       ) : (
         <div className={styles.journalWrapper}>
-          <h2 className={styles.heading}>Your Journals</h2>
+          <h2 className={styles.heading}>Your Journal</h2>
 
           <div className={styles.goBackWrapper}>
             <button onClick={handleGoBack} className={styles.goBackButton}>

@@ -179,12 +179,19 @@
 }
 
 .chatImage {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 20rem;
+  width: 100%;
+  height: auto;
+  display: block;
   border-radius: 10px;
-  margin-top: 6px;
-  cursor: pointer;
-  object-fit: cover;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1; /* Start transparent */
+  background-color: #e0e0e0; /* Soft gray while loading */
+}
+
+/* When loaded */
+.loaded {
+  opacity: 1;
 }
 
 

@@ -5,6 +5,7 @@
   import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
   import debounce from 'lodash/debounce';
   import styles from './index.module.css';
+  import LoadingSpinner from '../LoadingSpinner';
 
   // COMPONENT IMPORTS
   const MessageImageModal = lazy(() => import('../MessageImageModal'));
@@ -457,7 +458,7 @@
 
                 {showEmojiPicker && (
                   <div ref={emojiPickerRef} className={styles.emojiPickerContainer}>
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<LoadingSpinner />}>
                       <Picker data={data} onEmojiSelect={handleEmojiSelect} />
                     </Suspense>
                   </div>
@@ -492,7 +493,7 @@
                 </div>
               )}
 
-              <Suspense fallback={<div>Loading image...</div>}>
+              <Suspense fallback={<LoadingSpinner />}>
                 {modalImageUrl && (
                   <MessageImageModal
                     imageUrl={modalImageUrl}

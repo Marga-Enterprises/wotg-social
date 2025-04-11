@@ -4,6 +4,7 @@ import Picker from '@emoji-mart/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFaceSmile, faPaperPlane, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import styles from './index.module.css';
 
@@ -298,28 +299,44 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   return (
     <div className={styles.chatContainer}>
       <div className={styles.reactionContainer}>
-        {reactions.map((reaction) => {
-          const randomX = Math.random() * 80 - 40; // Smooth swerving left-right movement
-          const randomSpeed = Math.random() * 1 + 0.6; // Faster speed (0.6s - 1.6s)
-          const randomStart = Math.random() * 80 + 10; // Random starting position (10% - 90%)
+        <AnimatePresence>
+          {reactions.map((reaction) => {
+            const randomX = Math.random() * 80 - 40;
+            const randomStart = Math.random() * 80 + 10;
+            const randomSpeed = Math.random() * 1 + 0.6;
 
-          return (
-            <span
-              key={reaction.id}
-              className={`${styles.floatingReaction} ${styles[reaction.type]}`}
-              style={{
-                "--x-move": `${randomX}px`, // Left-right swerving
-                "--speed": `${randomSpeed}s`, // Smoother speed range
-                left: `${randomStart}%`, // Randomized starting position along bottom
-              }}
-            >
-              {reaction.type === "heart" && "❤️"}
-              {reaction.type === "clap" && "👏"}
-              {reaction.type === "pray" && "🙏"}
-              {reaction.type === "praise" && "🙌"}
-            </span>
-          );
-        })}
+            const uniqueKey = `${reaction.id}-${Date.now()}-${Math.random()}`;
+
+            return (
+              <motion.span
+                key={uniqueKey}
+                className={`${styles.floatingReaction} ${styles[reaction.type]}`}
+                initial={{ opacity: 0, y: 0, scale: 0.8, x: 0 }}
+                animate={{ 
+                  opacity: [0, 1, 0],
+                  y: [0, -200, -350],
+                  x: [0, randomX * 0.5, randomX],
+                  scale: [0.8, 1, 0.7],
+                }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: randomSpeed + 3,
+                  ease: "easeInOut",
+                }}
+                style={{
+                  left: `${randomStart}%`,
+                  position: 'absolute',
+                  pointerEvents: 'none',
+                }}
+              >
+                {reaction.type === "heart" && "❤️"}
+                {reaction.type === "clap" && "👏"}
+                {reaction.type === "pray" && "🙏"}
+                {reaction.type === "praise" && "🙌"}
+              </motion.span>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       <div ref={messagesEndRef} />

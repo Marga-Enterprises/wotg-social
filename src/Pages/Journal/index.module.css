@@ -24,10 +24,10 @@
 
 .field textarea {
   width: 100%;
-  padding: 1rem;
+  padding: .2rem;
   border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: .8rem;
   font-family: inherit;
   line-height: 1.5;
   resize: vertical;
@@ -166,13 +166,14 @@
   max-height: 1000px;
   opacity: 1;
   padding: 1rem;
+  overflow-y: auto;
 }
 
 /* 🧠 Mobile Responsive */
 @media (max-width: 600px) {
   .journalWrapper {
-    margin: 4rem 1rem 2rem 1rem;
-    padding: 1.5rem;
+    /*margin: 4rem 1rem 2rem 1rem;*/
+    padding: .5rem;
   }
 
   .submitWrapper {

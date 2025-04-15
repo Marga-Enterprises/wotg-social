@@ -28,7 +28,7 @@ export const sendMessageAction = (payload) => async (dispatch) => {
     if (res.success) {
       dispatch({
         type: types.MESSAGE_CREATE_SUCCESS,
-        payload: res.data.docs,
+        payload: res.data,
       });
     } else {
       dispatch({
@@ -46,7 +46,7 @@ export const sendFileMessageAction = (payload) => async (dispatch) => {
     if (res.success) {
       dispatch({
         type: types.MESSAGE_CREATE_SUCCESS, // ✅ Reuse same reducer type
-        payload: res.data.docs, // File messages return a single message
+        payload: res.data, // File messages return a single message
       });
     } else {
       dispatch({

@@ -278,21 +278,21 @@ const Page = ({ onToggleMenu  }) => {
     useEffect(() => {
         if (!socket) return;
     
-        socket.on('new_message', (message) => {
-            // console.log('[[[[[[[[New message received:]]]]]]]]', message);
-            // if (!message?.id || !message?.chatroomId || !message?.senderId) return;
-    
+        const handleNewMessage = (message) => {
             setMessages((prevMessages) => {
-                // console.log('[[[[[[[[Previous messages:]]]]]]]]', prevMessages);
-                //const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
-                // if (isDuplicate) return prevMessages;
+                /*const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
     
-                return [message, ...prevMessages].sort((a, b) =>
+                if (isDuplicate) {
+                    console.log('[⚠️ Duplicate message skipped]', message.id);
+                    return prevMessages;
+                }*/
+    
+                const updatedMessages = [message, ...prevMessages].sort((a, b) =>
                     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
+    
+                return updatedMessages;
             });
-
-            // console.log('[[[[[[[[Message after update:]]]]]]]]', messages);
     
             setChatrooms((prevChatrooms) => {
                 const updated = prevChatrooms.map((chat) => {
@@ -311,12 +311,15 @@ const Page = ({ onToggleMenu  }) => {
                     new Date(b.RecentMessage?.createdAt || 0) - new Date(a.RecentMessage?.createdAt || 0)
                 );
             });
-        });
+        };
+    
+        socket.on('new_message', handleNewMessage);
     
         return () => {
-            socket.off('new_message');
+            socket.off('new_message', handleNewMessage);
         };
     }, [socket, user?.id]);
+    
     
     useEffect(() => {
         if (!socket) return;

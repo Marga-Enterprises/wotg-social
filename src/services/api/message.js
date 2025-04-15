@@ -24,11 +24,5 @@ export async function sendFile(payload) {
     }
   }
 
-  // 🔍 Log FormData entries
-  console.log('[[[[[[[Sending file:]]]]]]]');
-  for (let pair of formData.entries()) {
-    console.log(`${pair[0]}:`, pair[1]);
-  }
-
   return POST_FORM_DATA('/messages/send-file', { formData });
 }

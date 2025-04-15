@@ -1,14 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, Suspense, lazy, startTransition, useRef, useState, useCallback } from 'react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react'
+import debounce from 'lodash/debounce';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFaceSmile, faPaperPlane, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faFaceSmile, faPaperPlane, faHeart, faPaperclip, faTimes  } from '@fortawesome/free-solid-svg-icons';
 import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import styles from './index.module.css';
+import styles from './index.module.css'
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId, selectedChatroomDetails, onSendReaction, onMessageReaction, reactions }) => {
+// COMPONENT IMPORTS
+import LoadingSpinner from '../LoadingSpinner';
+const MessageImageModal = lazy(() => import('../MessageImageModal'));
+
+
+const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, selectedChatroomDetails, onSendReaction, onMessageReaction, reactions, userRole }) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
@@ -24,11 +30,14 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
   const [mentionList, setMentionList] = useState([]); // List of participants
   const [showMentionList, setShowMentionList] = useState(false); // Controls mention dropdown visibility
   const [cursorPosition, setCursorPosition] = useState(0); // Tracks cursor position
-
-
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [modalImageUrl, setModalImageUrl] = useState(null);
+  
   const longPressTimeout = useRef(null);
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
   const emojiPickerRef = useRef(null); 
+  const fileInputRef = useRef(null);
 
   // Sync initial messages with realtimeMessages
   useEffect(() => {
@@ -41,24 +50,6 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
       messagesEndRef.current.scrollIntoView({ behavior: 'auto' }); 
     }
   }, [realtimeMessages,]); // Trigger scroll when messages are updated
-
-  // Listen for real-time messages
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on('new_message', (newMessage) => {
-      if (newMessage.chatroomId === selectedChatroom) {
-        // Avoid duplicate messages for the same chatroom
-        setRealtimeMessages((prev) => [...prev, newMessage]);
-      }
-    });
-
-    return () => {
-      socket.off('new_message');
-    };
-  }, [socket, selectedChatroom]);
-
-
 
   const handleLongPress = (e, messageId) => {
     e.preventDefault();
@@ -89,24 +80,45 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
 
   // Handle Send Message
   const handleSend = () => {
-    if (message.trim() && selectedChatroom) {
-      onSendMessage(message); // Send the message
-      setMessage(''); // Clear the input field
+    if ((!message.trim() && !selectedFile) || !selectedChatroom) return;
   
-      // Reset the textarea height to 1 row
-      const textarea = document.querySelector(`.${styles.messageTextarea}`);
-      if (textarea) {
-        textarea.style.height = 'auto'; // Force height reset
-      }
+    // Pass both message and file to the parent handler
+    onSendMessage(message, selectedFile);
+  
+    setMessage(''); // Clear input
+    removePreview(); // Reset file selection
+  
+    // Reset textarea height
+    const textarea = document.querySelector(`.${styles.messageTextarea}`);
+    if (textarea) {
+      textarea.style.height = 'auto';
     }
-  };
+  }; 
   
   const handleSendReaction = (reaction) => {
-      console.log('[[[REACTION CHAT STREAM COMPONENT]]]', reaction);  
+      // console.log('[[[REACTION CHAT STREAM COMPONENT]]]', reaction);  
 
       if (onSendReaction) {
           onSendReaction(reaction);
       }
+  };
+
+  const handleFileIconClick = () => {
+    // console.log('File icon clicked!');
+    fileInputRef.current?.click();
+  };
+  
+  const handleFileChange = useCallback(debounce((e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  }, 300), []);  
+  
+  const removePreview = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
   };
 
   const handleMessageReaction = (reaction, messageId) => {
@@ -117,39 +129,39 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     setActiveMessageId(null);
  };
 
-  const renderMessageContent = (content) => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g; // Detects URLs
-    const mentionRegex = /(^|\s)(@\w+(?:\s\w+)?)(?=\s|$)/g; // Captures mentions only (single or double names)
-
-    return content.split(urlRegex).map((part, index) => {
-      if (urlRegex.test(part)) {
-        // Convert URLs into clickable links
-        return (
-          <a
-            key={index}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: '#007bff', textDecoration: 'underline' }}
-          >
-            {part}
-          </a>
-        );
-      } else {
-        // Format mentions properly without affecting other text
-        return part.split(mentionRegex).map((subPart, subIndex) => {
-          if (subPart.trim().startsWith("@")) {
-            return (
-              <strong key={subIndex} style={{ fontWeight: 'bold' }}>
-                {subPart}
-              </strong>
-            );
-          }
-          return subPart; // Normal text remains unchanged
-        });
-      }
+  const handleImageClick = (url) => {
+    startTransition(() => {
+      setModalImageUrl(url);
     });
-  };
+  }; 
+
+  const renderMessageContent = useCallback((content, type) => {
+    const isImage = type === 'file';
+    if (isImage) {
+      return (
+        <img
+          src={`${backendUrl}${content}`}
+          alt="sent-img"
+          className={styles.chatImage}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onClick={() => handleImageClick(`${backendUrl}${content}`)}
+        />
+      );
+    }
+  
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return content.split(urlRegex).map((part, index) =>
+      urlRegex.test(part) ? (
+        <a key={index} href={part} target="_blank" rel="noopener noreferrer">
+          {part}
+        </a>
+      ) : (
+        part
+      )
+    );
+  }, [backendUrl, handleImageClick]);  
 
   // Handle Enter key press to send the message
   const handleKeyDown = (e) => {
@@ -294,7 +306,6 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
     setShowMessageReactors(false);
     setSelectedMessageReactions([]);
   };
-  
 
   return (
     <div className={styles.chatContainer}>
@@ -387,7 +398,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                       )}
 
                       <p className={styles.messageContent}>
-                        {msg?.content ? renderMessageContent(msg.content) : "No content available"}
+                        {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
                       </p>
 
                       {/* Show Reactions Below Message */}
@@ -439,6 +450,7 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
                   </div>
                 );
               })
+              
           ) : (
             <div className={styles.noMessages}>
               <p>Say 'Hi' and start messaging</p>
@@ -457,6 +469,20 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
       )}
 
       <div className={styles.inputContainer}>
+        {previewUrl && (
+          <div 
+            className={styles.previewWrapper}
+            style={{
+              bottom: (userRole === 'admin' || userRole === 'owner') ? '8.5rem' : '4.5rem'
+            }}
+          >
+            <img src={previewUrl} alt="Preview" className={styles.previewImage} />
+            <button className={styles.removePreview} onClick={removePreview} title="Remove image">
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          </div>
+        )}
+
         <div className={styles.textareaWrapper}> {/* Wrapper for positioning */}
           <textarea
             value={message}
@@ -466,6 +492,14 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
             rows={1}
             onKeyDown={handleKeyDown}
           ></textarea>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
 
           <button
             className={styles.emojiButton}  
@@ -482,6 +516,10 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
             />
           </div>
         )}
+
+        <button className={styles.attachButton} onClick={handleFileIconClick} title="Attach file">
+          <FontAwesomeIcon icon={faPaperclip} className={styles.sendIcon} />
+        </button>
 
         <div className={styles.reactionButton}>
           {/* Toggle Reaction Drawer on Click */}
@@ -531,6 +569,15 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, socket, userId,
           </div>
         </div>
       )}
+
+      <Suspense fallback={<LoadingSpinner />}>
+        {modalImageUrl && (
+          <MessageImageModal
+            imageUrl={modalImageUrl}
+            onClose={() => setModalImageUrl(null)}
+          />
+        )}
+      </Suspense>
     </div>
   );
    

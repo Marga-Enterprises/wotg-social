@@ -477,7 +477,7 @@ const Page = ({ onToggleMenu  }) => {
       
           await dispatch(wotgsocial.message.sendMessageAction(message))
         }
-      };
+    };
       
 
     // If the user is authenticated, subscribe them to push notifications

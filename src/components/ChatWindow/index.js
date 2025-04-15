@@ -70,7 +70,7 @@
       onSendMessage(message, selectedFile);
     
       setMessage(''); // Clear input
-      setSelectedFile(null); // Reset file selection
+      removePreview(); // Reset file selection
     
       // Reset textarea height
       const textarea = document.querySelector(`.${styles.messageTextarea}`);
@@ -79,8 +79,9 @@
       }
     };   
 
-    const renderMessageContent = useCallback((content) => {
-      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(content);
+    const renderMessageContent = useCallback((content, type) => {
+      const isImage = type === 'file';
+
       if (isImage) {
         return (
           <img
@@ -193,7 +194,7 @@
               {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
                 <p className={styles.senderName}>{msg.sender.user_fname} {msg.sender.user_lname}</p>
               )}
-              {msg?.content ? renderMessageContent(msg.content) : "No content available"}
+              {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
     
               {msg?.reactions?.length > 0 && (
                 <div

@@ -279,16 +279,20 @@ const Page = ({ onToggleMenu  }) => {
         if (!socket) return;
     
         socket.on('new_message', (message) => {
-            if (!message?.id || !message?.chatroomId || !message?.senderId) return;
+            // console.log('[[[[[[[[New message received:]]]]]]]]', message);
+            // if (!message?.id || !message?.chatroomId || !message?.senderId) return;
     
             setMessages((prevMessages) => {
-                const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
-                if (isDuplicate) return prevMessages;
+                // console.log('[[[[[[[[Previous messages:]]]]]]]]', prevMessages);
+                //const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
+                // if (isDuplicate) return prevMessages;
     
                 return [message, ...prevMessages].sort((a, b) =>
                     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
             });
+
+            // console.log('[[[[[[[[Message after update:]]]]]]]]', messages);
     
             setChatrooms((prevChatrooms) => {
                 const updated = prevChatrooms.map((chat) => {
@@ -428,25 +432,47 @@ const Page = ({ onToggleMenu  }) => {
     // Handle sending a message
     const handleSendMessage = async (messageContent, selectedFile) => {
         if (!selectedChatroom || !user) return;
-
-        console.log('[[[[[[SELECTED FILE MAIN]]]]]]', selectedFile);
       
         if (selectedFile) {
           const message = {
             file: selectedFile, // Attach the selected file
             senderId: user.id,
             chatroomId: selectedChatroom,
+            type: 'file', // Specify the type as 'file'
           };
-          await dispatch(wotgsocial.message.sendFileMessageAction(message));
+          await dispatch(wotgsocial.message.sendFileMessageAction(message))
+          .then((res) => {
+              // console.log('[[[[[[[SENT MESSAGE 2 ]]]]]]', res);
+              if (res) {
+              const sentMessage = res.data;
+                  // console.log('[[[[[[[SENT MESSAGE 3 ]]]]]', sentMessage);
+
+                  const { content, senderId, chatroomId } = sentMessage;
+
+                  if (socket) {
+                      // console.log('[[[[[[[SENT MESSAGE 4 ]]]]]', socket);  
+                      
+                      socket.emit('new_message', {
+                        content,
+                        senderId,
+                        chatroomId,
+                        type: 'file', // Specify the type as 'file'
+                    });
+                  }
+              }
+          })
+          .catch((err) => {
+              console.error('File message dispatch failed:', err);
+          });
         } else if (messageContent?.trim()) {
-          // ✉️ Regular text message
           const message = {
             content: messageContent,
             senderId: user.id,
             chatroomId: selectedChatroom,
+            type: 'text', // Specify the type as 'text'
           };
       
-          await dispatch(wotgsocial.message.sendMessageAction(message));
+          await dispatch(wotgsocial.message.sendMessageAction(message))
         }
       };
       

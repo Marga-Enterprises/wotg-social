@@ -143,6 +143,23 @@
   margin-left: 8px;
 }
 
+.chatImage {
+  max-width: 20rem;
+  min-width: 10rem;
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1; /* Start transparent */
+  background-color: #e0e0e0; /* Soft gray while loading */
+  cursor: pointer;
+}
+
+.chatImage:hover {
+  opacity: 0.7; /* Slightly transparent on hover */
+}
+
 .previewWrapper {
   position: absolute;
   right: 1rem;

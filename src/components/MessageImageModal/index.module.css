@@ -17,12 +17,14 @@
   max-height: 95vh;
   display: flex;
   align-items: center;
+  padding: 1rem;
   justify-content: center;
   animation: fadeIn 0.2s ease-out;
 }
 
 .fullImage {
   max-width: 40rem;
+  min-width: 40rem;
   height: auto;
   width: 100%;
   border-radius: 8px;

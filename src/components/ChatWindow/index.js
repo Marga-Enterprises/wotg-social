@@ -12,7 +12,19 @@
 
   const Picker = React.lazy(() => import('@emoji-mart/react'));
 
-  const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, onBackClick, isMobile, selectedChatroomDetails, onOpenAddParticipantModal, onMessageReaction, userDetails }) => {
+  const ChatWindow = ({ 
+    messages, 
+    onSendMessage, 
+    selectedChatroom, 
+    userId, 
+    onBackClick, 
+    isMobile, 
+    selectedChatroomDetails, 
+    onOpenAddParticipantModal, 
+    onMessageReaction, 
+    userDetails,
+    uploading
+  }) => {
     const backendUrl =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:5000'
@@ -37,13 +49,12 @@
     useEffect(() => {
       setRealtimeMessages([...messages]);
     }, [messages]);
-
-    // Scroll to the bottom when component mounts or when new messages are added (initially)
-    useEffect(() => {
+    
+    const scrollToBottom = () => {
       if (messagesEndRef.current) {
         messagesEndRef.current.scrollIntoView({ behavior: 'auto' }); 
       }
-    }, [realtimeMessages,]); // Trigger scroll when messages are updated
+    }
 
     const handleFileIconClick = () => {
       fileInputRef.current?.click();
@@ -69,30 +80,40 @@
       // Pass both message and file to the parent handler
       onSendMessage(message, selectedFile);
     
-      setMessage(''); // Clear input
-      removePreview(); // Reset file selection
+      setMessage('');       // Clear input
+      removePreview();      // Reset file selection
     
       // Reset textarea height
       const textarea = document.querySelector(`.${styles.messageTextarea}`);
       if (textarea) {
         textarea.style.height = 'auto';
       }
-    };   
+    
+      // ✅ Wait for DOM update and then scroll to bottom safely
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          scrollToBottom();
+        });
+      }, 100); // zero delay works best when using rAF
+    };
+    
 
     const renderMessageContent = useCallback((content, type) => {
       const isImage = type === 'file';
 
       if (isImage) {
         return (
-          <img
-            src={`${backendUrl}${content}`}
-            alt="sent-img"
-            className={styles.chatImage}
-            loading="lazy"
-            decoding="async"
-            referrerPolicy="no-referrer"
-            onClick={() => handleImageClick(`${backendUrl}${content}`)}
-          />
+          <>
+            <img
+              src={`${backendUrl}${content}`}
+              alt="sent-img"
+              className={styles.chatImage}
+              loading="lazy"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              onClick={() => handleImageClick(`${backendUrl}${content}`)}
+            />
+          </>
         );
       }
     
@@ -403,15 +424,28 @@
                     </div>
                   )}
               </div>
-              <div ref={messagesEndRef} />
+              
               <div className={styles.messageContainer}>
+                <div ref={messagesEndRef} />
+
+                {uploading && (
+                  <div className={styles.uploadingMessage}>
+                    <div className={styles.uploadingBubble}>
+                      <span className={styles.uploadingDots}>Uploading Image<span className={styles.dot}>.</span><span className={styles.dot}>.</span><span className={styles.dot}>.</span></span>
+                    </div>
+                  </div>
+                )}
+
                 {renderedMessages.length > 0 ? (
-                  renderedMessages
+                  <>
+                    {renderedMessages}
+                  </>
                 ) : (
-                  <div className={styles.noMessages}><p>Say 'Hi' and start messaging</p></div>
+                  <div className={styles.noMessages}>
+                    <p>Say 'Hi' and start messaging</p>
+                  </div>
                 )}
               </div>
-
               <div className={styles.inputContainer}>
                 {previewUrl && (
                   <div className={styles.previewWrapper}>

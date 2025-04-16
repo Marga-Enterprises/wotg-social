@@ -14,7 +14,17 @@ import LoadingSpinner from '../LoadingSpinner';
 const MessageImageModal = lazy(() => import('../MessageImageModal'));
 
 
-const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, selectedChatroomDetails, onSendReaction, onMessageReaction, reactions, userRole }) => {
+const ChatWindow = ({ messages, 
+  onSendMessage, 
+  selectedChatroom, 
+  userId, 
+  selectedChatroomDetails, 
+  onSendReaction, 
+  onMessageReaction, 
+  reactions, 
+  userRole,
+  uploading
+}) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:5000'
@@ -350,8 +360,16 @@ const ChatWindow = ({ messages, onSendMessage, selectedChatroom, userId, selecte
         </AnimatePresence>
       </div>
 
-      <div ref={messagesEndRef} />
       <div className={styles.messageContainer}>
+        <div ref={messagesEndRef} />
+        {uploading && (
+          <div className={styles.uploadingMessage}>
+            <div className={styles.uploadingBubble}>
+              <span className={styles.uploadingDots}>Uploading Image<span className={styles.dot}>.</span><span className={styles.dot}>.</span><span className={styles.dot}>.</span></span>
+            </div>
+          </div>
+        )}
+
         {realtimeMessages &&
           realtimeMessages.length > 0 ? (
             realtimeMessages

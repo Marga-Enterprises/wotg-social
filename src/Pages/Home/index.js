@@ -35,6 +35,7 @@ const Page = ({ onToggleMenu  }) => {
     const [isModalOpenForAddParticipant, setIsModalOpenForAddParticipant] = useState(false); // State to manage modal visibility
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
+    const [uploading, setUploading] = useState(false);
 
     const setHideNavbar = useSetHideNavbar();
 
@@ -436,50 +437,54 @@ const Page = ({ onToggleMenu  }) => {
     const handleSendMessage = async (messageContent, selectedFile) => {
         if (!selectedChatroom || !user) return;
       
+        // 1. If file exists, send file first
         if (selectedFile) {
-          const message = {
-            file: selectedFile, // Attach the selected file
+          const fileMessage = {
+            file: selectedFile,
             senderId: user.id,
             chatroomId: selectedChatroom,
-            type: 'file', // Specify the type as 'file'
+            type: 'file',
           };
-          await dispatch(wotgsocial.message.sendFileMessageAction(message))
-          .then((res) => {
-              // console.log('[[[[[[[SENT MESSAGE 2 ]]]]]]', res);
-              if (res) {
-              const sentMessage = res.data;
-                  // console.log('[[[[[[[SENT MESSAGE 3 ]]]]]', sentMessage);
+      
+          try {
+            setUploading(true);
+            const fileRes = await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
 
-                  const { content, senderId, chatroomId } = sentMessage;
+            if (fileRes) {
+              const { content, senderId, chatroomId } = fileRes.data;
+              if (socket) {
+                socket.emit('new_message', {
+                  content,
+                  senderId,
+                  chatroomId,
+                  type: 'file',
+                });
 
-                  if (socket) {
-                      // console.log('[[[[[[[SENT MESSAGE 4 ]]]]]', socket);  
-                      
-                      socket.emit('new_message', {
-                        content,
-                        senderId,
-                        chatroomId,
-                        type: 'file', // Specify the type as 'file'
-                    });
-                  }
+                setUploading(false);
               }
-          })
-          .catch((err) => {
-              console.error('File message dispatch failed:', err);
-          });
-        } else if (messageContent?.trim()) {
-          const message = {
+            }
+          } catch (err) {
+            console.error('File message dispatch failed:', err);
+          }
+        }
+      
+        // 2. If message content exists, send text after
+        if (messageContent?.trim()) {
+          const textMessage = {
             content: messageContent,
             senderId: user.id,
             chatroomId: selectedChatroom,
-            type: 'text', // Specify the type as 'text'
+            type: 'text',
           };
       
-          await dispatch(wotgsocial.message.sendMessageAction(message))
+          try {
+            await dispatch(wotgsocial.message.sendMessageAction(textMessage));
+          } catch (err) {
+            console.error('Text message dispatch failed:', err);
+          }
         }
     };
       
-
     // If the user is authenticated, subscribe them to push notifications
     useEffect(() => {
         if (isAuthenticated) {
@@ -515,6 +520,7 @@ const Page = ({ onToggleMenu  }) => {
                         className={isMobile ? styles.chatWindowVisible : ''} 
                         onBackClick={handleBackClick}
                         isMobile={isMobile}
+                        uploading={uploading}
                         onMessageReaction={handleReactMessage}
                         onOpenAddParticipantModal={handleOpenAddParticipantModal}
                         userDetails={user}

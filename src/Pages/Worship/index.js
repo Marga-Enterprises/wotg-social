@@ -108,56 +108,56 @@ const Page = () => {
   }, [fetchMessages, isAuthenticated]);
 
   // Handle sending a message
-    const handleSendMessage = async (messageContent, selectedFile) => {
-      if (!user) return;
-    
-      // 1. If file exists, send file first
-      if (selectedFile) {
-        const fileMessage = {
-          file: selectedFile,
-          senderId: user.id,
-          chatroomId: wotglivechatroom,
-          type: 'file',
-        };
-    
-        try {
-          setUploading(true);
-          const fileRes = await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
+  const handleSendMessage = async (messageContent, selectedFile) => {
+    if (!user) return;
+  
+    // 1. If file exists, send file first
+    if (selectedFile) {
+      const fileMessage = {
+        file: selectedFile,
+        senderId: user.id,
+        chatroomId: wotglivechatroom,
+        type: 'file',
+      };
+  
+      try {
+        setUploading(true);
+        const fileRes = await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
 
-          if (fileRes) {
-            const { content, senderId, chatroomId } = fileRes.data;
-            if (socket) {
-              socket.emit('new_message', {
-                content,
-                senderId,
-                chatroomId,
-                type: 'file',
-              });
+        if (fileRes) {
+          const { content, senderId, chatroomId } = fileRes.data;
+          if (socket) {
+            socket.emit('new_message', {
+              content,
+              senderId,
+              chatroomId,
+              type: 'file',
+            });
 
-              setUploading(false);
-            }
+            setUploading(false);
           }
-        } catch (err) {
-          console.error('File message dispatch failed:', err);
         }
+      } catch (err) {
+        console.error('File message dispatch failed:', err);
       }
-    
-      // 2. If message content exists, send text after
-      if (messageContent?.trim()) {
-        const textMessage = {
-          content: messageContent,
-          senderId: user.id,
-          chatroomId: wotglivechatroom,
-          type: 'text',
-        };
-    
-        try {
-          await dispatch(wotgsocial.message.sendMessageAction(textMessage));
-        } catch (err) {
-          console.error('Text message dispatch failed:', err);
-        }
+    }
+  
+    // 2. If message content exists, send text after
+    if (messageContent?.trim()) {
+      const textMessage = {
+        content: messageContent,
+        senderId: user.id,
+        chatroomId: wotglivechatroom,
+        type: 'text',
+      };
+  
+      try {
+        await dispatch(wotgsocial.message.sendMessageAction(textMessage));
+      } catch (err) {
+        console.error('Text message dispatch failed:', err);
       }
-    };
+    }
+  };
 
   const handleReactMessage = (messageId, reactionType) => {
     if (!socket) {

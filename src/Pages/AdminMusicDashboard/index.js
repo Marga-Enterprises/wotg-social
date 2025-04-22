@@ -1,0 +1,197 @@
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { wotgsocial } from "../../redux/combineActions";
+
+// Components
+import LoadingSpinner from "../../components/LoadingSpinner";
+import AddAlbumModal from "../../components/AddAlbumModal";
+
+// Styles
+import styles from "./index.module.css";
+
+// FontAwesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons';
+
+const Page = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const loadingRef = useRef(false);
+    const location = useLocation();
+
+    const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+    const currentPage = useMemo(() => parseInt(queryParams.get("page")) || 1, [queryParams]);
+
+    const backendUrl = useMemo(() => {
+        return process.env.NODE_ENV === "development"
+            ? "http://localhost:5000"
+            : "https://community.wotgonline.com/api";
+    }, []);
+
+    const [loading, setLoading] = useState(false);
+    const [pageSize] = useState(5);
+    const [albums, setAlbums] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [pageDetails, setPageDetails] = useState({
+        totalRecords: 0,
+        pageIndex: currentPage,
+        totalPages: 0
+    });
+
+    const handleAlbumsList = useCallback(async (pageIndex = 1) => {
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        try {
+            const res = await dispatch(wotgsocial.album.getAlbumsByParamsAction({ pageSize, pageIndex }));
+            if (res.success && res.data?.albums) {
+                setAlbums(res.data.albums);
+                setPageDetails({
+                    totalRecords: res.data.totalRecords,
+                    pageIndex: res.data.pageIndex,
+                    totalPages: res.data.totalPages,
+                });
+
+                // ✅ Sync page to URL
+                navigate(`?page=${pageIndex}`, { replace: false });
+            }
+        } catch (error) {
+            console.error("Error fetching albums:", error);
+        } finally {
+            loadingRef.current = false;
+            setLoading(false);
+        }
+    }, [dispatch, navigate]);
+
+    const handleDeleteAlbum = useCallback(async (id) => {
+        if (!window.confirm("Are you sure you want to delete this album? All its music and playlist links will be removed. This action cannot be undone.")) return;
+
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        try {
+            const res = await dispatch(wotgsocial.album.deleteAlbumAction({ id }));
+            if (res.success) {
+                await handleAlbumsList(pageDetails.pageIndex);
+            }
+        } catch (error) {
+            console.error("Error deleting album:", error);
+        } finally {
+            loadingRef.current = false;
+            setLoading(false);
+        }
+    }, [dispatch, handleAlbumsList, pageDetails.pageIndex]);
+
+    useEffect(() => {
+        handleAlbumsList(currentPage);
+    }, [handleAlbumsList, currentPage]);
+
+    return (
+        <>
+            {loading && <LoadingSpinner />}
+            <div className={styles.container}>
+                <h1 className={styles.heading}>Albums</h1>
+                <p className={styles.subheading}>Explore and manage your released albums here.</p>
+
+                <div className={styles.toolbar}>
+                    <button className={styles.addButton} onClick={() => setShowModal(true)}>
+                    <FontAwesomeIcon icon={faPlus} /> Add Album
+                    </button>
+                </div>
+
+                <div className={styles.albumList}>
+                    {albums?.length > 0 ? (
+                        albums.map(album => (
+                            <div key={album.id} className={styles.albumCard}>
+                                <div className={styles.albumThumbWrapper}>
+                                    <img
+                                        src={`${backendUrl}/uploads/${album.cover_image || "default-cover.png"}`}
+                                        alt={album.title}
+                                        loading="lazy"
+                                        className={styles.albumImage}
+                                    />
+                                </div>
+                                <div className={styles.albumInfo}>
+                                    <h3>{album.title}</h3>
+                                    <p><span><strong>Artist:</strong></span> {album.artist_name}</p>
+                                    <p><span><strong>Genre:</strong></span> {album.genre || "N/A"}</p>
+                                </div>
+
+                                <div className={styles.albumCardActions}>
+                                    <button
+                                        className={styles.deleteButton}
+                                        onClick={() => handleDeleteAlbum(album.id)}
+                                        title="Delete Album"
+                                    >
+                                        <FontAwesomeIcon icon={faTrash} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        !loading && <p className={styles.noData}>No albums found.</p>
+                    )}
+                </div>
+
+                {/* Pagination Controls */}
+                <div className={styles.pagination}>
+                    {/* ⬅ Prev */}
+                    <button
+                        className={styles.arrowButton}
+                        onClick={() => handleAlbumsList(pageDetails.pageIndex - 1)}
+                        disabled={pageDetails.pageIndex <= 1 || loading}
+                    >
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                    </button>
+
+                    {/* Page buttons */}
+                    {(() => {
+                        const pageButtons = [];
+                        const groupSize = 5;
+                        const start = Math.floor((pageDetails.pageIndex - 1) / groupSize) * groupSize + 1;
+                        const end = Math.min(start + groupSize - 1, pageDetails.totalPages);
+
+                        for (let i = start; i <= end; i++) {
+                            pageButtons.push(
+                                <button
+                                    key={i}
+                                    className={`${styles.pageButton} ${
+                                        pageDetails.pageIndex === i ? styles.active : ""
+                                    }`}
+                                    onClick={() => handleAlbumsList(i)}
+                                    disabled={loading}
+                                >
+                                    {i}
+                                </button>
+                            );
+                        }
+
+                        return pageButtons;
+                    })()}
+
+                    {/* ➡ Next */}
+                    <button
+                        className={styles.arrowButton}
+                        onClick={() => handleAlbumsList(pageDetails.pageIndex + 1)}
+                        disabled={pageDetails.pageIndex >= pageDetails.totalPages || loading}
+                    >
+                        <FontAwesomeIcon icon={faChevronRight} />
+                    </button>
+                </div>
+
+                <AddAlbumModal
+                    isOpen={showModal}
+                    onClose={() => {
+                        setShowModal(false);
+                        handleAlbumsList(pageDetails.pageIndex); // optional: refresh after adding
+                    }}
+                />
+            </div>
+        </>
+    );
+};
+
+export default Page;

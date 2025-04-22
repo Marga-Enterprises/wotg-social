@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar";
 import BurgerMenu from "./components/BurgerMenu";
 import AuthRouter from "./components/AuthRouter";
 import AdminRouter from "./components/AdminRouter";
+import ManagementRouter from "./components/ManagementRouter";
 
 // Pages
 import Home from "./Pages/Home";
@@ -33,6 +34,8 @@ import Commentary from "./Pages/Commentary";
 import UploadVideoFromFiles from "./Pages/UploadVideoFromFiles";
 import ViewJournalPage from "./Pages/ViewJournalPage";
 import UpdateJournal from "./Pages/UpdateJournal";
+import AdminMusicDashboard from "./Pages/AdminMusicDashboard";
+
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -69,6 +72,7 @@ function AppRoutes() {
           <Route path="/commentary/:book/:chapter/:verse/:language/" element={<AuthRouter><Commentary /></AuthRouter>} />
           <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
           <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
+          <Route path="/music-dashboard" element={<ManagementRouter><AdminMusicDashboard /></ManagementRouter>} />
           <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

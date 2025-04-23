@@ -46,7 +46,7 @@ const Page = () => {
 
         try {
             const res = await dispatch(wotgsocial.album.getAlbumsByParamsAction({ pageSize, pageIndex }));
-            if (res.success && res.data?.albums) {
+            if (res.success) {
                 setAlbums(res.data.albums);
                 setPageDetails({
                     totalRecords: res.data.totalRecords,
@@ -75,6 +75,8 @@ const Page = () => {
         try {
             const res = await dispatch(wotgsocial.album.deleteAlbumAction({ id }));
             if (res.success) {
+                console.log("Album deleted successfully:", res.data);
+                setAlbums(prev => prev.filter(album => album.id !== id)); // Remove deleted album from state
                 await handleAlbumsList(pageDetails.pageIndex);
             }
         } catch (error) {
@@ -83,7 +85,7 @@ const Page = () => {
             loadingRef.current = false;
             setLoading(false);
         }
-    }, [dispatch, handleAlbumsList, pageDetails.pageIndex]);
+    }, [dispatch, pageDetails.pageIndex]);
 
     useEffect(() => {
         handleAlbumsList(currentPage);

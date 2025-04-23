@@ -1,8 +1,10 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import styles from "./index.module.css";
 
 import { useDispatch } from "react-redux";
 import { wotgsocial } from "../../redux/combineActions";
+
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const AddAlbumModal = ({ isOpen, onClose }) => {
   const initialForm = useMemo(
@@ -17,7 +19,10 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
   );
 
   const dispatch = useDispatch();
+  const loadingRef = useRef(false); // ✅ Loading state reference
+
   const [formData, setFormData] = useState(initialForm);
+  const [loading, setLoading] = useState(false); // ✅ Loading state
   const [imagePreview, setImagePreview] = useState(null); // ✅ Preview URL
 
   const handleChange = useCallback((e) => {
@@ -36,6 +41,10 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
+
+      if (loadingRef.current) return; // ✅ Prevent multiple submissions
+      loadingRef.current = true; // ✅ Set loading state
+      setLoading(true); // ✅ Set loading state
 
       const payload = {
         title: formData.title,
@@ -56,6 +65,9 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
         }
       } catch (error) {
         console.error("Error adding album:", error);
+      } finally {
+        loadingRef.current = false; // ✅ Reset loading state
+        setLoading(false); // ✅ Reset loading state
       }
     },
     [dispatch, formData, initialForm, onClose]
@@ -66,70 +78,75 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modal}>
-        <h2>Add Album</h2>
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <input
-            type="text"
-            name="title"
-            placeholder="Album Title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="genre"
-            placeholder="Genre"
-            value={formData.genre}
-            onChange={handleChange}
-          />
-          <select name="type" value={formData.type} onChange={handleChange}>
-            {typeOptions.map((type) => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-          <input
-            type="date"
-            name="release_date"
-            value={formData.release_date}
-            onChange={handleChange}
-          />
-
-          <label className={styles.fileLabel}>
-            Upload Cover Image
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className={styles.fileInput}
-            />
-          </label>
-
-          {imagePreview && (
-            <div className={styles.previewContainer}>
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className={styles.imagePreview}
+    <>
+      { loading ? <LoadingSpinner /> : (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h2>Add Album</h2>
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <input
+                type="text"
+                name="title"
+                placeholder="Album Title"
+                value={formData.title}
+                onChange={handleChange}
+                required
               />
-            </div>
-          )}
+              <input
+                type="text"
+                name="genre"
+                placeholder="Genre"
+                value={formData.genre}
+                onChange={handleChange}
+              />
+              <select name="type" value={formData.type} onChange={handleChange}>
+                {typeOptions.map((type) => (
+                  <option key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="date"
+                name="release_date"
+                value={formData.release_date}
+                onChange={handleChange}
+              />
 
-          <div className={styles.actions}>
-            <button type="button" onClick={onClose} className={styles.cancel}>
-              Cancel
-            </button>
-            <button type="submit" className={styles.submit}>
-              Add Album
-            </button>
+              <label className={styles.fileLabel}>
+                Upload Cover Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className={styles.fileInput}
+                />
+              </label>
+
+              {imagePreview && (
+                <div className={styles.previewContainer}>
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className={styles.imagePreview}
+                  />
+                </div>
+              )}
+
+              <div className={styles.actions}>
+                <button type="button" onClick={onClose} className={styles.cancel}>
+                  Cancel
+                </button>
+                <button type="submit" className={styles.submit}>
+                  Add Album
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      )}
+    </>
+
   );
 };
 

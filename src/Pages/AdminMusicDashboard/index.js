@@ -75,7 +75,6 @@ const Page = () => {
         try {
             const res = await dispatch(wotgsocial.album.deleteAlbumAction({ id }));
             if (res.success) {
-                console.log("Album deleted successfully:", res.data);
                 setAlbums(prev => prev.filter(album => album.id !== id)); // Remove deleted album from state
                 await handleAlbumsList(pageDetails.pageIndex);
             }

@@ -50,6 +50,8 @@ export const getMusicByIdAction = (payload) => async (dispatch) => {
                 payload: data.msg || "Failed to fetch music",
             })
         }
+
+        return res;
     } catch (err) {{
         dispatch({
             type: types.MUSIC_GET_FAIL,
@@ -74,6 +76,8 @@ export const createMusicAction = (payload) => async (dispatch) => {
                 payload: data.msg || "Failed to create music",
             });
         }
+
+        return res;
     } catch (err) {
         dispatch({
             type: types.MUSIC_CREATE_FAIL,
@@ -98,6 +102,8 @@ export const updateMusicAction = (payload) => async (dispatch) => {
                 payload: data.msg || "Failed to update music",
             });
         }
+
+        return res;
     } catch (err) {
         dispatch({
             type: types.MUSIC_UPDATE_FAIL,
@@ -122,6 +128,8 @@ export const deleteMusicAction = (payload) => async (dispatch) => {
                 payload: data.msg || "Failed to delete music",
             });
         }
+
+        return res;
     } catch (err) {
         dispatch({
             type: types.MUSIC_DELETE_FAIL,

@@ -32,6 +32,7 @@ export const getAlbumsByParamsAction = (payload) => async (dispatch) => {
             payload: err.response?.data?.msg || "Failed to fetch albums",
         });
     }
+
 };
 
 export const getAlbumByIdAction = (payload) => async (dispatch) => {
@@ -51,6 +52,8 @@ export const getAlbumByIdAction = (payload) => async (dispatch) => {
                 payload: data.msg || "Failed to fetch album",
             });
         }
+
+        return res;
     } catch (err) {
         return dispatch({
             type: types.ALBUM_GET_FAIL,

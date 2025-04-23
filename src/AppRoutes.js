@@ -35,6 +35,7 @@ import UploadVideoFromFiles from "./Pages/UploadVideoFromFiles";
 import ViewJournalPage from "./Pages/ViewJournalPage";
 import UpdateJournal from "./Pages/UpdateJournal";
 import AdminMusicDashboard from "./Pages/AdminMusicDashboard";
+import MusicInAlbumPage from "./Pages/MusicInAlbumPage";
 
 
 function AppRoutes() {
@@ -73,6 +74,7 @@ function AppRoutes() {
           <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
           <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
           <Route path="/music-dashboard" element={<ManagementRouter><AdminMusicDashboard /></ManagementRouter>} />
+          <Route path="/music-in-album/:id" element={<ManagementRouter><MusicInAlbumPage /></ManagementRouter>} />
           <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

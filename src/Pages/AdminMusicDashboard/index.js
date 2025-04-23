@@ -39,6 +39,10 @@ const Page = () => {
         totalPages: 0
     });
 
+    const handleRouteToMusicPage = (id) => {
+        navigate(`/music-in-album/${id}`);
+    };
+
     const handleAlbumsList = useCallback(async (pageIndex = 1) => {
         if (loadingRef.current) return;
         loadingRef.current = true;
@@ -99,14 +103,14 @@ const Page = () => {
 
                 <div className={styles.toolbar}>
                     <button className={styles.addButton} onClick={() => setShowModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} /> Add Album
+                        <FontAwesomeIcon icon={faPlus} /> Add Album
                     </button>
                 </div>
 
                 <div className={styles.albumList}>
                     {albums?.length > 0 ? (
                         albums.map(album => (
-                            <div key={album.id} className={styles.albumCard}>
+                            <div key={album.id} onClick={() => handleRouteToMusicPage(album.id)} className={styles.albumCard}>
                                 <div className={styles.albumThumbWrapper}>
                                     <img
                                         src={`${backendUrl}/uploads/${album.cover_image || "default-cover.png"}`}

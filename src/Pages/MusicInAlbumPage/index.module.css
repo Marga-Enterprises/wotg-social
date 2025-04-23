@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+.albumPage {
+  padding: 3rem 1.5rem;
+  max-width: 1400px;
+  margin: 5rem auto;
+  font-family: 'Segoe UI', sans-serif;
+  color: #222;
+  min-height: 100svh;
+  background-color: #f0f0f0;
+}
+
+.albumHeader {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.albumCover {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: #eaeaea;
+}
+
+.albumInfo {
+  flex: 1;
+  min-width: 200px;
+}
+
+.albumType {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 0.2rem;
+}
+
+.albumTitle {
+  font-size: 2.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #111;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.albumMeta {
+  font-size: 1rem;
+  color: #666;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  background-color: #c43434;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* TRACKLIST TABLE STYLE */
+.trackList {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.trackListHeader {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 1rem;
+  background-color: #efefef;
+  color: #666;
+  border-bottom: 1px solid #ddd;
+}
+
+.trackItem {
+  display: grid;
+  grid-template-columns: 40px 1fr 80px;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.trackItem:hover {
+  background-color: #f7f7f7;
+}
+
+.trackInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.trackTitle {
+  font-size: 1.2rem;
+  margin-bottom: 0.2rem;
+  color: #111;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.trackTitleSelected {
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+    color: darkred;
+    font-weight: bold;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+}
+  
+.playingBars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  width: 12px;
+  height: 14px;
+}
+
+.playingBars div {
+  width: 5px;
+  background-color: darkred;
+  animation: barBounce 1s infinite ease-in-out;
+}
+
+.playingBars div:nth-child(1) {
+  animation-delay: 0s;
+}
+.playingBars div:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.playingBars div:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes barBounce {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+.trackArtist {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.trackDuration {
+  text-align: right;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .albumHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .albumPage {
+    background: #fff;
+    margin: 2rem auto;
+  }
+
+  .albumInfo {
+    align-items: center;
+    margin-top: 1rem;
+  }
+
+  .trackListHeader,
+  .trackItem {
+    grid-template-columns: 20px 1fr 50px;
+    padding: 0.75rem;
+  }
+
+  .trackTitle {
+    font-size: 0.95rem;
+  }
+
+  .albumTitle {
+    font-size: 1.5rem;
+  }
+
+  .trackSelected {
+    font-size: 0.95rem;
+  }
+
+  .trackArtist {
+    font-size: 0.75rem;
+  }
+}

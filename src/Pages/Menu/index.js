@@ -21,6 +21,7 @@ const Page = () => {
                     <li><a href="/blogs">Devotion</a></li>
                     <li><a href="/bible">Bible</a></li>
                     <li><a href="/your-journals">Journal</a></li>
+                    <li><a href="/music-dashboard">Music</a></li>
                 </ul>
             </div>
         </div>

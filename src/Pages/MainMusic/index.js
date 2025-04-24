@@ -3,12 +3,16 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 // Styles
 import styles from './index.module.css';
 
+// Sections
+import AlbumsSection from '../../sections/AlbumsSection';
+
 const Page = () => {
     return (
         <div className={styles.page}>
-            Main Music Page
+            <div></div>
+            <AlbumsSection />
         </div>
     )
 }
 
-export default Page;   
+export default Page;

@@ -10,7 +10,6 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
   const initialForm = useMemo(
     () => ({
       title: "",
-      genre: "",
       // type: "album",
       // release_date: "",
       file: null, // ✅ Image file
@@ -50,7 +49,6 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
 
       const payload = {
         title: formData.title,
-        genre: formData.genre,
         type: formData.type,
         release_date: dateTodayString,
         file: formData.file,
@@ -91,13 +89,6 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
                 value={formData.title}
                 onChange={handleChange}
                 required
-              />
-              <input
-                type="text"
-                name="genre"
-                placeholder="Genre"
-                value={formData.genre}
-                onChange={handleChange}
               />
 
               <label className={styles.fileLabel}>

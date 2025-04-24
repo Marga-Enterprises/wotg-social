@@ -11,8 +11,8 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
     () => ({
       title: "",
       genre: "",
-      type: "album",
-      release_date: "",
+      // type: "album",
+      // release_date: "",
       file: null, // ✅ Image file
     }),
     []
@@ -20,6 +20,8 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
 
   const dispatch = useDispatch();
   const loadingRef = useRef(false); // ✅ Loading state reference
+  const today = new Date();
+  const dateTodayString = today.toLocaleDateString();
 
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(false); // ✅ Loading state
@@ -50,7 +52,7 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
         title: formData.title,
         genre: formData.genre,
         type: formData.type,
-        release_date: formData.release_date,
+        release_date: dateTodayString,
         file: formData.file,
       };
 
@@ -72,8 +74,6 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
     },
     [dispatch, formData, initialForm, onClose]
   );
-
-  const typeOptions = useMemo(() => ["album", "single", "compilation"], []);
 
   if (!isOpen) return null;
 
@@ -97,19 +97,6 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
                 name="genre"
                 placeholder="Genre"
                 value={formData.genre}
-                onChange={handleChange}
-              />
-              <select name="type" value={formData.type} onChange={handleChange}>
-                {typeOptions.map((type) => (
-                  <option key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="date"
-                name="release_date"
-                value={formData.release_date}
                 onChange={handleChange}
               />
 

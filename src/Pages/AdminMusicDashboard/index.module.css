@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .container {
   padding: 3rem 1.5rem;
   max-width: 1300px;
@@ -51,46 +53,54 @@
 }
 
 .albumCard {
-  background: #121212;
+  background: #fff;
   border-radius: 16px;
   overflow: hidden;
   width: 250px;
-  cursor: pointer;
+  padding: .5rem;
   transition: transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  /*box-shadow: 0 4px 12px rgba(0,0,0,0.3);*/
 }
 
 .albumCard:hover {
   transform: translateY(-5px);
+  background-color: #f3f3f3;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .albumThumbWrapper {
   height: 250px;
-  background-color: #222;
+  cursor: pointer;
+  border-radius: 1rem;
+  padding: 0;
 }
 
 .albumImage {
   width: 100%;
+  border-radius: 1rem;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
 .albumInfo {
-  padding: 1rem;
-  color: #fff;
+  padding: .5rem;
+  color: #000;
 }
 
 .albumInfo h3 {
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  color: #fff;
+  color: #000;
 }
 
 .albumInfo p {
   font-size: 0.9rem;
-  color: #b3b3b3;
+  color: #000;
   margin: 0.25rem 0;
 }
 

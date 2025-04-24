@@ -198,6 +198,7 @@ const AlbumDetailsPage = () => {
             setShowModal(false);
             handleFetchDetails(); // optional: refresh after adding
         }}
+        length={musics?.length}
       />
     </>
   );

@@ -6,13 +6,12 @@
 
   import LoadingSpinner from "../../components/LoadingSpinner";
 
-  const AddMusicModal = ({ isOpen, onClose, albumId }) => {
+  const AddMusicModal = ({ isOpen, onClose, albumId, length }) => {
     const initialForm = useMemo(
       () => ({
         title: "",
         album_id: albumId,
         duration: "",
-        track_number: "",
         is_explicit: "false",
         genre: "",
         file: null,
@@ -61,7 +60,7 @@
         title: formData.title,
         album_id: formData.album_id,
         duration: formData.duration,
-        track_number: formData.track_number,
+        track_number: length + 1,
         is_explicit: formData.is_explicit,
         genre: formData.genre,
         file: formData.file,
@@ -99,7 +98,7 @@
         { loading ? <LoadingSpinner /> : (
           <div className={styles.modalOverlay}>
             <div className={styles.modal}>
-              <h2>Add Album</h2>
+              <h2>Add Track</h2>
               <form onSubmit={handleSubmit} className={styles.form}>
                 <input
                   type="text"
@@ -109,22 +108,6 @@
                   onChange={handleChange}
                   required
                 />
-                <input
-                  type="number"
-                  name="track_number"
-                  placeholder="Track Number"
-                  value={formData.track_number}
-                  onChange={handleChange}
-                  required
-                />
-                <select
-                  name="is_explicit"
-                  value={formData.is_explicit}
-                  onChange={handleChange}
-                >
-                  <option value="false">Not Explicit</option>
-                  <option value="true">Explicit</option>
-                </select>
                 <input
                   type="text"
                   name="genre"

@@ -5,27 +5,22 @@ import {
   faPause,
   faPlay,
   faVolumeUp,
-  faStepForward ,
+  faStepForward,
   faStepBackward
 } from '@fortawesome/free-solid-svg-icons';
-
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
 
-const MusicControlsSection = ({ 
-    musicId, 
-    albumCover,
-    onPrevious, 
-    onNext
- }) => {    
+const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   const dispatch = useDispatch();
   const audioRef = useRef(null);
 
-  const backendUrl = useMemo(() => (
+  const backendUrl = useMemo(() =>
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:5000'
-      : 'https://community.wotgonline.com/api'
-  ), []);
+      : 'https://community.wotgonline.com/api',
+    []
+  );
 
   const [music, setMusic] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -46,36 +41,44 @@ const MusicControlsSection = ({
     const audio = audioRef.current;
     if (!music || !audio) return;
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-      setCurrentTime(0);
-      audio.play()
-        .then(() => setIsPlaying(true))
-        .catch(err => console.warn('Autoplay blocked:', err));
+    let metadataHandler, timeUpdateHandler;
+
+    const setupAudio = () => {
+      metadataHandler = () => {
+        setDuration(audio.duration);
+        setCurrentTime(0);
+        audio.play()
+          .then(() => setIsPlaying(true))
+          .catch(err => console.warn('Autoplay blocked:', err));
+      };
+
+      timeUpdateHandler = () => setCurrentTime(audio.currentTime);
+
+      audio.addEventListener('loadedmetadata', metadataHandler);
+      audio.addEventListener('timeupdate', timeUpdateHandler);
+      audio.src = `${backendUrl}/uploads/${music.audio_url}`;
+      audio.load();
     };
 
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-
-    audio.src = `${backendUrl}/uploads/${music.audio_url}`;
-    audio.load();
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
+    setupAudio();
 
     return () => {
-      audio.pause();
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      if (audio) {
+        audio.pause();
+        audio.removeEventListener('loadedmetadata', metadataHandler);
+        audio.removeEventListener('timeupdate', timeUpdateHandler);
+      }
     };
   }, [music, backendUrl]);
 
   const togglePlay = useCallback(() => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
     if (isPlaying) {
-      audioRef.current.pause();
+      audio.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      audio.play().then(() => setIsPlaying(true));
     }
   }, [isPlaying]);
 
@@ -111,10 +114,11 @@ const MusicControlsSection = ({
 
       <div className={styles.controls}>
         <div className={styles.icons}>
-            <FontAwesomeIcon icon={faStepBackward} className={styles.icon} onClick={onPrevious} />
-            <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} className={styles.icon} onClick={togglePlay} />
-            <FontAwesomeIcon icon={faStepForward } className={styles.icon} onClick={onNext} />
+          <FontAwesomeIcon icon={faStepBackward} className={styles.icon} onClick={onPrevious} />
+          <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} className={styles.icon} onClick={togglePlay} />
+          <FontAwesomeIcon icon={faStepForward} className={styles.icon} onClick={onNext} />
         </div>
+
         <div className={styles.progress}>
           <span className={styles.time}>{formatDuration(currentTime)}</span>
           <input
@@ -145,9 +149,7 @@ const MusicControlsSection = ({
       <audio
         ref={audioRef}
         preload="metadata"
-        onEnded={() => setTimeout(() => {
-            onNext();
-        }, 2000)}
+        onEnded={() => setTimeout(onNext, 1000)}
       />
     </div>
   );

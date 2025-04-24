@@ -42,7 +42,7 @@ const AlbumDetailsPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [musics, setMusics] = useState([]);
   const [selectedMusicId, setSelectedMusicId] = useState(null); // ✅ currently playing track ID
-  const [pageSize] = useState(50);
+  const [pageSize] = useState(50); 
   const [pageDetails, setPageDetails] = useState({
     totalRecords: 0,
     pageIndex: currentPage,
@@ -76,7 +76,7 @@ const AlbumDetailsPage = () => {
   const fetchMusics = useCallback(async () => {
     try {
       const res = await dispatch(
-        wotgsocial.music.getMusicByParamsAction({ id, pageSize, pageIndex: currentPage })
+        wotgsocial.music.getMusicByParamsAction({ id, pageSize, pageIndex: currentPage, albumId: id })
       );
       if (res.success) {
         setMusics(res.data.musics);

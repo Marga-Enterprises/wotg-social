@@ -122,8 +122,8 @@ const Page = () => {
                 <div className={styles.albumList}>
                     {albums?.length > 0 ? (
                         albums.map(album => (
-                            <div key={album.id} onClick={() => handleRouteToMusicPage(album.id)} className={styles.albumCard}>
-                                <div className={styles.albumThumbWrapper}>
+                            <div key={album.id} className={styles.albumCard}>
+                                <div className={styles.albumThumbWrapper} onClick={() => handleRouteToMusicPage(album.id)}>
                                     <img
                                         src={`${backendUrl}/uploads/${album.cover_image || "default-cover.png"}`}
                                         alt={album.title}
@@ -137,15 +137,17 @@ const Page = () => {
                                     <p><span><strong>Genre:</strong></span> {album.genre || "N/A"}</p>
                                 </div>
 
-                                <div className={styles.albumCardActions}>
-                                    <button
-                                        className={styles.deleteButton}
-                                        onClick={() => handleDeleteAlbum(album.id)}
-                                        title="Delete Album"
-                                    >
-                                        <FontAwesomeIcon icon={faTrash} />
-                                    </button>
-                                </div>
+                                { role === "admin" || role === "owner" ? (
+                                    <div className={styles.albumCardActions}>
+                                        <button
+                                            className={styles.deleteButton}
+                                            onClick={() => handleDeleteAlbum(album.id)}
+                                            title="Delete Album"
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
+                                    </div>
+                                ): null}
                             </div>
                         ))
                     ) : (

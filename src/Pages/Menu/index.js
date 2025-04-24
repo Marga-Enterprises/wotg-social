@@ -1,31 +1,60 @@
 import React, { useEffect } from 'react';
 import { useSetHideNavbar } from "../../contexts/NavbarContext";
+import { motion } from "framer-motion";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faPrayingHands, faComments, faBookOpen,
+  faBible, faPenFancy, faMusic
+} from '@fortawesome/free-solid-svg-icons';
 
 import styles from './index.module.css';
 
+const menuItems = [
+  { label: "Worship", href: "/worship", icon: faPrayingHands },
+  { label: "Chat", href: "/", icon: faComments },
+  { label: "Devotion", href: "/blogs", icon: faBookOpen },
+  { label: "Bible", href: "/bible", icon: faBible },
+  { label: "Journal", href: "/your-journals", icon: faPenFancy },
+  { label: "Music", href: "/music-dashboard", icon: faMusic },
+];
+
 const Page = () => {
-    const setHideNavbar = useSetHideNavbar();
+  const setHideNavbar = useSetHideNavbar();
 
-    useEffect(() => {
-        setHideNavbar(true);
-        return () => setHideNavbar(false);
-    }, [setHideNavbar]);
+  useEffect(() => {
+    setHideNavbar(true);
+    return () => setHideNavbar(false);
+  }, [setHideNavbar]);
 
-    return (
-        <div className={styles.container}> 
-            <div className={styles.menu}>
-                <div className={styles.menuHeader}>Where do you want to go?</div>
-                <ul className={styles.menuList}>
-                    <li><a href="/worship">Worship</a></li>
-                    <li><a href="/">Chat</a></li>
-                    <li><a href="/blogs">Devotion</a></li>
-                    <li><a href="/bible">Bible</a></li>
-                    <li><a href="/your-journals">Journal</a></li>
-                    <li><a href="/music-dashboard">Music</a></li>
-                </ul>
-            </div>
+  return (
+    <div className={styles.container}>
+      <motion.div
+        className={styles.menu}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className={styles.menuHeader}>Where do you want to go?</div>
+        <div className={styles.gridMenu}>
+          {menuItems.map((item, index) => (
+            <motion.a
+              key={item.label}
+              href={item.href}
+              className={styles.gridItem}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.3 }}
+            >
+              <FontAwesomeIcon icon={item.icon} className={styles.icon} />
+              <span>{item.label}</span>
+            </motion.a>
+          ))}
         </div>
-    );
-}
+      </motion.div>
+    </div>
+  );
+};
 
 export default Page;

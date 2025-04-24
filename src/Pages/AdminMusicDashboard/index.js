@@ -134,7 +134,6 @@ const Page = () => {
                                 <div className={styles.albumInfo}>
                                     <h3>{album.title}</h3>
                                     <p><span><strong>Artist:</strong></span> {album.artist_name}</p>
-                                    <p><span><strong>Genre:</strong></span> {album.genre || "N/A"}</p>
                                 </div>
 
                                 { role === "admin" || role === "owner" ? (

@@ -15,7 +15,7 @@ const menuItems = [
   { label: "Devotion", href: "/blogs", icon: faBookOpen },
   { label: "Bible", href: "/bible", icon: faBible },
   { label: "Journal", href: "/your-journals", icon: faPenFancy },
-  { label: "Music", href: "/music-dashboard", icon: faMusic },
+  { label: "Music", href: "/albums", icon: faMusic },
 ];
 
 const Page = () => {

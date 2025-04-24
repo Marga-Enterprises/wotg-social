@@ -10,7 +10,7 @@ const AddAlbumModal = ({ isOpen, onClose }) => {
   const initialForm = useMemo(
     () => ({
       title: "",
-      // type: "album",
+      type: "album",
       // release_date: "",
       file: null, // ✅ Image file
     }),

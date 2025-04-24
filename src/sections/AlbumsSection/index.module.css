@@ -1,0 +1,64 @@
+.albumRow {
+  display: flex;
+  overflow-x: auto;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  scroll-behavior: smooth;
+}
+
+.albumRow::-webkit-scrollbar {
+  display: none;
+}
+.albumRow {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.albumCard {
+  min-width: 180px;
+  max-width: 200px;
+  flex-shrink: 0;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+  background: #fff;
+  padding: 1rem;
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.albumCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.albumImage {
+  width: 100%;
+  border-radius: 12px;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  margin-bottom: 0.75rem;
+}
+
+.albumText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.albumTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.albumMeta {
+  font-size: 0.85rem;
+  color: #555;
+  margin: 0;
+}

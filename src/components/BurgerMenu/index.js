@@ -46,7 +46,7 @@ const BurgerMenu = ({ onClose }) => {
         <Link to="/bible" className={styles.menuItem} onClick={onClose}>Bible</Link>
         <Link to="/your-journals" className={styles.menuItem} onClick={onClose}>Journal</Link>
         <Link to="/worship" className={styles.menuItem} onClick={onClose}>Worship</Link>
-        <Link to="/music-dashboard" className={styles.menuItem} onClick={onClose}>Music</Link>
+        <Link to="/albums" className={styles.menuItem} onClick={onClose}>Music</Link>
         <a
           href="https://wotgonline.com/donate/"
           target="_blank"

@@ -1,18 +1,22 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-
-// Styles
+import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './index.module.css';
-
-// Sections
 import AlbumsSection from '../../sections/AlbumsSection';
 
 const Page = () => {
-    return (
-        <div className={styles.page}>
-            <div></div>
-            <AlbumsSection />
+  return (
+    <div className={styles.page}>
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2>Albums</h2>
+          <Link to="/albums" className={styles.showAllBtn}>
+            Show all
+          </Link>
         </div>
-    )
-}
+        <AlbumsSection />
+      </div>
+    </div>
+  );
+};
 
 export default Page;

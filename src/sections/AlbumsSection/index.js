@@ -26,7 +26,7 @@ const AlbumSection = () => {
 
     try {
       const res = await dispatch(
-        wotgsocial.album.getAlbumsByParamsAction({ pageSize: 5, pageIndex: 1 })
+        wotgsocial.album.getAlbumsByParamsAction({ pageSize: 7, pageIndex: 1 })
       );
       if (res.success && res.data?.albums?.length) {
         setAlbums(res.data.albums);
@@ -54,7 +54,7 @@ const AlbumSection = () => {
         />
         <div className={styles.albumText}>
           <h3 className={styles.albumTitle}>{album.title}</h3>
-          <p className={styles.albumMeta}><strong>Artist:</strong> {album.artist_name}</p>
+          <p className={styles.albumMeta}>{album.artist_name}</p>
         </div>
       </div>
     ))

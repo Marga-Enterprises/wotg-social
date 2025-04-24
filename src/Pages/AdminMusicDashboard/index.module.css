@@ -52,6 +52,14 @@
   justify-content: center;
 }
 
+.albumTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin-top: .5rem;
+}
+
 .albumCard {
   background: #fff;
   border-radius: 16px;
@@ -95,7 +103,6 @@
 .albumInfo h3 {
   font-size: 1.2rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
   color: #000;
 }
 
@@ -159,10 +166,8 @@
 }
 
 .albumCardActions {
-  margin-bottom: 1rem;
   display: flex;
   justify-content: flex-end;
-  margin-right: 1rem;
 }
 
 .deleteButton {

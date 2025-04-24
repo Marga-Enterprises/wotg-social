@@ -132,21 +132,22 @@ const Page = () => {
                                     />
                                 </div>
                                 <div className={styles.albumInfo}>
-                                    <h3>{album.title}</h3>
+                                    <div className={styles.albumTitle}>
+                                        <h3>{album.title}</h3>
+                                        { role === "admin" || role === "owner" ? (
+                                            <span className={styles.albumCardActions}>
+                                                <button
+                                                    className={styles.deleteButton}
+                                                    onClick={() => handleDeleteAlbum(album.id)}
+                                                    title="Delete Album"
+                                                >
+                                                    <FontAwesomeIcon icon={faTrash} />
+                                                </button>
+                                            </span>
+                                        ): null}
+                                    </div>
                                     <p><span><strong>Artist:</strong></span> {album.artist_name}</p>
                                 </div>
-
-                                { role === "admin" || role === "owner" ? (
-                                    <div className={styles.albumCardActions}>
-                                        <button
-                                            className={styles.deleteButton}
-                                            onClick={() => handleDeleteAlbum(album.id)}
-                                            title="Delete Album"
-                                        >
-                                            <FontAwesomeIcon icon={faTrash} />
-                                        </button>
-                                    </div>
-                                ): null}
                             </div>
                         ))
                     ) : (

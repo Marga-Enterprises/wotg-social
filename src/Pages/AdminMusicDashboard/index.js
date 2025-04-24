@@ -14,11 +14,20 @@ import styles from "./index.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons';
 
+// Cookies
+import Cookies from "js-cookie";
+
 const Page = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const loadingRef = useRef(false);
     const location = useLocation();
+
+    const account = useMemo(() => {
+        return Cookies.get("account") ? JSON.parse(Cookies.get("account")) : null;
+    }, []);
+
+    const role = account?.user_role || null; 
 
     const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
     const currentPage = useMemo(() => parseInt(queryParams.get("page")) || 1, [queryParams]);
@@ -99,13 +108,16 @@ const Page = () => {
             {loading && <LoadingSpinner />}
             <div className={styles.container}>
                 <h1 className={styles.heading}>Albums</h1>
-                <p className={styles.subheading}>Explore and manage your released albums here.</p>
+                {/*<p className={styles.subheading}>Explore and manage your released albums here.</p>*/}
 
-                <div className={styles.toolbar}>
-                    <button className={styles.addButton} onClick={() => setShowModal(true)}>
-                        <FontAwesomeIcon icon={faPlus} /> Add Album
-                    </button>
-                </div>
+                { role === "admin" || role === "owner" ? (
+                    <div className={styles.toolbar}>
+                        <button className={styles.addButton} onClick={() => setShowModal(true)}>
+                            <FontAwesomeIcon icon={faPlus} /> Add Album
+                        </button>
+                    </div>
+                ): null}
+
 
                 <div className={styles.albumList}>
                     {albums?.length > 0 ? (

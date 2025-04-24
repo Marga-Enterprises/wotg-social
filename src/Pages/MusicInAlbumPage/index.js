@@ -133,12 +133,12 @@ const AlbumDetailsPage = () => {
                 {album?.artist_name || "Unknown Artist"} • {album?.release_date?.split("-")[0]} • {musics.length} songs
               </p>
             </div>
-
-            { role === "admin" || role === "owner" && (
+            
+            { role === "admin" || role === "owner" ? (
               <button className={styles.addButton} onClick={() => setShowModal(true)}>
                 Add Track
               </button>
-            )}
+            ): null}
           </div>
 
           {/* Track List */}

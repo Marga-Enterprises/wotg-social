@@ -54,7 +54,7 @@
   margin-bottom: 0.5rem;
 }
 
-/* Text inside album card */
+/* Text inside album card 
 .albumTitle {
   font-size: 0.95rem;
   font-weight: 600;
@@ -66,6 +66,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   height: 2.6em;
+}*/
+
+.albumTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  color: #111;
+  width: 100%;
 }
 
 .albumMeta {

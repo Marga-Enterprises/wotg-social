@@ -18,7 +18,6 @@ const AlbumSection = () => {
 
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showArrows, setShowArrows] = useState(false);
 
   const fetchAlbums = useCallback(async () => {
     if (loadingRef.current || albums.length > 0) return;
@@ -44,19 +43,6 @@ const AlbumSection = () => {
     fetchAlbums();
   }, [fetchAlbums]);
 
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollRef.current) {
-        const { scrollWidth, clientWidth } = scrollRef.current;
-        setShowArrows(scrollWidth > clientWidth);
-      }
-    };
-
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-    return () => window.removeEventListener('resize', checkScroll);
-  }, [albums]);
-
   const scrollFunction = (direction) => {
     if (scrollRef.current) {
       const scrollAmount = 150;
@@ -69,14 +55,12 @@ const AlbumSection = () => {
 
   return (
     <div className={styles.albumScrollContainer}>
-      {showArrows && (
-        <button
-          className={`${styles.scrollButton} ${styles.left}`}
-          onClick={() => scrollFunction('left')}
-        >
-          &#10094;
-        </button>
-      )}
+      <button
+        className={`${styles.scrollButton} ${styles.left}`}
+        onClick={() => scrollFunction('left')}
+      >
+        &#10094;
+      </button>
 
       <div className={styles.albumRowWrapper} ref={scrollRef}>
         <div className={styles.albumRow}>
@@ -97,14 +81,12 @@ const AlbumSection = () => {
         </div>
       </div>
 
-      {showArrows && (
-        <button
-          className={`${styles.scrollButton} ${styles.right}`}
-          onClick={() => scrollFunction('right')}
-        >
-          &#10095;
-        </button>
-      )}
+      <button
+        className={`${styles.scrollButton} ${styles.right}`}
+        onClick={() => scrollFunction('right')}
+      >
+        &#10095;
+      </button>
     </div>
   );
 };

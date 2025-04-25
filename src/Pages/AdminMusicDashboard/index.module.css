@@ -183,6 +183,18 @@
   color: #ff6b6b;
 }
 
+.editButton {
+  background: transparent;
+  border: none;
+  color: #4f9df7;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.editButton:hover {
+  color: #4f9df7;
+}
 
 /* Responsive */
 @media (max-width: 640px) {

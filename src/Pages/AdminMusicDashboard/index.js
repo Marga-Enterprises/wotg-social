@@ -6,13 +6,14 @@ import { wotgsocial } from "../../redux/combineActions";
 // Components
 import LoadingSpinner from "../../components/LoadingSpinner";
 import AddAlbumModal from "../../components/AddAlbumModal";
+import UpdateAlbumModal from "../../components/UpdateAlbumModal";
 
 // Styles
 import styles from "./index.module.css";
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faChevronLeft, faChevronRight, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faChevronLeft, faChevronRight, faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 // Cookies
 import Cookies from "js-cookie";
@@ -41,7 +42,9 @@ const Page = () => {
     const [loading, setLoading] = useState(false);
     const [pageSize] = useState(10);
     const [albums, setAlbums] = useState([]);
+    const [albumId, setAlbumId] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [pageDetails, setPageDetails] = useState({
         totalRecords: 0,
         pageIndex: currentPage,
@@ -78,6 +81,11 @@ const Page = () => {
         }
     }, [dispatch, navigate]);
 
+    const handleOpenUpdateModal = (id) => {
+        setAlbumId(id);
+        setShowUpdateModal(true);
+    };
+
     const handleDeleteAlbum = useCallback(async (id) => {
         if (!window.confirm("Are you sure you want to delete this album? All its music and playlist links will be removed. This action cannot be undone.")) return;
 
@@ -102,6 +110,8 @@ const Page = () => {
     useEffect(() => {
         handleAlbumsList(currentPage);
     }, [handleAlbumsList, currentPage]);
+
+    console.log('albumId', albumId);
 
     return (
         <>
@@ -136,17 +146,31 @@ const Page = () => {
                                 <div className={styles.albumInfo}>
                                     <div className={styles.albumTitle}>
                                         <h3 className={styles.albumTitleHeading}>{album.title}</h3>
+
                                         { role === "admin" || role === "owner" ? (
-                                            <span className={styles.albumCardActions}>
-                                                <button
-                                                    className={styles.deleteButton}
-                                                    onClick={() => handleDeleteAlbum(album.id)}
-                                                    title="Delete Album"
-                                                >
-                                                    <FontAwesomeIcon icon={faTrash} />
-                                                </button>
-                                            </span>
+                                            <div>
+                                                <span className={styles.albumCardActions}>
+                                                    <button
+                                                        className={styles.deleteButton}
+                                                        onClick={() => handleDeleteAlbum(album.id)}
+                                                        title="Delete Album"
+                                                    >
+                                                        <FontAwesomeIcon icon={faTrash} />
+                                                    </button>
+                                                </span>
+
+                                                <span className={styles.albumCardActions}>
+                                                    <button
+                                                        className={styles.editButton}
+                                                        onClick={() => handleOpenUpdateModal(album.id)}
+                                                        title="Delete Album"
+                                                    >
+                                                        <FontAwesomeIcon icon={faEdit} />
+                                                    </button>
+                                                </span>
+                                            </div>
                                         ): null}
+
                                     </div>
                                     <p>{album.artist_name}</p>
                                 </div>
@@ -209,6 +233,16 @@ const Page = () => {
                         setShowModal(false);
                         handleAlbumsList(pageDetails.pageIndex); // optional: refresh after adding
                     }}
+                />
+
+                <UpdateAlbumModal
+                  id={albumId}
+                  isOpen={showUpdateModal}
+                  onClose={() => {
+                    setShowUpdateModal(false);
+                    handleAlbumsList(pageDetails.pageIndex);
+                    setAlbumId('');
+                  }}
                 />
             </div>
         </>

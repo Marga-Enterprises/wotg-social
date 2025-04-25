@@ -18,7 +18,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   const backendUrl = useMemo(() =>
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:5000'
-      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios',
+      : 'https://community.wotgonline.com/api',
     []
   );
 

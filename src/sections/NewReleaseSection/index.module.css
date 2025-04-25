@@ -7,7 +7,7 @@
   gap: 0.5rem;
   padding: 0 1rem;
   position: relative;
-  width: 100%;
+  max-width: 80svw;
 }
 
 /* ⬅️ Scrollable row wrapper */
@@ -16,6 +16,7 @@
   -webkit-overflow-scrolling: touch;
   width: 100%;
   padding: 1rem 0;
+  max-width: 80svw;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
 }

@@ -10,7 +10,7 @@
   display: none;
 }
 
-.albumTable {
+.musicTable {
   display: table;
   table-layout: fixed;
   white-space: nowrap;
@@ -18,11 +18,11 @@
   border-spacing: 1rem;
 }
 
-.albumTableCell {
+.musicTableCell {
   vertical-align: top;
 }
 
-.albumScrollContainer {
+.musicScrollContainer {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -51,7 +51,7 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
-.albumCard {
+.musicCard {
   width: 180px;
   background: #fff;
   border-radius: 16px;
@@ -63,11 +63,11 @@
   transition: transform 0.2s ease-in-out;
 }
 
-.albumCard:hover {
+.musicCard:hover {
   transform: translateY(-4px);
 }
 
-.albumImage {
+.musicImage {
   width: 100%;
   aspect-ratio: 1/1;
   object-fit: cover;
@@ -75,14 +75,14 @@
   margin-bottom: 0.5rem;
 }
 
-.albumTitle {
+.musicTitle {
   font-size: 0.95rem;
   font-weight: 600;
   color: #111;
   margin: 0.25rem 0 0.3rem;
 }
 
-.albumMeta {
+.musicMeta {
   font-size: 0.8rem;
   color: #666;
 }

@@ -1,20 +1,92 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+/* ======= Base Layout ======= */
 .page {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  padding: 1rem;
-  overflow-x: hidden;
+  gap: 3rem;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+  min-height: 95svh;
+  margin-top: 3.5rem;
+  padding: 4rem 1rem;
+  background-color: #f7f7f7;
 }
 
-.pageContent {
-  margin-top: 4rem;
-  max-width: 1000px;
-  width: 100%;
-  border: solid;
+/* ======= Section Wrapper ======= */
+.section {
   display: flex;
-  overflow-x: auto;
-  gap: 5rem;
+  flex-direction: column;
+  width: 100%;
+  max-width: 80svw;
+  padding: 0 1rem;
+  margin-bottom: 4rem;
+  box-sizing: border-box;
 }
 
+/* ======= Section Header ======= */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionHeader h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin: 0;
+}
+
+.showAllBtn {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #c00;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.showAllBtn:hover {
+  color: #900;
+}
+
+/* ======= Media Queries ======= 
+@media (max-width: 768px) {
+  .sectionHeader h2 {
+    font-size: 1.5rem;
+  }
+
+  .showAllBtn {
+    font-size: 0.9rem;
+  }
+
+  .page {
+    padding: 3rem 1rem;
+    gap: 2rem;
+  }
+
+  .section {
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .sectionHeader h2 {
+    font-size: 1.4rem;
+  }
+
+  .showAllBtn {
+    align-self: flex-end;
+  }
+}
+*/

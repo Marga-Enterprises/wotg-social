@@ -4,7 +4,7 @@ import { wotgsocial } from '../../redux/combineActions';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 
-const AlbumSection = () => {
+const NewReleaseSection = () => {
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
   const loadingRef = useRef(false);
@@ -16,32 +16,32 @@ const AlbumSection = () => {
     []
   );
 
-  const [albums, setAlbums] = useState([]);
+  const [musics, setMusics] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchAlbums = useCallback(async () => {
-    if (loadingRef.current || albums.length > 0) return;
+  const fetchMusics = useCallback(async () => {
+    if (loadingRef.current || musics.length > 0) return;
     loadingRef.current = true;
     setLoading(true);
 
     try {
       const res = await dispatch(
-        wotgsocial.album.getAlbumsByParamsAction({ pageSize: 10, pageIndex: 1 })
+        wotgsocial.music.getMusicByParamsAction({ pageSize: 10, pageIndex: 1 })
       );
-      if (res.success && Array.isArray(res.data?.albums)) {
-        setAlbums(res.data.albums);
+      if (res.success && Array.isArray(res.data?.musics)) {
+        setMusics(res.data.musics);
       }
     } catch (error) {
-      console.error('❌ Failed to fetch albums:', error);
+      console.error('❌ Failed to fetch musics:', error);
     } finally {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [dispatch, albums.length]);
+  }, [dispatch, musics.length]);
 
   useEffect(() => {
-    fetchAlbums();
-  }, [fetchAlbums]);
+    fetchMusics();
+  }, [fetchMusics]);
 
   const scrollFunction = (direction) => {
     // console.log('[[[[[[[[[[[ DIRECTION ]]]]]]]]]]]', direction);
@@ -55,27 +55,27 @@ const AlbumSection = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className={styles.albumScrollContainer}>
+    <div className={styles.musicScrollContainer}>
       <button className={styles.scrollButton} onClick={() => scrollFunction('left')}>
         &#10094;
       </button>
 
       <div className={styles.tableScrollWrapper} ref={scrollRef}>
-        <table className={styles.albumTable}>
+        <table className={styles.musicTable}>
           <tbody>
             <tr>
-              {albums.map((album) => (
-                <td key={album.id} className={styles.albumTableCell}>
-                  <div className={styles.albumCard}>
+              {musics.map((music) => (
+                <td key={music.id} className={styles.musicTableCell}>
+                  <div className={styles.musicCard}>
                     <img
-                      src={`${backendUrl}/uploads/${album.cover_image || 'default-cover.png'}`}
-                      alt={album.title}
-                      className={styles.albumImage}
+                      src={`${backendUrl}/uploads/${music.cover_image || 'default-cover.png'}`}
+                      alt={music.title}
+                      className={styles.musicImage}
                       loading="lazy"
                     />
-                    <div className={styles.albumText}>
-                      <h3 className={styles.albumTitle}>{album.title}</h3>
-                      <p className={styles.albumMeta}>{album.artist_name}</p>
+                    <div className={styles.musicText}>
+                      <h3 className={styles.musicTitle}>{music.title}</h3>
+                      <p className={styles.musicMeta}>{music.artist_name}</p>
                     </div>
                   </div>
                 </td>
@@ -92,4 +92,4 @@ const AlbumSection = () => {
   );
 };
 
-export default React.memo(AlbumSection);
+export default React.memo(NewReleaseSection);

@@ -37,8 +37,9 @@ const Page = () => {
     const [pageDetails, setPageDetails] = useState({ totalRecords: 0, pageIndex: currentPage, totalPages: 0 });
 
     const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development" ? "http://localhost:5000" : "https://community.wotgonline.com/api";
+        return process.env.NODE_ENV === "development" ? "http://localhost:5000/uploads" : "https://wotg.sgp1.cdn.digitaloceanspaces.com/images";
     }, []);
+
 
     // ✅ Fetch Blog List with Page Index (Optimized)
     const handleBlogList = useCallback(async (pageIndex) => {
@@ -92,7 +93,7 @@ const Page = () => {
                 <div className={styles.blogImageContainer} style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}>
                     <img
                         loading="lazy"
-                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : wotgLogo}
+                        src={blog.blog_thumbnail ? `${backendUrl}/${blog.blog_thumbnail}` : wotgLogo}
                         alt={blog.blog_title}
                         className={styles.blogImage}
                     />

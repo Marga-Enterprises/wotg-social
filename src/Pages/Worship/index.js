@@ -29,6 +29,7 @@ const Page = () => {
   const [viewersList, setViewersList] = useState([]); 
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [reactions, setReactions] = useState([]);
+  const [uploading, setUploading] = useState(false);
   // const [messageReacts, setMessageReacts] = useState([]);
   
   // Fetch user authentication details
@@ -107,17 +108,55 @@ const Page = () => {
   }, [fetchMessages, isAuthenticated]);
 
   // Handle sending a message
-  const handleSendMessage = (messageContent) => {
+  const handleSendMessage = async (messageContent, selectedFile) => {
     if (!user) return;
+  
+    // 1. If file exists, send file first
+    if (selectedFile) {
+      const fileMessage = {
+        file: selectedFile,
+        senderId: user.id,
+        chatroomId: wotglivechatroom,
+        type: 'file',
+      };
+  
+      try {
+        setUploading(true);
+        const fileRes = await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
 
-    const message = {
-      content: messageContent,
-      senderId: user.id,
-      chatroomId: wotglivechatroom,
-    };
+        if (fileRes) {
+          const { content, senderId, chatroomId } = fileRes.data;
+          if (socket) {
+            socket.emit('new_message', {
+              content,
+              senderId,
+              chatroomId,
+              type: 'file',
+            });
 
-    socket.emit('send_message', message);
-    dispatch(wotgsocial.message.sendMessageAction(message));
+            setUploading(false);
+          }
+        }
+      } catch (err) {
+        console.error('File message dispatch failed:', err);
+      }
+    }
+  
+    // 2. If message content exists, send text after
+    if (messageContent?.trim()) {
+      const textMessage = {
+        content: messageContent,
+        senderId: user.id,
+        chatroomId: wotglivechatroom,
+        type: 'text',
+      };
+  
+      try {
+        await dispatch(wotgsocial.message.sendMessageAction(textMessage));
+      } catch (err) {
+        console.error('Text message dispatch failed:', err);
+      }
+    }
   };
 
   const handleReactMessage = (messageId, reactionType) => {
@@ -131,7 +170,7 @@ const Page = () => {
   };
   
   const sendReaction = (reaction) => {
-      console.log('[[[REACTION WORSHIP PAGE]]]', reaction); 
+      // console.log('[[[REACTION WORSHIP PAGE]]]', reaction); 
       if (!socket) {
           console.error("⚠️ Socket is not connected! Cannot send reaction.");
           return;
@@ -164,8 +203,8 @@ const Page = () => {
       // Update only if the message belongs to the current chatroom
       if (message.chatroomId === wotglivechatroom) {
         setMessages((prevMessages) => {
-            const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
-            if (isDuplicate) return prevMessages;
+            // const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
+            // if (isDuplicate) return prevMessages;
 
             const updatedMessages = [message, ...prevMessages];
             // Sort messages in descending order based on createdAt timestamp
@@ -257,6 +296,7 @@ const Page = () => {
           <div className={styles.chatSection}>
             <ChatWindowStream
               messages={messages}
+              userRole={userRole}
               onSendMessage={handleSendMessage}
               selectedChatroom={wotglivechatroom}
               selectedChatroomDetails={selectedChatroomDetails}
@@ -264,6 +304,7 @@ const Page = () => {
               onSendReaction={sendReaction}
               onMessageReaction={handleReactMessage}
               reactions={reactions}
+              uploading={uploading}
             />
           </div>
         )}

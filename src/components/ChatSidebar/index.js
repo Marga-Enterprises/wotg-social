@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import Cookie from 'js-cookie';
 
 const ChatSidebar = ({ 
   chatrooms, 
@@ -12,6 +13,9 @@ const ChatSidebar = ({
   selectedChatroom,
   toggleMenu
 }) => {
+  const account = Cookie.get('account') ? JSON.parse(Cookie.get('account')) : null;
+  const role = account ? account.user_role : null;
+  const isAdmin = role === 'admin' || role === 'owner';
 
   const [maxLength, setMaxLength] = useState(100);
 
@@ -68,7 +72,8 @@ const ChatSidebar = ({
               <a className={styles.worshipLink} href="/bible">Bible</a>
               <a className={styles.worshipLink} href="/worship">Worship</a>
               <a className={styles.worshipLink} href="/blogs">Devotion</a>
-              <a className={styles.worshipLink} href="/your-journals">Journals</a>
+              <a className={styles.worshipLink} href="/albums">Music</a>
+              <a className={styles.worshipLink} href="/your-journals">Journal</a>
             </div>
           </div>
         </div>

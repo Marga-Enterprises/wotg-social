@@ -10,6 +10,9 @@ import bibleBooks from "../Bible/data";
 
 import styles from "./index.module.css";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear} from "@fortawesome/free-solid-svg-icons";
+
 const Page = () => {
   const dispatch = useDispatch();
   const loadingRef = useRef(false);
@@ -145,7 +148,14 @@ const Page = () => {
             <button onClick={handleGoBack} className={styles.goBackButton}>← Go Back</button>
           </div>
 
-          <h2 className={styles.heading}>Conversation Time {bookName} {chapter}:{verse} ({language.toUpperCase()})</h2>
+          <div className={styles.headingContainer}>
+            <h2 className={styles.heading}>Conversation Time {bookName} {chapter}:{verse} ({language.toUpperCase()})</h2>
+            <FontAwesomeIcon
+              icon={faGear}
+              className={styles.iconButton}
+              title="Copy All"
+            />
+          </div>
 
           <div className={styles.field}>
             <label>1. Ano ang sinabi ng Diyos?</label>

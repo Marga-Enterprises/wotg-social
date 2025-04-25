@@ -8,13 +8,13 @@
       "type": "image/x-icon"
     },
     {
-      "src": "wotg-logo-with-bg.jpeg",
-      "type": "image/jpeg",
+      "src": "wotg-logo.webp",
+      "type": "image/webp",
       "sizes": "192x192"
     },
     {
-      "src": "wotg-logo-with-bg.jpeg",
-      "type": "image/jpeg",
+      "src": "wotg-logo.webp",
+      "type": "image/webp",
       "sizes": "512x512"
     }
   ],

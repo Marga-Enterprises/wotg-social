@@ -104,7 +104,7 @@ const BibleVersesAction = ({ verses = [], onClose, onHighlight, highlightedVerse
             className={styles.iconButton}
           >
             <FontAwesomeIcon icon={faBook} />
-            View Your Journals
+            View Your Journal
           </Link>
 
           {firstVerse.commentary ? (

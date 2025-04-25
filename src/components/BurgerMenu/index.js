@@ -7,8 +7,14 @@ import { wotgsocial } from '../../redux/combineActions';
 
 import styles from "./index.module.css";
 
+import Cookie from 'js-cookie';
+
 const BurgerMenu = ({ onClose }) => {
   const dispatch = useDispatch();
+
+  const account = Cookie.get('account') ? JSON.parse(Cookie.get('account')) : null;
+  const role = account ? account.user_role : null;
+  const isAdmin = role === 'admin' || role === 'owner';
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());
@@ -38,8 +44,9 @@ const BurgerMenu = ({ onClose }) => {
         <Link to="/" className={styles.menuItem} onClick={onClose}>Chat</Link>
         <Link to="/blogs" className={styles.menuItem} onClick={onClose}>Devotion</Link>
         <Link to="/bible" className={styles.menuItem} onClick={onClose}>Bible</Link>
-        <Link to="/your-journals" className={styles.menuItem} onClick={onClose}>Journals</Link>
+        <Link to="/your-journals" className={styles.menuItem} onClick={onClose}>Journal</Link>
         <Link to="/worship" className={styles.menuItem} onClick={onClose}>Worship</Link>
+        <Link to="/albums" className={styles.menuItem} onClick={onClose}>Music</Link>
         <a
           href="https://wotgonline.com/donate/"
           target="_blank"

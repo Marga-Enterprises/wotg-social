@@ -35,6 +35,7 @@ const Page = ({ onToggleMenu  }) => {
     const [isModalOpenForAddParticipant, setIsModalOpenForAddParticipant] = useState(false); // State to manage modal visibility
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
+    const [uploading, setUploading] = useState(false);
 
     const setHideNavbar = useSetHideNavbar();
 
@@ -278,16 +279,20 @@ const Page = ({ onToggleMenu  }) => {
     useEffect(() => {
         if (!socket) return;
     
-        socket.on('new_message', (message) => {
-            if (!message?.id || !message?.chatroomId || !message?.senderId) return;
-    
+        const handleNewMessage = (message) => {
             setMessages((prevMessages) => {
-                const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
-                if (isDuplicate) return prevMessages;
+                /*const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
     
-                return [message, ...prevMessages].sort((a, b) =>
+                if (isDuplicate) {
+                    console.log('[⚠️ Duplicate message skipped]', message.id);
+                    return prevMessages;
+                }*/
+    
+                const updatedMessages = [message, ...prevMessages].sort((a, b) =>
                     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
+    
+                return updatedMessages;
             });
     
             setChatrooms((prevChatrooms) => {
@@ -307,12 +312,15 @@ const Page = ({ onToggleMenu  }) => {
                     new Date(b.RecentMessage?.createdAt || 0) - new Date(a.RecentMessage?.createdAt || 0)
                 );
             });
-        });
+        };
+    
+        socket.on('new_message', handleNewMessage);
     
         return () => {
-            socket.off('new_message');
+            socket.off('new_message', handleNewMessage);
         };
     }, [socket, user?.id]);
+    
     
     useEffect(() => {
         if (!socket) return;
@@ -428,29 +436,55 @@ const Page = ({ onToggleMenu  }) => {
     // Handle sending a message
     const handleSendMessage = async (messageContent, selectedFile) => {
         if (!selectedChatroom || !user) return;
-
-        console.log('[[[[[[SELECTED FILE MAIN]]]]]]', selectedFile);
       
+        // 1. If file exists, send file first
         if (selectedFile) {
-          const message = {
-            file: selectedFile, // Attach the selected file
+          const fileMessage = {
+            file: selectedFile,
             senderId: user.id,
             chatroomId: selectedChatroom,
+            type: 'file',
           };
-          await dispatch(wotgsocial.message.sendFileMessageAction(message));
-        } else if (messageContent?.trim()) {
-          // ✉️ Regular text message
-          const message = {
+      
+          try {
+            setUploading(true);
+            const fileRes = await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
+
+            if (fileRes) {
+              const { content, senderId, chatroomId } = fileRes.data;
+              if (socket) {
+                socket.emit('new_message', {
+                  content,
+                  senderId,
+                  chatroomId,
+                  type: 'file',
+                });
+
+                setUploading(false);
+              }
+            }
+          } catch (err) {
+            console.error('File message dispatch failed:', err);
+          }
+        }
+      
+        // 2. If message content exists, send text after
+        if (messageContent?.trim()) {
+          const textMessage = {
             content: messageContent,
             senderId: user.id,
             chatroomId: selectedChatroom,
+            type: 'text',
           };
       
-          await dispatch(wotgsocial.message.sendMessageAction(message));
+          try {
+            await dispatch(wotgsocial.message.sendMessageAction(textMessage));
+          } catch (err) {
+            console.error('Text message dispatch failed:', err);
+          }
         }
-      };
+    };
       
-
     // If the user is authenticated, subscribe them to push notifications
     useEffect(() => {
         if (isAuthenticated) {
@@ -486,6 +520,7 @@ const Page = ({ onToggleMenu  }) => {
                         className={isMobile ? styles.chatWindowVisible : ''} 
                         onBackClick={handleBackClick}
                         isMobile={isMobile}
+                        uploading={uploading}
                         onMessageReaction={handleReactMessage}
                         onOpenAddParticipantModal={handleOpenAddParticipantModal}
                         userDetails={user}

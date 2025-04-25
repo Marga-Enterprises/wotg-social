@@ -1,76 +1,96 @@
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100svh;
-    width: 100%;
-    background: linear-gradient(to right, #da2f1c, #f17050);
-    padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100svh;
+  width: 100%;
+  background: linear-gradient(135deg, #da2f1c, #f17050);
+  animation: bgShift 10s ease infinite alternate;
+  padding: 1rem;
+}
+
+@keyframes bgShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 .menu {
-    width: 100%;
-    max-width: 24rem;
-    padding: 3rem;
-    background-color: #ffffff;
-    border-radius: 0.5rem;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    /* Fade-in animation */
-    opacity: 0;
-    transform: translateY(-10px);
-    animation: fadeIn 0.8s ease-out forwards;
+  width: 100%;
+  max-width: 28rem;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: box-shadow 0.3s ease-in-out;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.menu:hover {
+  box-shadow: 0px 12px 28px rgba(0, 0, 0, 0.2);
 }
 
 .menuHeader {
-    text-align: center;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    font-weight: bold;
-    color: #757575;
+  text-align: center;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+  color: #555;
 }
 
-.menuList {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
-  
-.menuList a {
-    margin-bottom: 1rem;
-    background: #c93929;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #ffffff;
-    cursor: pointer;
-    
-    /* Smooth transition effect */
-    transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
-    opacity: 0;
-    transform: translateY(10px);
-    animation: fadeIn 0.8s ease-out forwards;
-    animation-delay: 0.2s;
+.gridMenu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
 }
 
-.menuList a:hover {
-    background: #be2f1f;
-    transform: scale(1.05);
+.gridItem {
+  background: linear-gradient(145deg, #c93929, #d95343);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.gridItem::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: width 0.3s ease;
+  border-radius: 0.75rem;
+  z-index: 0;
+}
+
+.gridItem:hover::after {
+  width: 100%;
+}
+
+.gridItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.gridItem span {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  z-index: 1;
+}
+
+.icon {
+  font-size: 1.8rem;
+  z-index: 1;
 }

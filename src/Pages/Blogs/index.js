@@ -37,8 +37,9 @@ const Page = () => {
     const [pageDetails, setPageDetails] = useState({ totalRecords: 0, pageIndex: currentPage, totalPages: 0 });
 
     const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development" ? "http://localhost:5000" : "https://community.wotgonline.com/api";
+        return process.env.NODE_ENV === "development" ? "http://localhost:5000/uploads" : "https://wotg.sgp1.cdn.digitaloceanspaces.com/images";
     }, []);
+
 
     // ✅ Fetch Blog List with Page Index (Optimized)
     const handleBlogList = useCallback(async (pageIndex) => {
@@ -89,21 +90,18 @@ const Page = () => {
         return blogs.map((blog) => (
             <div key={blog.id} className={styles.blogCard}>
                 <h3 className={styles.blogTitle}>{blog.blog_title}</h3>
-
-                {account.user_role !== "member" && (
-                    <h3 className={styles.blogRelease}>
-                        Release Date: {convertMomentWithFormatWhole(blog.blog_release_date_and_time)}
-                    </h3>
-                )}
-
                 <div className={styles.blogImageContainer} style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}>
                     <img
                         loading="lazy"
-                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : wotgLogo}
+                        src={blog.blog_thumbnail ? `${backendUrl}/${blog.blog_thumbnail}` : wotgLogo}
                         alt={blog.blog_title}
                         className={styles.blogImage}
                     />
                 </div>
+
+                <h3 className={styles.blogRelease}>
+                    Date: {convertMomentWithFormatWhole(blog.blog_release_date_and_time)}
+                </h3>
 
                 <p className={styles.blogBody}>{truncateText(decodeHtmlEntities(stripHtml(blog.blog_body)), 200)}</p>
 
@@ -149,7 +147,7 @@ const Page = () => {
             ) : (
                 <div className={styles.mainContainer}>
                     <div className={styles.banner}>
-                        <img src="./prayer.webp" alt="Banner" loading="lazy" className={styles.bannerImage} />
+                        <img src="https://wotg.sgp1.cdn.digitaloceanspaces.com/images/prayer.webp" alt="Banner" loading="lazy" className={styles.bannerImage} />
                         <div className={styles.overlay}></div>
                         <div className={styles.bannerContent}>
                             <h2>Romans 1:16</h2>

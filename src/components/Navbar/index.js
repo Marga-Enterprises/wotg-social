@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from './index.module.css';
 
+import Cookie from 'js-cookie';
+
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
 
@@ -9,6 +11,10 @@ import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 function Navbar({ onToggleMenu  }) {
   const dispatch = useDispatch();
+
+  const account = Cookie.get('account') ? JSON.parse(Cookie.get('account')) : null;
+  const role = account ? account.user_role : null;
+  const isAdmin = role === 'admin' || role === 'owner';
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());
@@ -23,7 +29,8 @@ function Navbar({ onToggleMenu  }) {
           <a href="/" className={styles.navLink}>Chat</a>
           <a href="/blogs" className={styles.navLink}>Devotion</a>
           <a href="/bible" className={styles.navLink}>Bible</a>
-          <a href="/your-journals" className={styles.navLink}>Journals</a>
+          <a href="/your-journals" className={styles.navLink}>Journal</a>
+          <a className={styles.navLink} href="/albums">Music</a>
           <a href="/worship" className={styles.navLink}>Worship</a>
           <a
               href="https://wotgonline.com/donate/"

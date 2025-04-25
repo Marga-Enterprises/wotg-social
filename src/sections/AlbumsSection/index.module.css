@@ -2,7 +2,7 @@
 .albumScrollContainer {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   max-width: 80svw;
   padding: 0 1rem;
 }

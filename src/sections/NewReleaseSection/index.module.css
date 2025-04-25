@@ -3,7 +3,7 @@
 /* ⬅️ Main scroll wrapper with arrow buttons */
 .musicScrollContainer {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0.5rem;
   padding: 0 1rem;
   position: relative;

@@ -147,7 +147,7 @@ const Page = () => {
             ) : (
                 <div className={styles.mainContainer}>
                     <div className={styles.banner}>
-                        <img src="./prayer.webp" alt="Banner" loading="lazy" className={styles.bannerImage} />
+                        <img src="https://wotg.sgp1.cdn.digitaloceanspaces.com/images/prayer.webp" alt="Banner" loading="lazy" className={styles.bannerImage} />
                         <div className={styles.overlay}></div>
                         <div className={styles.bannerContent}>
                             <h2>Romans 1:16</h2>

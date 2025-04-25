@@ -39,7 +39,7 @@ const Page = () => {
     }, []);
 
     const [loading, setLoading] = useState(false);
-    const [pageSize] = useState(5);
+    const [pageSize] = useState(10);
     const [albums, setAlbums] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [pageDetails, setPageDetails] = useState({
@@ -107,17 +107,19 @@ const Page = () => {
         <>
             {loading && <LoadingSpinner />}
             <div className={styles.container}>
-                <h1 className={styles.heading}>Albums</h1>
-                {/*<p className={styles.subheading}>Explore and manage your released albums here.</p>*/}
+                <center className={styles.headingContainer}>
+                  <h1 className={styles.heading}>Albums</h1>
 
-                { role === "admin" || role === "owner" ? (
+                  { role === "admin" || role === "owner" ? (
                     <div className={styles.toolbar}>
                         <button className={styles.addButton} onClick={() => setShowModal(true)}>
                             <FontAwesomeIcon icon={faPlus} /> Add Album
                         </button>
                     </div>
-                ): null}
-
+                  ): null}
+                </center>
+                
+                {/*<p className={styles.subheading}>Explore and manage your released albums here.</p>*/}
 
                 <div className={styles.albumList}>
                     {albums?.length > 0 ? (
@@ -133,7 +135,7 @@ const Page = () => {
                                 </div>
                                 <div className={styles.albumInfo}>
                                     <div className={styles.albumTitle}>
-                                        <h3>{album.title}</h3>
+                                        <h3 className={styles.albumTitleHeading}>{album.title}</h3>
                                         { role === "admin" || role === "owner" ? (
                                             <span className={styles.albumCardActions}>
                                                 <button
@@ -146,7 +148,7 @@ const Page = () => {
                                             </span>
                                         ): null}
                                     </div>
-                                    <p><span><strong>Artist:</strong></span> {album.artist_name}</p>
+                                    <p>{album.artist_name}</p>
                                 </div>
                             </div>
                         ))

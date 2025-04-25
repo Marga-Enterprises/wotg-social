@@ -6,6 +6,7 @@ import styles from './index.module.css';
 
 const AlbumSection = () => {
   const dispatch = useDispatch();
+  const scrollRef = useRef(null);
   const loadingRef = useRef(false);
 
   const backendUrl = useMemo(() =>
@@ -18,9 +19,8 @@ const AlbumSection = () => {
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const handleFetchAlbums = useCallback(async () => {
+  const fetchAlbums = useCallback(async () => {
     if (loadingRef.current || albums.length > 0) return;
-
     loadingRef.current = true;
     setLoading(true);
 
@@ -28,11 +28,11 @@ const AlbumSection = () => {
       const res = await dispatch(
         wotgsocial.album.getAlbumsByParamsAction({ pageSize: 7, pageIndex: 1 })
       );
-      if (res.success && res.data?.albums?.length) {
+      if (res.success && Array.isArray(res.data?.albums)) {
         setAlbums(res.data.albums);
       }
-    } catch (err) {
-      console.error('Unable to fetch albums.', err);
+    } catch (error) {
+      console.error('❌ Failed to fetch albums:', error);
     } finally {
       loadingRef.current = false;
       setLoading(false);
@@ -40,31 +40,14 @@ const AlbumSection = () => {
   }, [dispatch, albums.length]);
 
   useEffect(() => {
-    handleFetchAlbums();
-  }, [handleFetchAlbums]);
-
-  const renderedAlbums = useMemo(() => (
-    albums.map((album) => (
-      <div key={album.id} className={styles.albumCard}>
-        <img
-          src={`${backendUrl}/uploads/${album.cover_image || 'default-cover.png'}`}
-          alt={album.title}
-          className={styles.albumImage}
-          loading="lazy"
-        />
-        <div className={styles.albumText}>
-          <h3 className={styles.albumTitle}>{album.title}</h3>
-          <p className={styles.albumMeta}>{album.artist_name}</p>
-        </div>
-      </div>
-    ))
-  ), [albums, backendUrl]);
+    fetchAlbums();
+  }, [fetchAlbums]);
 
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className={styles.albumRow}>
-      {renderedAlbums}
+    <div className={styles.tableScrollWrapper} ref={scrollRef}>
+
     </div>
   );
 };

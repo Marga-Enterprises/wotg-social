@@ -15,10 +15,17 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   const dispatch = useDispatch();
   const audioRef = useRef(null);
 
-  const backendUrl = useMemo(() =>
+  const backendUrlImage = useMemo(() =>
     process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000'
-      : 'https://community.wotgonline.com/api',
+      ? 'http://localhost:5000/uploads'
+      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+    []
+  );
+
+  const backendUrlAudio= useMemo(() =>
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:5000/uploads'
+      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios',
     []
   );
 
@@ -56,7 +63,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
 
       audio.addEventListener('loadedmetadata', metadataHandler);
       audio.addEventListener('timeupdate', timeUpdateHandler);
-      audio.src = `${backendUrl}/uploads/${music.audio_url}`;
+      audio.src = `${backendUrlAudio}/${music.audio_url}`;
       audio.load();
     };
 
@@ -69,7 +76,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
         audio.removeEventListener('timeupdate', timeUpdateHandler);
       }
     };
-  }, [music, backendUrl]);
+  }, [music, backendUrlAudio]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -102,7 +109,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
     <div className={styles.musicControlsSection}>
       <div className={styles.songInfo} onClick={togglePlay} style={{ cursor: 'pointer' }}>
         <img
-          src={`${backendUrl}/uploads/${albumCover || 'default-cover.png'}`}
+          src={`${backendUrlImage}/${albumCover || 'default-cover.png'}`}
           alt="Album Art"
           className={styles.albumThumb}
         />

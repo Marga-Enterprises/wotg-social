@@ -18,6 +18,7 @@ const AlbumSection = () => {
 
   const [albums, setAlbums] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showArrows, setShowArrows] = useState(false);
 
   const fetchAlbums = useCallback(async () => {
     if (loadingRef.current || albums.length > 0) return;
@@ -43,51 +44,67 @@ const AlbumSection = () => {
     fetchAlbums();
   }, [fetchAlbums]);
 
+  useEffect(() => {
+    const checkScroll = () => {
+      if (scrollRef.current) {
+        const { scrollWidth, clientWidth } = scrollRef.current;
+        setShowArrows(scrollWidth > clientWidth);
+      }
+    };
+
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, [albums]);
+
   const scrollFunction = (direction) => {
-    // console.log('[[[[[[[[[[[ DIRECTION ]]]]]]]]]]]', direction);
     if (scrollRef.current) {
       const scrollAmount = 150;
       const scrollBy = direction === 'left' ? -scrollAmount : scrollAmount;
       scrollRef.current.scrollBy({ left: scrollBy, behavior: 'smooth' });
     }
-  };  
+  };
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className={styles.albumScrollContainer}>
-      <button className={styles.scrollButton} onClick={() => scrollFunction('left')}>
-        &#10094;
-      </button>
+      {showArrows && (
+        <button
+          className={`${styles.scrollButton} ${styles.left}`}
+          onClick={() => scrollFunction('left')}
+        >
+          &#10094;
+        </button>
+      )}
 
-      <div className={styles.tableScrollWrapper} ref={scrollRef}>
-        <table className={styles.albumTable}>
-          <tbody>
-            <tr>
-              {albums.map((album) => (
-                <td key={album.id} className={styles.albumTableCell}>
-                  <div className={styles.albumCard}>
-                    <img
-                      src={`${backendUrl}/uploads/${album.cover_image || 'default-cover.png'}`}
-                      alt={album.title}
-                      className={styles.albumImage}
-                      loading="lazy"
-                    />
-                    <div className={styles.albumText}>
-                      <h3 className={styles.albumTitle}>{album.title}</h3>
-                      <p className={styles.albumMeta}>{album.artist_name}</p>
-                    </div>
-                  </div>
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
+      <div className={styles.albumRowWrapper} ref={scrollRef}>
+        <div className={styles.albumRow}>
+          {albums.map((album) => (
+            <div key={album.id} className={styles.albumCard}>
+              <img
+                src={`${backendUrl}/uploads/${album.cover_image || 'default-cover.png'}`}
+                alt={album.title}
+                className={styles.albumImage}
+                loading="lazy"
+              />
+              <div className={styles.albumText}>
+                <h3 className={styles.albumTitle}>{album.title}</h3>
+                <p className={styles.albumMeta}>{album.artist_name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <button className={styles.scrollButton} onClick={() => scrollFunction('right')}>
-        &#10095;
-      </button>
+      {showArrows && (
+        <button
+          className={`${styles.scrollButton} ${styles.right}`}
+          onClick={() => scrollFunction('right')}
+        >
+          &#10095;
+        </button>
+      )}
     </div>
   );
 };

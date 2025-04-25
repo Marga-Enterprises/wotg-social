@@ -1,57 +1,35 @@
-.tableScrollWrapper {
+/* Scrollable container wrapper */
+.albumScrollContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+/* Scroll area that hides native scrollbars */
+.albumRowWrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   width: 100%;
   padding: 1rem 0;
   scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
 }
 
-.tableScrollWrapper::-webkit-scrollbar {
-  display: none;
+.albumRowWrapper::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
-.albumTable {
-  display: table;
-  table-layout: fixed;
-  white-space: nowrap;
-  border-collapse: separate;
-  border-spacing: 1rem;
-}
-
-.albumTableCell {
-  vertical-align: top;
-}
-
-.albumScrollContainer {
+/* Horizontal row of album cards */
+.albumRow {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0 1rem;
-  position: relative;
+  gap: 1rem;
 }
 
-.scrollButton {
-  background-color: #fff;
-  border: none;
-  border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  color: #333;
-  font-size: 1.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
-}
-
-.scrollButton:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-}
-
+/* Album card */
 .albumCard {
+  flex: 0 0 auto;
   width: 180px;
   background: #fff;
   border-radius: 16px;
@@ -67,6 +45,7 @@
   transform: translateY(-4px);
 }
 
+/* Album cover image */
 .albumImage {
   width: 100%;
   aspect-ratio: 1/1;
@@ -75,14 +54,54 @@
   margin-bottom: 0.5rem;
 }
 
+/* Text inside album card */
 .albumTitle {
   font-size: 0.95rem;
   font-weight: 600;
   color: #111;
-  margin: 0.25rem 0 0.3rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.6em;
 }
 
 .albumMeta {
   font-size: 0.8rem;
   color: #666;
+}
+
+/* Scroll arrows */
+.scrollButton {
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #fff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  color: #333;
+  font-size: 1.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+  z-index: 2;
+}
+
+.scrollButton.left {
+  left: 0;
+}
+
+.scrollButton.right {
+  right: 0;
+}
+
+.scrollButton:hover {
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }

@@ -22,8 +22,8 @@ const Page = () => {
     // ✅ Memoize Backend URL
     const backendUrl = useMemo(() => {
         return process.env.NODE_ENV === "development"
-            ? "http://localhost:5000"
-            : "https://community.wotgonline.com/api";
+            ? "http://localhost:5000/uploads"
+            : "https://wotg.sgp1.cdn.digitaloceanspaces.com/images";
     }, []);
 
     // ✅ Fetch Blog Details (Optimized with `useCallback`)
@@ -59,7 +59,7 @@ const Page = () => {
                                 <div className={styles.blogImageContainer}>
                                     <img
                                         loading="lazy"
-                                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : wotgLogo1}
+                                        src={blog.blog_thumbnail ? `${backendUrl}/${blog.blog_thumbnail}` : wotgLogo1}
                                         alt={blog.blog_title}
                                         className={styles.blogImage}
                                     />

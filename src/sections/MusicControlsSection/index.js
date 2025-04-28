@@ -9,6 +9,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   const dispatch = useDispatch();
   const audioRef = useRef(null);
   const clickListenerRef = useRef(null);
+  const isSeekingRef = useRef(false); // ✅ Detect manual seeking
 
   const backendUrlImage = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images', []);
   const backendUrlAudio = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios', []);
@@ -31,7 +32,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !music) return;
-  
+
     const attemptPlay = () => {
       audio.play()
         .then(() => setIsPlaying(true))
@@ -46,31 +47,33 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
           }
         });
     };
-  
+
     const handleLoadedMetadata = () => {
-      audio.currentTime = 0; // 🔥 make sure
+      audio.currentTime = 0;
       setDuration(audio.duration || 0);
       setCurrentTime(0);
       attemptPlay();
     };
-  
+
     const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
+      if (!isSeekingRef.current) {
+        setCurrentTime(audio.currentTime);
+      }
     };
-  
-    // Reset audio first (important for fast clickers)
+
+    // Reset audio
     audio.pause();
-    audio.removeAttribute('src'); // Clear old src
+    audio.removeAttribute('src');
     audio.load();
-  
-    // Now assign new src
+
+    // Assign new src
     audio.src = `${backendUrlAudio}/${music.audio_url}`;
     audio.load();
-  
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
-  
-    // MediaSession API (lockscreen control)
+
+    // MediaSession API setup
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: music.title,
@@ -88,19 +91,17 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
       navigator.mediaSession.setActionHandler('previoustrack', onPrevious);
       navigator.mediaSession.setActionHandler('nexttrack', onNext);
     }
-  
+
     return () => {
-      if (audio) {
-        audio.pause();
-        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        audio.removeEventListener('timeupdate', handleTimeUpdate);
-      }
+      audio.pause();
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
       if (clickListenerRef.current) {
         document.removeEventListener('click', clickListenerRef.current);
         clickListenerRef.current = null;
       }
     };
-  }, [music, backendUrlAudio, backendUrlImage, albumCover, onPrevious, onNext]);  
+  }, [music, backendUrlAudio, backendUrlImage, albumCover, onPrevious, onNext]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -115,10 +116,15 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
 
   const handleSliderChange = useCallback((e) => {
     const value = parseFloat(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.currentTime = value;
-      setCurrentTime(value);
-    }
+    if (!audioRef.current) return;
+
+    isSeekingRef.current = true;
+    audioRef.current.currentTime = value;
+    setCurrentTime(value);
+
+    setTimeout(() => {
+      isSeekingRef.current = false;
+    }, 300); // wait a bit before allowing timeupdate to take over
   }, []);
 
   const handleVolumeChange = useCallback((e) => {

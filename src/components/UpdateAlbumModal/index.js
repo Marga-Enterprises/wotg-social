@@ -17,11 +17,9 @@ const UpdateAlbumModal = ({ isOpen, onClose, id }) => {
     []
   );
 
-  const backendUrl = useMemo(() => {
-      return process.env.NODE_ENV === "development"
-          ? "http://localhost:5000"
-          : "https://community.wotgonline.com/api";
-  }, []);
+  const backendUrl= useMemo(() =>
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+  []);
 
   const dispatch = useDispatch();
   const loadingRef = useRef(false); // ✅ Loading state reference
@@ -59,7 +57,7 @@ const UpdateAlbumModal = ({ isOpen, onClose, id }) => {
           type: res.data.type
         })
 
-        setImagePreview(`${backendUrl}/uploads/${res.data.cover_image}`);
+        setImagePreview(`${backendUrl}/${res.data.cover_image}`);
       }
     } catch (err) {
       console.error('Unable to fetch details')

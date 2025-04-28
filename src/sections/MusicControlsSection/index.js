@@ -16,11 +16,8 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   const audioRef = useRef(null);
 
   const backendUrlImage = useMemo(() =>
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000/uploads'
-      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
-    []
-  );
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+  []);
 
   const backendUrlAudio= useMemo(() =>
     'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios',

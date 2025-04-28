@@ -50,10 +50,10 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
 
     const handleLoadedMetadata = () => {
       audio.currentTime = 0;
+      setCurrentTime(0); // 🔥 Make sure UI resets
       setDuration(audio.duration || 0);
-      setCurrentTime(0);
       attemptPlay();
-    };
+    };    
 
     const handleTimeUpdate = () => {
       if (!isSeekingRef.current) {
@@ -186,7 +186,10 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
       <audio
         ref={audioRef}
         preload="metadata"
-        onEnded={() => setTimeout(onNext, 1000)}
+        onEnded={() => {
+          setCurrentTime(0); // 🔥 Immediately reset seeker
+          setTimeout(onNext, 1000); // Then after a slight delay go to next
+        }}
       />
     </div>
   );

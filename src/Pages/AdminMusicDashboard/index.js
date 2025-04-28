@@ -33,11 +33,10 @@ const Page = () => {
     const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
     const currentPage = useMemo(() => parseInt(queryParams.get("page")) || 1, [queryParams]);
 
-    const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development"
-            ? "http://localhost:5000"
-            : "https://community.wotgonline.com/api";
-    }, []);
+  const backendUrl= useMemo(() =>
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+    []
+  );
 
     const [loading, setLoading] = useState(false);
     const [pageSize] = useState(10);
@@ -137,7 +136,7 @@ const Page = () => {
                             <div key={album.id} className={styles.albumCard}>
                                 <div className={styles.albumThumbWrapper} onClick={() => handleRouteToMusicPage(album.id)}>
                                     <img
-                                        src={`${backendUrl}/uploads/${album.cover_image || "default-cover.png"}`}
+                                        src={`${backendUrl}/${album.cover_image || "default-cover.png"}`}
                                         alt={album.title}
                                         loading="lazy"
                                         className={styles.albumImage}

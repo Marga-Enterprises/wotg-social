@@ -110,8 +110,6 @@ const Page = () => {
         handleAlbumsList(currentPage);
     }, [handleAlbumsList, currentPage]);
 
-    console.log('albumId', albumId);
-
     return (
         <>
             {loading && <LoadingSpinner />}

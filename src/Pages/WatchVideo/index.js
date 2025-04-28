@@ -18,8 +18,8 @@ const Page = () => {
     // ✅ Memoized Backend URL (Prevents unnecessary recalculations)
     const backendUrl = useMemo(() => {
         return process.env.NODE_ENV === "development"
-            ? "http://localhost:5000"
-            : "https://community.wotgonline.com/api";
+            ? "http://localhost:5000/uploads"
+            : "https://wotg.sgp1.cdn.digitaloceanspaces.com/videos";
     }, []);
 
     // ✅ Fetch Blog Details (Optimized)

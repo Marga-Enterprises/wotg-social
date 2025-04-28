@@ -7,8 +7,8 @@ import LoadingSpinner from '../LoadingSpinner';
 
 const BACKEND_URL =
   process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000'
-    : 'https://community.wotgonline.com/api';
+    ? 'http://localhost:5000/uploads'
+    : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
 
 const Profile = ({ onClose }) => {
     const dispatch = useDispatch();
@@ -42,7 +42,7 @@ const Profile = ({ onClose }) => {
                     });
 
                     if (res.data.user_profile_picture) {
-                        setPreviewImage(`${BACKEND_URL}/uploads/${res.data.user_profile_picture}`);
+                        setPreviewImage(`${BACKEND_URL}/${res.data.user_profile_picture}`);
                     }
                 }
             })

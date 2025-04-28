@@ -27,8 +27,8 @@
   }) => {
     const backendUrl =
     process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000'
-      : 'https://community.wotgonline.com/api';
+      ? 'http://localhost:5000/uploads'
+      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
       
     const [message, setMessage] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
@@ -198,7 +198,7 @@
               <img
                 loading="lazy"
                 src={receiver?.user?.user_profile_picture
-                  ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
+                  ? `${backendUrl}/${receiver.user.user_profile_picture}`
                   : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
                 alt={receiver?.user?.user_fname || "User Avatar"}
                 className={styles.receiverAvatar}
@@ -386,7 +386,7 @@
                                   loading="lazy"
                                   key={index}
                                   onClick={onOpenAddParticipantModal}
-                                  src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
+                                  src={`${backendUrl}/${participant.user.user_profile_picture}`}
                                   alt={participant.user.user_fname}
                                   className={styles.avatarImage}
                                 />
@@ -510,7 +510,7 @@
                         <li key={index} className={styles.reactorItem}>
                           <img
                             loading="lazy"
-                            src={`${backendUrl}/uploads/${reactor.user.user_profile_picture}`}
+                            src={`${backendUrl}/${reactor.user.user_profile_picture}`}
                             alt={reactor.user.user_fname}
                             className={styles.reactorAvatar}
                           />
@@ -542,7 +542,7 @@
               <div className={styles.avatarWrapper}>
                 <img
                   loading="lazy"
-                  src={`${backendUrl}/uploads/${userDetails.user_profile_picture}`}
+                  src={`${backendUrl}/${userDetails.user_profile_picture}`}
                   alt={userDetails.user_fname}
                   className={styles.noChatIdAvatarImage}
                 />

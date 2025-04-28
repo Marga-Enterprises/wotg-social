@@ -14,7 +14,7 @@ const ProfileSidebar = ({ onOpenProfileModal }) => {
   const [userInitials, setUserInitials] = useState('');
 
   const backendUrl = 
-  process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://community.wotgonline.com/api';
+  process.env.NODE_ENV === 'development' ? 'http://localhost:5000/uploads' : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
 
   useEffect(() => {
     if (storedAccount) {
@@ -22,7 +22,7 @@ const ProfileSidebar = ({ onOpenProfileModal }) => {
   
       // Check if user has a profile picture
       if (accountData.user_profile_picture) {
-        setProfilePicture(`${backendUrl}/uploads/${accountData.user_profile_picture}`);
+        setProfilePicture(`${backendUrl}/${accountData.user_profile_picture}`);
       } else {
         // Generate initials from first and last name
         const firstName = accountData.user_fname || '';

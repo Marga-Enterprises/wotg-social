@@ -21,8 +21,8 @@ const ChatSidebar = ({
 
   const backendUrl =
   process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000'
-    : 'https://community.wotgonline.com/api';
+    ? 'http://localhost:5000/uploads'
+    : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
 
   // Detect screen size (mobile or not)
   useEffect(() => {
@@ -114,7 +114,7 @@ const ChatSidebar = ({
                                 <img
                                   loading="lazy"
                                   key={index}
-                                  src={`${backendUrl}/uploads/${participant.user.user_profile_picture}`}
+                                  src={`${backendUrl}/${participant.user.user_profile_picture}`}
                                   alt={participant.user.user_fname}
                                   className={styles.avatarImage}
                                 />

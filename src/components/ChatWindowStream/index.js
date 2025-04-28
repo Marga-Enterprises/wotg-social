@@ -27,8 +27,8 @@ const ChatWindow = ({ messages,
 }) => {
   const backendUrl =
   process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000'
-    : 'https://community.wotgonline.com/api';
+    ? 'http://localhost:5000/uploads'
+    : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
     
   const [message, setMessage] = useState('');
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);

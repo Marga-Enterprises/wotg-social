@@ -31,17 +31,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !music) return;
-
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration || 0);
-      setCurrentTime(0);
-      attemptPlay();
-    };
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
-
+  
     const attemptPlay = () => {
       audio.play()
         .then(() => setIsPlaying(true))
@@ -56,14 +46,31 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
           }
         });
     };
-
-    // Set source
+  
+    const handleLoadedMetadata = () => {
+      audio.currentTime = 0; // 🔥 make sure
+      setDuration(audio.duration || 0);
+      setCurrentTime(0);
+      attemptPlay();
+    };
+  
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+  
+    // Reset audio first (important for fast clickers)
+    audio.pause();
+    audio.removeAttribute('src'); // Clear old src
+    audio.load();
+  
+    // Now assign new src
     audio.src = `${backendUrlAudio}/${music.audio_url}`;
     audio.load();
-
+  
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
-
+  
+    // MediaSession API (lockscreen control)
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: music.title,
@@ -71,12 +78,17 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
         album: 'WOTG Streaming',
         artwork: [{ src: `${backendUrlImage}/${albumCover || 'default-cover.png'}`, sizes: '512x512', type: 'image/png' }]
       });
-      navigator.mediaSession.setActionHandler('play', () => audio.play().then(() => setIsPlaying(true)));
-      navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+      navigator.mediaSession.setActionHandler('play', () => {
+        audio.play().then(() => setIsPlaying(true));
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        audio.pause();
+        setIsPlaying(false);
+      });
       navigator.mediaSession.setActionHandler('previoustrack', onPrevious);
       navigator.mediaSession.setActionHandler('nexttrack', onNext);
     }
-
+  
     return () => {
       if (audio) {
         audio.pause();
@@ -88,7 +100,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
         clickListenerRef.current = null;
       }
     };
-  }, [music, backendUrlAudio, backendUrlImage, albumCover, onPrevious, onNext]);
+  }, [music, backendUrlAudio, backendUrlImage, albumCover, onPrevious, onNext]);  
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;

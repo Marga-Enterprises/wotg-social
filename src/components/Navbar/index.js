@@ -24,7 +24,7 @@ function Navbar({ onToggleMenu  }) {
           <a href="/blogs" className={styles.navLink}>Devotion</a>
           <a href="/bible" className={styles.navLink}>Bible</a>
           <a href="/your-journals" className={styles.navLink}>Journal</a>
-          <a className={styles.navLink} href="/albums">Music</a>
+          <a className={styles.navLink} href="/music">Music</a>
           <a href="/worship" className={styles.navLink}>Worship</a>
           <a
               href="https://wotgonline.com/donate/"

@@ -1,75 +1,62 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-
-/* ⬅️ Main scroll wrapper with arrow buttons */
+/* Scrollable container wrapper */
 .musicScrollContainer {
+  position: relative;
   display: flex;
   align-items: stretch;
-  gap: 0.5rem;
-  padding: 0 1rem;
-  position: relative;
   max-width: 80svw;
+  padding: 0 1rem;
 }
 
-/* ⬅️ Scrollable row wrapper */
+/* Scroll area that hides native scrollbars */
 .musicRowWrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  width: 100%;
-  padding: 1rem 0;
   max-width: 80svw;
+  padding: 1rem 0;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
 }
 
 .musicRowWrapper::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+  display: none; /* Chrome/Safari */
 }
 
-/* ⬅️ Actual flex row of cards */
+/* Horizontal row of music cards */
 .musicRow {
   display: flex;
   gap: 1rem;
 }
 
-/* ⬅️ Card container */
+/* Music card */
 .musicCard {
   flex: 0 0 auto;
-  width: 180px;
-  background: #fff;
+  width: 250px;
   border-radius: 16px;
-  padding: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
   display: flex;
+  padding: .5rem;
   flex-direction: column;
   align-items: flex-start;
   transition: transform 0.2s ease-in-out;
 }
 
 .musicCard:hover {
-  transform: translateY(-4px);
+  background-color: #dbdbdb;
 }
 
-/* ⬅️ Music image inside the card */
+/* Music cover image */
 .musicImage {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1/1;
   object-fit: cover;
   border-radius: 12px;
   margin-bottom: 0.5rem;
 }
 
-/* ⬅️ Text container */
-.musicText {
-  width: 100%;
-}
-
-/* ⬅️ Music title with 2-line clamp 
+/* Text inside music card 
 .musicTitle {
   font-size: 0.95rem;
-  font-weight: 700;
-  font-family: 'Inter', sans-serif;
-  font-optical-sizing: auto;
-  font-style: normal;
+  font-weight: 600;
   color: #111;
   line-height: 1.3;
   display: -webkit-box;
@@ -77,8 +64,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 2.6em; /* = 2 lines of text with line-height 
-} */
+  height: 2.6em;
+}*/
 
 .musicTitle {
   font-size: 0.95rem;
@@ -90,13 +77,13 @@
   width: 100%;
 }
 
-/* ⬅️ Subtitle / artist name */
 .musicMeta {
   font-size: 0.8rem;
   color: #666;
 }
 
 .scrollButton {
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
   background-color: #fff;
@@ -112,7 +99,17 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s;
-  z-index: 2; /* Make sure it's above the scrollable content */
+  z-index: 2;
+  padding: 0;
+  margin: 0;
+}
+
+.scrollButton.left {
+  left: 0;
+}
+
+.scrollButton.right {
+  right: 0;
 }
 
 .scrollButton:hover {
@@ -120,3 +117,24 @@
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
 }
 
+@media (max-width: 1024px) {
+  .musicCard {
+    width: 160px;
+  }
+
+  .musicRow {
+    gap: .2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .musicCard {
+    width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .musicCard {
+    width: 120px;
+  }
+}

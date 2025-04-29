@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
+import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 
 const NewReleaseSection = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const scrollRef = useRef(null);
   const loadingRef = useRef(false);
 
-  const backendUrl = useMemo(() =>
-    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+  const backendUrl = useMemo(
+    () => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
     []
   );
 
@@ -37,53 +40,60 @@ const NewReleaseSection = () => {
     }
   }, [dispatch, musics.length]);
 
+  const handleRouteToMusicPage = (musicId, albumId) => {
+    navigate(`/music-in-album/${albumId}?music=${musicId}`);
+  };
+
   useEffect(() => {
     fetchMusics();
   }, [fetchMusics]);
 
   const scrollFunction = (direction) => {
-    // console.log('[[[[[[[[[[[ DIRECTION ]]]]]]]]]]]', direction);
     if (scrollRef.current) {
       const scrollAmount = 150;
       const scrollBy = direction === 'left' ? -scrollAmount : scrollAmount;
       scrollRef.current.scrollBy({ left: scrollBy, behavior: 'smooth' });
     }
-  };  
+  };
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className={styles.musicScrollContainer}>
-      <button className={styles.scrollButton} onClick={() => scrollFunction('left')}>
+      <button
+        className={`${styles.scrollButton} ${styles.left}`}
+        onClick={() => scrollFunction('left')}
+      >
         &#10094;
       </button>
 
-      <div className={styles.tableScrollWrapper} ref={scrollRef}>
-        <table className={styles.musicTable}>
-          <tbody>
-            <tr>
-              {musics.map((music) => (
-                <td key={music.id} className={styles.musicTableCell}>
-                  <div className={styles.musicCard}>
-                    <img
-                      src={`${backendUrl}/${music.cover_image || 'default-cover.png'}`}
-                      alt={music.title}
-                      className={styles.musicImage}
-                      loading="lazy"
-                    />
-                    <div className={styles.musicText}>
-                      <h3 className={styles.musicTitle}>{music.title}</h3>
-                      <p className={styles.musicMeta}>{music.artist_name}</p>
-                    </div>
-                  </div>
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
+      <div className={styles.musicRowWrapper} ref={scrollRef}>
+        <div className={styles.musicRow}>
+          {musics.map((music) => (
+            <div key={music.id} className={styles.musicCard} onClick={() => handleRouteToMusicPage(music.id, music.album_id)}>
+              <img
+                src={
+                  process.env.NODE_ENV === 'development'
+                    ? 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/prayer.webp'
+                    : `${backendUrl}/${music.cover_image || 'wotgLogo.webp'}`
+                }
+                alt={music.title}
+                className={styles.musicImage}
+                loading="lazy"
+              />
+              <div className={styles.musicText}>
+                <h3 className={styles.musicTitle}>{music.title}</h3>
+                <p className={styles.musicMeta}>{music.artist_name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <button className={styles.scrollButton} onClick={() => scrollFunction('right')}>
+      <button
+        className={`${styles.scrollButton} ${styles.right}`}
+        onClick={() => scrollFunction('right')}
+      >
         &#10095;
       </button>
     </div>

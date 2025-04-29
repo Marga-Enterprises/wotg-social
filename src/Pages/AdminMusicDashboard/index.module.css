@@ -64,6 +64,12 @@
   margin-top: .5rem;
 }
 
+.albumArtist {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .albumCard {
   background: #fff;
   border-radius: 16px;

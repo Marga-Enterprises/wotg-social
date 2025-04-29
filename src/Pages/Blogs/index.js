@@ -6,7 +6,6 @@ import { convertMomentWithFormatWhole } from "../../utils/methods";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
 import Cookies from "js-cookie";
-import wotgLogo from "../../images/wotgLogo.webp";
 
 // Utility functions
 const stripHtml = (html) => html.replace(/<\/?[^>]+(>|$)/g, "");
@@ -93,7 +92,10 @@ const Page = () => {
                 <div className={styles.blogImageContainer} style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}>
                     <img
                         loading="lazy"
-                        src={blog.blog_thumbnail ? `${backendUrl}/${blog.blog_thumbnail}` : wotgLogo}
+                        src={blog.blog_thumbnail ? 
+                            `${backendUrl}/${blog.blog_thumbnail}` : 
+                            'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'
+                        }
                         alt={blog.blog_title}
                         className={styles.blogImage}
                     />

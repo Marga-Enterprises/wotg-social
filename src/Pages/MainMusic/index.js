@@ -13,9 +13,9 @@ const Page = () => {
         <section className={styles.section}>
           <header className={styles.sectionHeader}>
             <h2>New Releases</h2>
-            <Link to="/albums" className={styles.showAllBtn}>
+            {/*<Link to="/albums" className={styles.showAllBtn}>
               Show all
-            </Link>
+            </Link>*/}
           </header>
 
           <div className={styles.carouselWrapper}>

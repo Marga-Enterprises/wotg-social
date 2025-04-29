@@ -1,11 +1,11 @@
-/* Scrollable container wrapper */
 .albumScrollContainer {
-  position: relative;
+  position: relative; /* Important for absolutely positioned children */
   display: flex;
   align-items: stretch;
   max-width: 80svw;
   padding: 0 1rem;
 }
+
 
 /* Scroll area that hides native scrollbars */
 .albumRowWrapper {
@@ -30,19 +30,18 @@
 /* Album card */
 .albumCard {
   flex: 0 0 auto;
-  width: 180px;
-  background: #fff;
+  width: 250px;
   border-radius: 16px;
-  padding: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
   display: flex;
+  padding: .5rem;
   flex-direction: column;
   align-items: flex-start;
   transition: transform 0.2s ease-in-out;
 }
 
 .albumCard:hover {
-  transform: translateY(-4px);
+  background-color: #dbdbdb;
 }
 
 /* Album cover image */
@@ -83,8 +82,8 @@
   color: #666;
 }
 
-/* Scroll arrows */
 .scrollButton {
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
   background-color: #fff;
@@ -101,6 +100,8 @@
   justify-content: center;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s;
   z-index: 2;
+  padding: 0;
+  margin: 0;
 }
 
 .scrollButton.left {
@@ -114,4 +115,26 @@
 .scrollButton:hover {
   transform: translateY(-50%) scale(1.1);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 1024px) {
+  .albumCard {
+    width: 160px;
+  }
+
+  .albumRow {
+    gap: .2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .albumCard {
+    width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .albumCard {
+    width: 120px;
+  }
 }

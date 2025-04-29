@@ -20,11 +20,10 @@ const Page = () => {
     const page = useMemo(() => queryParams.get("page") || 1, [queryParams]);
 
     // ✅ Memoize Backend URL
-    const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development"
-            ? "http://localhost:5000/uploads"
-            : "https://wotg.sgp1.cdn.digitaloceanspaces.com/images";
-    }, []);
+    const backendUrl = useMemo(() =>
+        'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+        []
+    );
 
     // ✅ Fetch Blog Details (Optimized with `useCallback`)
     const fetchBlogDetails = useCallback(async () => {

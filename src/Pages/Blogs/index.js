@@ -36,10 +36,10 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [pageDetails, setPageDetails] = useState({ totalRecords: 0, pageIndex: currentPage, totalPages: 0 });
 
-    const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development" ? "http://localhost:5000/uploads" : "https://wotg.sgp1.cdn.digitaloceanspaces.com/images";
-    }, []);
-
+    const backendUrl = useMemo(() =>
+        'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+        []
+    );
 
     // ✅ Fetch Blog List with Page Index (Optimized)
     const handleBlogList = useCallback(async (pageIndex) => {

@@ -16,11 +16,10 @@ const Page = () => {
     const [videoLoaded, setVideoLoaded] = useState(false);
 
     // ✅ Memoized Backend URL (Prevents unnecessary recalculations)
-    const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development"
-            ? "http://localhost:5000/uploads"
-            : "https://wotg.sgp1.cdn.digitaloceanspaces.com/videos";
-    }, []);
+    const backendUrl = useMemo(() =>
+        'https://wotg.sgp1.cdn.digitaloceanspaces.com/videos',
+        []
+    );
 
     // ✅ Fetch Blog Details (Optimized)
     const fetchBlogDetails = useCallback(async () => {
@@ -68,7 +67,7 @@ const Page = () => {
                                                 poster={wotgLogo}
                                                 preload="metadata" // ✅ Faster page load
                                             >
-                                                <source src={`${backendUrl}/uploads/${blog.blog_video}`} type="video/webm" />
+                                                <source src={`${backendUrl}/${blog.blog_video}`} type="video/webm" />
                                                 Your browser does not support the video tag.
                                             </video>
                                         </div>

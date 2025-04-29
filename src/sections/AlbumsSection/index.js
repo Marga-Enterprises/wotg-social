@@ -10,9 +10,7 @@ const AlbumSection = () => {
   const loadingRef = useRef(false);
 
   const backendUrl = useMemo(() =>
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000'
-      : 'https://community.wotgonline.com/api',
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
     []
   );
 
@@ -67,7 +65,7 @@ const AlbumSection = () => {
           {albums.map((album) => (
             <div key={album.id} className={styles.albumCard}>
               <img
-                src={`${backendUrl}/uploads/${album.cover_image || 'default-cover.png'}`}
+                src={`${backendUrl}/${album.cover_image || 'default-cover.png'}`}
                 alt={album.title}
                 className={styles.albumImage}
                 loading="lazy"

@@ -10,9 +10,7 @@ const NewReleaseSection = () => {
   const loadingRef = useRef(false);
 
   const backendUrl = useMemo(() =>
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000'
-      : 'https://community.wotgonline.com/api',
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
     []
   );
 
@@ -68,7 +66,7 @@ const NewReleaseSection = () => {
                 <td key={music.id} className={styles.musicTableCell}>
                   <div className={styles.musicCard}>
                     <img
-                      src={`${backendUrl}/uploads/${music.cover_image || 'default-cover.png'}`}
+                      src={`${backendUrl}/${music.cover_image || 'default-cover.png'}`}
                       alt={music.title}
                       className={styles.musicImage}
                       loading="lazy"

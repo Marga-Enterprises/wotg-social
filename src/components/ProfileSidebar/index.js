@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from './index.module.css';
 import { useDispatch } from 'react-redux';
 import Cookies from 'js-cookie';
@@ -13,8 +13,10 @@ const ProfileSidebar = ({ onOpenProfileModal }) => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [userInitials, setUserInitials] = useState('');
 
-  const backendUrl = 
-  process.env.NODE_ENV === 'development' ? 'http://localhost:5000/uploads' : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
+  const backendUrl = useMemo(() =>
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+    []
+  );
 
   useEffect(() => {
     if (storedAccount) {

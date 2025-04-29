@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy, startTransition, useRef, useState, useCallback } from 'react';
+import React, { useEffect, Suspense, lazy, startTransition, useRef, useState, useCallback, useMemo } from 'react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react'
 import debounce from 'lodash/debounce';
@@ -25,10 +25,10 @@ const ChatWindow = ({ messages,
   userRole,
   uploading
 }) => {
-  const backendUrl =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000/uploads'
-    : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
+  const backendUrl = useMemo(() =>
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+    []
+  );
     
   const [message, setMessage] = useState('');
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
@@ -150,13 +150,13 @@ const ChatWindow = ({ messages,
     if (isImage) {
       return (
         <img
-          src={`${backendUrl}${content}`}
+          src={`${backendUrl}/${content}`}
           alt="sent-img"
           className={styles.chatImage}
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
-          onClick={() => handleImageClick(`${backendUrl}${content}`)}
+          onClick={() => handleImageClick(`${backendUrl}/${content}`)}
         />
       );
     }
@@ -395,7 +395,7 @@ const ChatWindow = ({ messages,
                       <img
                         loading="lazy"
                         src={receiver?.user?.user_profile_picture
-                          ? `${backendUrl}/uploads/${receiver.user.user_profile_picture}`
+                          ? `${backendUrl}/${receiver.user.user_profile_picture}`
                           : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
                         alt={receiver?.user?.user_fname || "User Avatar"}
                         className={styles.receiverAvatar}
@@ -411,7 +411,9 @@ const ChatWindow = ({ messages,
                     >
                       {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
                         <p className={styles.senderName}>
-                          {formatName(`${msg?.sender?.user_fname} ${msg?.sender?.user_lname}`)}
+                          { msg.type !== 'file' && (
+                            <>{formatName(`${msg?.sender?.user_fname} ${msg?.sender?.user_lname}`)}</>
+                          )}
                         </p>
                       )}
 
@@ -570,7 +572,7 @@ const ChatWindow = ({ messages,
                 <li key={index} className={styles.reactorItem}>
                   <img
                     loading="lazy"
-                    src={`${backendUrl}/uploads/${reactor.user.user_profile_picture}`}
+                    src={`${backendUrl}/${reactor.user.user_profile_picture}`}
                     alt={reactor.user.user_fname}
                     className={styles.reactorAvatar}
                   />

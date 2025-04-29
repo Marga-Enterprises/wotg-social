@@ -129,12 +129,16 @@
 
 @media (max-width: 768px) {
   .albumCard {
-    width: 140px;
+    width: 160px;
+  }
+
+  .scrollButton {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
   .albumCard {
-    width: 120px;
+    width: 150px;
   }
 }

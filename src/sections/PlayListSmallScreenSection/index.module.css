@@ -2,17 +2,31 @@
   padding: 1rem;
 }
 
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .sectionTitle {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 1rem;
-  color: #222;
+  color: #7c7c7c;
+  margin: 0;
 }
 
 .playlistGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+}
+
+.addButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #7c7c7c;
 }
 
 .playlistItem {

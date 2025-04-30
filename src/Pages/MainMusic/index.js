@@ -25,13 +25,6 @@ const Page = () => {
       <div className={styles.pageContent}>
         { width <= 1030 &&
           <section className={styles.section}>
-            <header className={styles.sectionHeader}>
-              <h2>Playlists</h2>
-              {/*<Link to="/albums" className={styles.showAllBtn}>
-                Show all
-              </Link>*/}
-            </header>
-
             <div className={styles.carouselWrapper}>
               <PlayListSmallScreenSection />
             </div>

@@ -14,6 +14,10 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 // css
 import styles from './index.module.css';
 
+// font awesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+
 const PlayListSmallScreenSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -46,6 +50,30 @@ const PlayListSmallScreenSection = () => {
     navigate(`/playlist/${playlistId}`)
   };
 
+  const handleCreateNewPlayList = useCallback(async () => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setLoading(true);
+
+    const payload = {
+      name: 'New Playlist',
+      description: ''
+    };
+
+    try {
+      const res = await dispatch(wotgsocial.playlist.createPlaylistAction(payload));
+
+      if (res.success) {
+        navigate(`/playlist/${res.data.id}`);
+      };
+    } catch (err) {
+        console.error('Unable to create playlists.', err);
+    } finally {
+        loadingRef.current = false;
+        setLoading(false);
+    }
+  }, [dispatch])
+
   useEffect(() => {
     handleFetchPlaylists();
   }, [handleFetchPlaylists])
@@ -53,22 +81,37 @@ const PlayListSmallScreenSection = () => {
   if (loading) return <LoadingSpinner/>;
 
   return (
-    <div className={styles.smallPlaylistSection}>
-      <div className={styles.playlistGrid}>
-        {playlist.map((pl) => (
-          <div key={pl.id} className={styles.playlistItem} onClick={() => selectPlaylist(pl.id)}>
-            <img
-              src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${pl.cover_image || 'wotgLogo.webp'}`}
-              alt={pl.name}
-              className={styles.playlistImage}
+    <>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Playlists</h2>
+
+        <div>
+            <FontAwesomeIcon
+              icon={faPlus}
+              className={styles.addButton}
+              title="Add Playlist"
+              onClick={() => handleCreateNewPlayList()}
             />
-            <div className={styles.playlistText}>
-              <p className={styles.playlistName}>{pl.name}</p>
-            </div>
-          </div>
-        ))}
+        </div>
       </div>
-    </div>
+
+      <div className={styles.smallPlaylistSection}>
+        <div className={styles.playlistGrid}>
+          {playlist.map((pl) => (
+            <div key={pl.id} className={styles.playlistItem} onClick={() => selectPlaylist(pl.id)}>
+              <img
+                src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${pl.cover_image || 'wotgLogo.webp'}`}
+                alt={pl.name}
+                className={styles.playlistImage}
+              />
+              <div className={styles.playlistText}>
+                <p className={styles.playlistName}>{pl.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );  
 };
 

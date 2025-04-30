@@ -75,7 +75,7 @@ const AlbumDetailsPage = () => {
   const fetchMusics = useCallback(async () => {
     try {
       const res = await dispatch(
-        wotgsocial.music.getMusicByParamsAction({ id, pageSize, pageIndex: currentPage, albumId: id })
+        wotgsocial.music.getMusicByParamsAction({ id, pageSize, pageIndex: currentPage, albumId: id, order: 'createdAt' })
       );
       if (res.success) {
         setMusics(res.data.musics);

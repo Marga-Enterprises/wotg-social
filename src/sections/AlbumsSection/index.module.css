@@ -2,8 +2,6 @@
   position: relative; /* Important for absolutely positioned children */
   display: flex;
   align-items: stretch;
-  max-width: 80svw;
-  padding: 0 1rem;
 }
 
 
@@ -11,8 +9,6 @@
 .albumRowWrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  max-width: 80svw;
-  padding: 1rem 0;
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
 }
@@ -30,7 +26,7 @@
 /* Album card */
 .albumCard {
   flex: 0 0 auto;
-  width: 250px;
+  width: 245px;
   border-radius: 16px;
   cursor: pointer;
   display: flex;
@@ -119,7 +115,7 @@
 
 @media (max-width: 1024px) {
   .albumCard {
-    width: 160px;
+    width: 200px;
   }
 
   .albumRow {
@@ -129,7 +125,7 @@
 
 @media (max-width: 768px) {
   .albumCard {
-    width: 160px;
+    width: 155px;
   }
 
   .scrollButton {
@@ -139,6 +135,6 @@
 
 @media (max-width: 480px) {
   .albumCard {
-    width: 150px;
+    width: 145px;
   }
 }

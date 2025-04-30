@@ -26,6 +26,8 @@ export const getPlaylistsByParamsAction = (payload) => async (dispatch) => {
                 payload: res.data.message,
             });
         }
+
+        return res;
     } catch (error) {
         dispatch({
             type: types.PLAYLIST_LIST_FAIL,
@@ -50,6 +52,8 @@ export const getPlaylistByIdAction = (payload) => async (dispatch) => {
                 payload: res.data.message,
             });
         }
+
+        return res;
     } catch (error) {
         dispatch({
             type: types.PLAYLIST_GET_FAIL,
@@ -74,6 +78,8 @@ export const createPlaylistAction = (payload) => async (dispatch) => {
                 payload: res.data.message,
             });
         }
+
+        return res;
     } catch (error) {
         dispatch({
             type: types.PLAYLIST_CREATE_FAIL,
@@ -98,6 +104,8 @@ export const updatePlaylistAction = (payload) => async (dispatch) => {
                 payload: res.data.message,
             });
         }
+
+        return res;
     } catch (error) {
         dispatch({
             type: types.PLAYLIST_UPDATE_FAIL,
@@ -122,6 +130,8 @@ export const deletePlaylistAction = (payload) => async (dispatch) => {
                 payload: res.data.message,
             });
         }
+
+        return res;
     } catch (error) {
         dispatch({
             type: types.PLAYLIST_DELETE_FAIL,
@@ -146,6 +156,8 @@ export const addMusicToPlaylistAction = (payload) => async (dispatch) => {
                 payload: res.data.message,
             });
         }
+
+        return res;
     } catch (error) {
         dispatch({
             type: types.PLAYLIST_UPDATE_FAIL,
@@ -170,6 +182,8 @@ export const removeMusicFromPlaylistAction = (payload) => async (dispatch) => {
                 payload: res.data.message,
             });
         }
+
+        return res;
     } catch (error) {
         dispatch({
             type: types.PLAYLIST_UPDATE_FAIL,

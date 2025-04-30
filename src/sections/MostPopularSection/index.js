@@ -5,17 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 
-const NewReleaseSection = () => {
+const MostPopularSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const scrollRef = useRef(null);
   const loadingRef = useRef(false);
 
-  const backendUrl = useMemo(
-    () => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
-    []
-  );
+  const backendUrl = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images', []);
 
   const [musics, setMusics] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,7 +24,7 @@ const NewReleaseSection = () => {
 
     try {
       const res = await dispatch(
-        wotgsocial.music.getMusicByParamsAction({ pageSize: 10, pageIndex: 1, order: 'createdAt' })
+        wotgsocial.music.getMusicByParamsAction({ pageSize: 10, pageIndex: 1, order: 'play_count' })
       );
       if (res.success && Array.isArray(res.data?.musics)) {
         setMusics(res.data.musics);
@@ -100,4 +97,4 @@ const NewReleaseSection = () => {
   );
 };
 
-export default React.memo(NewReleaseSection);
+export default React.memo(MostPopularSection);

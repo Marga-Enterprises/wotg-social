@@ -3,18 +3,31 @@
 /* ======= Base Layout ======= */
 .page {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3rem;
+  flex-direction: row;
+  width: 100%;
+  max-width: 98svw;
+  overflow-x: hidden;
+  padding-top: 3rem;
+}
+
+
+
+/* ======= Page Content (right side) ======= */
+.pageContent {
+  min-width: 0; /* prevents overflowing into horizontal scroll */
+  margin-top: 3rem;
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
   box-sizing: border-box;
-  min-height: 95svh;
-  margin-top: 3.5rem;
-  padding-top: 3rem;
-  background-color: #fdfdfd;
+  overflow-x: hidden;
+  max-height: 89.9svh;
 }
+
+.pageContent::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
 
 /* ======= Section Wrapper ======= */
 .section {
@@ -22,9 +35,9 @@
   flex-direction: column;
   width: 100%;
   max-width: 1600px;
-  padding: 0 1rem;
-  margin-bottom: 4rem;
-  box-sizing: border-box;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-bottom: 3rem;
 }
 
 /* ======= Section Header ======= */
@@ -56,39 +69,28 @@
   color: #900;
 }
 
-/* ======= Media Queries ======= 
+/* ======= Carousel Wrapper ======= */
+
 @media (max-width: 768px) {
   .sectionHeader h2 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .showAllBtn {
     font-size: 0.9rem;
   }
 
-  .page {
-    padding: 3rem 1rem;
-    gap: 2rem;
-  }
-
   .section {
-    padding: 0;
+    margin: 0;
   }
 }
 
 @media (max-width: 480px) {
-  .sectionHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
   .sectionHeader h2 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
   .showAllBtn {
     align-self: flex-end;
   }
 }
-*/

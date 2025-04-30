@@ -94,18 +94,26 @@ const RecommendedTracksSection = ({
 
         <div className={styles.recommendedList}>
             {recommendedMusics.map((music, index) => (
-            <div key={index} onClick={() => handleRouteToMusicPage(music.id, music.album_id)} className={styles.recommendedRow}>
-                <img
-                    src={`${backendUrl}/${music.cover_image || 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'}`}
-                    alt={music.title}
-                    className={styles.musicThumbnail}
-                />
-                <div className={styles.musicDetails}>
-                    <p className={styles.musicTitle}>{music.title}</p>
-                    <p className={styles.musicArtist}>{music.artist_name}</p>
-                </div>
-                <button className={styles.addButton} onClick={() => handleAddTrackToPlayList(music.id)}>Add</button>
-            </div>
+              <div key={index} onClick={() => handleRouteToMusicPage(music.id, music.album_id)} className={styles.recommendedRow}>
+                  <img
+                      src={`${backendUrl}/${music.cover_image || 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'}`}
+                      alt={music.title}
+                      className={styles.musicThumbnail}
+                  />
+                  <div className={styles.musicDetails}>
+                      <p className={styles.musicTitle}>{music.title}</p>
+                      <p className={styles.musicArtist}>{music.artist_name}</p>
+                  </div>
+                  <button
+                    className={styles.addButton}
+                    onClick={(e) => {
+                      e.stopPropagation(); // ⛔ Prevents bubbling to the parent div
+                      handleAddTrackToPlayList(music.id);
+                    }}
+                  >
+                    Add
+                  </button>
+              </div>
             ))}
         </div>
     </div>

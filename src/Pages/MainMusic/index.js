@@ -7,6 +7,7 @@ import AlbumsSection from '../../sections/AlbumsSection';
 import NewReleaseSection from '../../sections/NewReleaseSection';
 import MostPopularSection from '../../sections/MostPopularSection';
 import PlayListSideBarSection from '../../sections/PlayListSideBarSection';
+import PlayListSmallScreenSection from '../../sections/PlayListSmallScreenSection';
 
 // HOOKS
 import useWindowDimensions from '../../hooks/useWindowDimensions';
@@ -22,6 +23,21 @@ const Page = () => {
       }
       
       <div className={styles.pageContent}>
+        { width <= 1030 &&
+          <section className={styles.section}>
+            <header className={styles.sectionHeader}>
+              <h2>Playlists</h2>
+              {/*<Link to="/albums" className={styles.showAllBtn}>
+                Show all
+              </Link>*/}
+            </header>
+
+            <div className={styles.carouselWrapper}>
+              <PlayListSmallScreenSection />
+            </div>
+          </section>
+        }
+
         <section className={styles.section}>
           <header className={styles.sectionHeader}>
             <h2>New Releases</h2>

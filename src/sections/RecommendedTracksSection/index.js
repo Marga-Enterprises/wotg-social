@@ -5,14 +5,22 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { wotgsocial } from '../../redux/combineActions';
 import { useDispatch } from 'react-redux';
 
+//react router
+import { useNavigate } from 'react-router-dom';
+
 // css
 import styles from './index.module.css';
 
 // components
 import LoadingSpinner from '../../components/LoadingSpinner';
 
-const RecommendedTracksSection = () => {
+const RecommendedTracksSection = ({
+  playlistId,
+  onRefresh
+}) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
   const loadingRef = useRef(null);
 
   const backendUrl = useMemo(
@@ -46,22 +54,47 @@ const RecommendedTracksSection = () => {
       loadingRef.current = false;
       setLoading(false);
     }
-  }, [dispatch]);
+  }, [dispatch, onRefresh]);
 
   useEffect(() => {
     handleFetchRecommended();
   }, [handleFetchRecommended]);
+
+  const handleAddTrackToPlayList = useCallback(async (trackId) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setLoading(true);
+
+    const payload = {
+      playlistId,
+      musicIds: [ trackId ]
+    }
+
+    try {
+      await dispatch(wotgsocial.playlist.addMusicToPlaylistAction(payload));
+      onRefresh();
+    } catch (err) {
+      console.error('Unable to add track to playlist');
+    } finally {
+      loadingRef.current = false;
+      setLoading(false);
+    }
+  }, [dispatch])
+
+  const handleRouteToMusicPage = (musicId, albumId) => {
+    navigate(`/music-in-album/${albumId}?music=${musicId}`);
+  };
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className={styles.recommendedSection}>
         <h4 className={styles.recommendedTitle}>Recommended</h4>
-        <p className={styles.subText}>Based on what’s in this playlist</p>
+        {/*<p className={styles.subText}>Based on what’s in this playlist</p>*/}
 
         <div className={styles.recommendedList}>
-            {recommendedMusics.map((music) => (
-            <div key={music.id} className={styles.recommendedRow}>
+            {recommendedMusics.map((music, index) => (
+            <div key={index} onClick={() => handleRouteToMusicPage(music.id, music.album_id)} className={styles.recommendedRow}>
                 <img
                     src={`${backendUrl}/${music.cover_image || 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'}`}
                     alt={music.title}
@@ -71,8 +104,7 @@ const RecommendedTracksSection = () => {
                     <p className={styles.musicTitle}>{music.title}</p>
                     <p className={styles.musicArtist}>{music.artist_name}</p>
                 </div>
-                <p className={styles.musicAlbum}>{music.album_title || 'Unknown Album'}</p>
-                <button className={styles.addButton}>Add</button>
+                <button className={styles.addButton} onClick={() => handleAddTrackToPlayList(music.id)}>Add</button>
             </div>
             ))}
         </div>

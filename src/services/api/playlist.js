@@ -39,10 +39,10 @@ export async function deletePlaylist(payload) {
 }
 
 export async function addMusicToPlaylist(payload) {
-    return POST(`/playlists/${payload.playlistId}/musics`, payload); // { musicId, playlistId }
+    return POST(`/playlists/${payload.playlistId}/add`, payload); // { musicId, playlistId }
 }
 
 export async function removeMusicFromPlaylist(payload) {
-    return DELETE(`/playlists/${payload.playlistId}/musics/${payload.musicId}`); // { musicId, playlistId }
+    return DELETE(`/playlists/${payload.playlistId}/remove`, payload); // { musicId, playlistId }
 }
 

@@ -6,7 +6,7 @@ import { wotgsocial } from '../../redux/combineActions';
 import { useDispatch } from 'react-redux';
 
 //react router
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 // css
 import styles from './index.module.css';
@@ -23,6 +23,8 @@ import useWindowDimensions from '../../hooks/useWindowDimensions';
 
 const Page = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { id } = useParams();
   const { width } = useWindowDimensions();
 
@@ -57,6 +59,10 @@ const Page = () => {
   useEffect(() => {
     handleFetchPlaylist();
   }, [handleFetchPlaylist]);
+
+  const handleRouteToMusicPage = (musicId, albumId) => {
+    navigate(`/music-in-album/${albumId}?music=${musicId}`);
+  };
 
   if (loading) return <LoadingSpinner/>;
 
@@ -93,7 +99,7 @@ const Page = () => {
                     </div>
 
                     {playlistTracks.map((track, index) => (
-                        <div key={track.id} className={styles.trackRow}>
+                        <div key={index} onClick={() => handleRouteToMusicPage(track.id, track.album_id)} className={styles.trackRow}>
                             <span className={styles.colNumber}>{index + 1}</span>
 
                             <div className={styles.colTrackInfo}>
@@ -109,7 +115,7 @@ const Page = () => {
                             </div>
 
                             <span className={styles.colDuration}>
-                            {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
+                                {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
                             </span>
                         </div>
                     ))}
@@ -118,7 +124,10 @@ const Page = () => {
         
             {/* Search Section */}
             <div className={styles.searchSection}>
-                <RecommendedTracksSection/>
+                <RecommendedTracksSection 
+                  playlistId={id}
+                  onRefresh={handleFetchPlaylist}
+                />
             </div>
         </div>
     </div>

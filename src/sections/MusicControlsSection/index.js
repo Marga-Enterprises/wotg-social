@@ -1,33 +1,18 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faPause,
-  faPlay,
-  faVolumeUp,
-  faStepForward,
-  faStepBackward
-} from '@fortawesome/free-solid-svg-icons';
+import { faPause, faPlay, faVolumeUp, faStepForward, faStepBackward } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
 
 const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
   const dispatch = useDispatch();
   const audioRef = useRef(null);
+  const clickListenerRef = useRef(null);
+  const isSeekingRef = useRef(false); // ✅ Detect manual seeking
 
-  const backendUrlImage = useMemo(() =>
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000/uploads'
-      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
-    []
-  );
-
-  const backendUrlAudio= useMemo(() =>
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000/uploads'
-      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios',
-    []
-  );
+  const backendUrlImage = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images', []);
+  const backendUrlAudio = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios', []);
 
   const [music, setMusic] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -46,37 +31,77 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!music || !audio) return;
+    if (!audio || !music) return;
 
-    let metadataHandler, timeUpdateHandler;
-
-    const setupAudio = () => {
-      metadataHandler = () => {
-        setDuration(audio.duration);
-        setCurrentTime(0);
-        audio.play()
-          .then(() => setIsPlaying(true))
-          .catch(err => console.warn('Autoplay blocked:', err));
-      };
-
-      timeUpdateHandler = () => setCurrentTime(audio.currentTime);
-
-      audio.addEventListener('loadedmetadata', metadataHandler);
-      audio.addEventListener('timeupdate', timeUpdateHandler);
-      audio.src = `${backendUrlAudio}/${music.audio_url}`;
-      audio.load();
+    const attemptPlay = () => {
+      audio.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {
+          if (!clickListenerRef.current) {
+            clickListenerRef.current = () => {
+              audio.play().then(() => setIsPlaying(true));
+              document.removeEventListener('click', clickListenerRef.current);
+              clickListenerRef.current = null;
+            };
+            document.addEventListener('click', clickListenerRef.current, { once: true });
+          }
+        });
     };
 
-    setupAudio();
+    const handleLoadedMetadata = () => {
+      audio.currentTime = 0;
+      // setCurrentTime(0); // 🔥 Make sure UI resets
+      setDuration(audio.duration || 0);
+      attemptPlay();
+    };    
 
-    return () => {
-      if (audio) {
-        audio.pause();
-        audio.removeEventListener('loadedmetadata', metadataHandler);
-        audio.removeEventListener('timeupdate', timeUpdateHandler);
+    const handleTimeUpdate = () => {
+      if (!isSeekingRef.current) {
+        setCurrentTime(audio.currentTime);
       }
     };
-  }, [music, backendUrlAudio]);
+
+    // Reset audio
+    audio.pause();
+    audio.removeAttribute('src');
+    audio.load();
+
+    // Assign new src
+    audio.src = `${backendUrlAudio}/${music.audio_url}`;
+    audio.load();
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+
+    // MediaSession API setup
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: music.title,
+        artist: music.artist_name,
+        album: 'WOTG Streaming',
+        artwork: [{ src: `${backendUrlImage}/${albumCover || 'default-cover.png'}`, sizes: '512x512', type: 'image/png' }]
+      });
+      navigator.mediaSession.setActionHandler('play', () => {
+        audio.play().then(() => setIsPlaying(true));
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        audio.pause();
+        setIsPlaying(false);
+      });
+      navigator.mediaSession.setActionHandler('previoustrack', onPrevious);
+      navigator.mediaSession.setActionHandler('nexttrack', onNext);
+    }
+
+    return () => {
+      audio.pause();
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      if (clickListenerRef.current) {
+        document.removeEventListener('click', clickListenerRef.current);
+        clickListenerRef.current = null;
+      }
+    };
+  }, [music, backendUrlAudio, backendUrlImage, albumCover, onPrevious, onNext]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -85,16 +110,21 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
       audio.pause();
       setIsPlaying(false);
     } else {
-      audio.play().then(() => setIsPlaying(true));
+      audio.play().then(() => setIsPlaying(true)).catch(() => {});
     }
   }, [isPlaying]);
 
   const handleSliderChange = useCallback((e) => {
     const value = parseFloat(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.currentTime = value;
-      setCurrentTime(value);
-    }
+    if (!audioRef.current) return;
+
+    isSeekingRef.current = true;
+    audioRef.current.currentTime = value;
+    setCurrentTime(value);
+
+    setTimeout(() => {
+      isSeekingRef.current = false;
+    }, 300); // wait a bit before allowing timeupdate to take over
   }, []);
 
   const handleVolumeChange = useCallback((e) => {
@@ -110,7 +140,7 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
       <div className={styles.songInfo} onClick={togglePlay} style={{ cursor: 'pointer' }}>
         <img
           src={`${backendUrlImage}/${albumCover || 'default-cover.png'}`}
-          alt="Album Art"
+          alt={music.title}
           className={styles.albumThumb}
         />
         <div>
@@ -156,7 +186,10 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
       <audio
         ref={audioRef}
         preload="metadata"
-        onEnded={() => setTimeout(onNext, 1000)}
+        onEnded={() => {
+          setTimeout(onNext, 1000); // Then after a slight delay go to next
+          setCurrentTime(0);
+        }}
       />
     </div>
   );

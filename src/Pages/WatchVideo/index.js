@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { useDispatch } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { wotgsocial } from "../../redux/combineActions";
-import wotgLogo from "../../images/wotgLogo.webp";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
 
@@ -16,11 +15,10 @@ const Page = () => {
     const [videoLoaded, setVideoLoaded] = useState(false);
 
     // ✅ Memoized Backend URL (Prevents unnecessary recalculations)
-    const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development"
-            ? "http://localhost:5000"
-            : "https://community.wotgonline.com/api";
-    }, []);
+    const backendUrl = useMemo(() =>
+        'https://wotg.sgp1.cdn.digitaloceanspaces.com/videos',
+        []
+    );
 
     // ✅ Fetch Blog Details (Optimized)
     const fetchBlogDetails = useCallback(async () => {
@@ -65,10 +63,10 @@ const Page = () => {
                                                         setVideoLoaded(true);
                                                     }
                                                 }}
-                                                poster={wotgLogo}
+                                                poster="https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp"
                                                 preload="metadata" // ✅ Faster page load
                                             >
-                                                <source src={`${backendUrl}/uploads/${blog.blog_video}`} type="video/webm" />
+                                                <source src={`${backendUrl}/${blog.blog_video}`} type="video/webm" />
                                                 Your browser does not support the video tag.
                                             </video>
                                         </div>

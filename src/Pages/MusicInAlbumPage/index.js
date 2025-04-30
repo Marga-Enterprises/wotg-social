@@ -27,14 +27,13 @@ const AlbumDetailsPage = () => {
 
   const role = account?.user_role || "user"; // Default to 'user' if role is not found
 
-  const backendUrl = useMemo(() => {
-    return process.env.NODE_ENV === "development"
-      ? "http://localhost:5000"
-      : "https://community.wotgonline.com/api";
-  }, []);
+  const backendUrl= useMemo(() =>
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+  []);
 
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const currentPage = useMemo(() => parseInt(queryParams.get("page")) || 1, [queryParams]);
+  const currentMusicId = useMemo(() => parseInt(queryParams.get("music")), [queryParams]);
 
   const loadingRef = useRef(false);
   const [loading, setLoading] = useState(true);
@@ -106,6 +105,25 @@ const AlbumDetailsPage = () => {
     handleFetchDetails();
   }, [handleFetchDetails]);
 
+  useEffect(() => {
+    if (selectedMusicId) {
+      const params = new URLSearchParams(location.search);
+      params.set('music', selectedMusicId);
+      window.history.replaceState({}, '', `${location.pathname}?${params.toString()}`);
+    }
+  }, [selectedMusicId, location.pathname]);
+  
+  useEffect(() => {
+    if (currentMusicId && musics.length > 0) {
+      const exists = musics.find((music) => music.id === currentMusicId);
+      if (exists) {
+        setSelectedMusicId(currentMusicId);
+      } else {
+        setSelectedMusicId(musics[0].id); // fallback: play first track if not found
+      }
+    }
+  }, [currentMusicId, musics]);  
+
   const formatDuration = (seconds) => {
     const min = Math.floor(seconds / 60);
     const sec = seconds % 60;
@@ -121,7 +139,7 @@ const AlbumDetailsPage = () => {
           {/* Album Header */}
           <div className={styles.albumHeader}>
             <img
-              src={`${backendUrl}/uploads/${album?.cover_image || "default-cover.png"}`}
+              src={`${backendUrl}/${album?.cover_image || "default-cover.png"}`}
               alt={album?.title}
               className={styles.albumCover}
               loading="lazy"

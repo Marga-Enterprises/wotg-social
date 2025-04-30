@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from './index.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 import LoadingSpinner from '../LoadingSpinner';
 
-const BACKEND_URL =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000'
-    : 'https://community.wotgonline.com/api';
-
 const Profile = ({ onClose }) => {
     const dispatch = useDispatch();
     const { ui: { loading } } = useSelector((state) => state.common);
+
+    const backendUrl = useMemo(() =>
+      'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+      []
+    );
 
     const [user, setUser] = useState({});
     const [formData, setFormData] = useState({
         user_fname: '',
         user_lname: '',
         // email: '',
-        file: null, // Holds the File object for uploads
+        file: null,
     });
     const [previewImage, setPreviewImage] = useState(null);
 
@@ -42,7 +42,7 @@ const Profile = ({ onClose }) => {
                     });
 
                     if (res.data.user_profile_picture) {
-                        setPreviewImage(`${BACKEND_URL}/uploads/${res.data.user_profile_picture}`);
+                        setPreviewImage(`${backendUrl}/${res.data.user_profile_picture}`);
                     }
                 }
             })
@@ -86,7 +86,7 @@ const Profile = ({ onClose }) => {
                 Cookies.set('account', JSON.stringify(res.data)); // Update stored user data
 
                 if (res.data.user_profile_picture) {
-                    setPreviewImage(`${BACKEND_URL}/uploads/${res.data.user_profile_picture}`);
+                    setPreviewImage(`${backendUrl}/${res.data.user_profile_picture}`);
                 }
             } else {
                 alert('Failed to update profile');

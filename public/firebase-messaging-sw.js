@@ -26,7 +26,7 @@ messaging.onBackgroundMessage((payload) => {
 
     self.registration.showNotification(title, {
         body: body,
-        icon: image || "/wotgLogo.webp",
-        badge: "/wotgLogo.webp",
+        icon: image || "/wotg-icon.ico",
+        badge: "/wotg-icon.ico",
     });
 });

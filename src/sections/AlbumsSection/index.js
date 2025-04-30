@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 import { wotgsocial } from '../../redux/combineActions';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 
 const AlbumSection = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const scrollRef = useRef(null);
   const loadingRef = useRef(false);
-
+  
   const backendUrl = useMemo(() =>
-    process.env.NODE_ENV === 'development'
-      ? 'http://localhost:5000'
-      : 'https://community.wotgonline.com/api',
+    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
     []
   );
 
@@ -38,6 +39,10 @@ const AlbumSection = () => {
       setLoading(false);
     }
   }, [dispatch, albums.length]);
+
+  const handleRouteToMusicPage = (id) => {
+      navigate(`/music-in-album/${id}`);
+  };
 
   useEffect(() => {
     fetchAlbums();
@@ -65,9 +70,12 @@ const AlbumSection = () => {
       <div className={styles.albumRowWrapper} ref={scrollRef}>
         <div className={styles.albumRow}>
           {albums.map((album) => (
-            <div key={album.id} className={styles.albumCard}>
+            <div key={album.id} className={styles.albumCard} onClick={() => handleRouteToMusicPage(album.id)}>
               <img
-                src={`${backendUrl}/uploads/${album.cover_image || 'default-cover.png'}`}
+                src={ process.env.NODE_ENV === 'development' ? 
+                    'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/prayer.webp' : 
+                    `${backendUrl}/${album.cover_image || "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp"}`
+                }
                 alt={album.title}
                 className={styles.albumImage}
                 loading="lazy"

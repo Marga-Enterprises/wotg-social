@@ -6,7 +6,6 @@ import { convertMomentWithFormatWhole } from "../../utils/methods";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
 import Cookies from "js-cookie";
-import wotgLogo from "../../images/wotgLogo.webp";
 
 // Utility functions
 const stripHtml = (html) => html.replace(/<\/?[^>]+(>|$)/g, "");
@@ -36,10 +35,10 @@ const Page = () => {
     const [loading, setLoading] = useState(true);
     const [pageDetails, setPageDetails] = useState({ totalRecords: 0, pageIndex: currentPage, totalPages: 0 });
 
-    const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development" ? "http://localhost:5000/uploads" : "https://wotg.sgp1.cdn.digitaloceanspaces.com/images";
-    }, []);
-
+    const backendUrl = useMemo(() =>
+        'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+        []
+    );
 
     // ✅ Fetch Blog List with Page Index (Optimized)
     const handleBlogList = useCallback(async (pageIndex) => {
@@ -93,7 +92,10 @@ const Page = () => {
                 <div className={styles.blogImageContainer} style={{ backgroundColor: blog.blog_thumbnail ? "transparent" : "red" }}>
                     <img
                         loading="lazy"
-                        src={blog.blog_thumbnail ? `${backendUrl}/${blog.blog_thumbnail}` : wotgLogo}
+                        src={blog.blog_thumbnail ? 
+                            `${backendUrl}/${blog.blog_thumbnail}` : 
+                            'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'
+                        }
                         alt={blog.blog_title}
                         className={styles.blogImage}
                     />

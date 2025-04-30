@@ -1,19 +1,19 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "WOTG Community",
+  "name": "WOTG Community",
   "icons": [
     {
-      "src": "wotg-icon.ico",
+      "src": "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotg-logo.webp",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "wotg-logo.webp",
+      "src": "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotg-logo.webp",
       "type": "image/webp",
       "sizes": "192x192"
     },
     {
-      "src": "wotg-logo.webp",
+      "src": "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotg-logo.webp",
       "type": "image/webp",
       "sizes": "512x512"
     }

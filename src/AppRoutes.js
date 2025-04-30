@@ -11,7 +11,7 @@ import Navbar from "./components/Navbar";
 import BurgerMenu from "./components/BurgerMenu";
 import AuthRouter from "./components/AuthRouter";
 import AdminRouter from "./components/AdminRouter";
-import ManagementRouter from "./components/ManagementRouter";
+// import ManagementRouter from "./components/ManagementRouter";
 
 // Pages
 import Home from "./Pages/Home";
@@ -37,6 +37,7 @@ import UpdateJournal from "./Pages/UpdateJournal";
 import AdminMusicDashboard from "./Pages/AdminMusicDashboard";
 import MusicInAlbumPage from "./Pages/MusicInAlbumPage";
 import MainMusic from "./Pages/MainMusic";
+import Playlist from "./Pages/Playlist";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -75,6 +76,7 @@ function AppRoutes() {
           <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
           <Route path="/albums" element={<AuthRouter><AdminMusicDashboard /></AuthRouter>} />
           <Route path="/music-in-album/:id" element={<AuthRouter><MusicInAlbumPage /></AuthRouter>} />
+          <Route path="/playlist/:id" element={<AuthRouter><Playlist /></AuthRouter>} />
           <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
           <Route path="/music" element={<AuthRouter><MainMusic/></AuthRouter>} />
           <Route path="/login" element={<SignIn />} />

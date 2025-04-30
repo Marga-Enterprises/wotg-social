@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { useParams, Link, useLocation } from "react-router-dom";
 import parse from "html-react-parser";
 import { wotgsocial } from "../../redux/combineActions";
-import wotgLogo1 from "./wotgLogo.webp";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import styles from "./index.module.css";
 
@@ -20,11 +19,10 @@ const Page = () => {
     const page = useMemo(() => queryParams.get("page") || 1, [queryParams]);
 
     // ✅ Memoize Backend URL
-    const backendUrl = useMemo(() => {
-        return process.env.NODE_ENV === "development"
-            ? "http://localhost:5000"
-            : "https://community.wotgonline.com/api";
-    }, []);
+    const backendUrl = useMemo(() =>
+        'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
+        []
+    );
 
     // ✅ Fetch Blog Details (Optimized with `useCallback`)
     const fetchBlogDetails = useCallback(async () => {
@@ -59,7 +57,11 @@ const Page = () => {
                                 <div className={styles.blogImageContainer}>
                                     <img
                                         loading="lazy"
-                                        src={blog.blog_thumbnail ? `${backendUrl}/uploads/${blog.blog_thumbnail}` : wotgLogo1}
+                                        src={
+                                            blog.blog_thumbnail ? 
+                                            `${backendUrl}/${blog.blog_thumbnail}` : 
+                                            'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'
+                                        }
                                         alt={blog.blog_title}
                                         className={styles.blogImage}
                                     />

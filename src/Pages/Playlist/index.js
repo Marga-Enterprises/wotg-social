@@ -13,6 +13,7 @@ import styles from './index.module.css';
 
 // components
 import LoadingSpinner from '../../components/LoadingSpinner';
+import UpdatePlaylistModal from '../../components/UpdatePlaylistModal';
 
 // sections
 import PlayListSideBarSection from '../../sections/PlayListSideBarSection';
@@ -20,6 +21,12 @@ import RecommendedTracksSection from '../../sections/RecommendedTracksSection';
 
 // hooks
 import useWindowDimensions from '../../hooks/useWindowDimensions';
+
+// fast average color
+// import { FastAverageColor } from 'fast-average-color';
+
+// color js
+// import Color from 'colorjs.io';
 
 const Page = () => {
   const dispatch = useDispatch();
@@ -29,12 +36,16 @@ const Page = () => {
   const { width } = useWindowDimensions();
 
   const loadingRef = useRef(null);
+  const imgRef = useRef(null);
 
   const backendUrl = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images', []);
 
   const [loading, setLoading] = useState(false);
-  const [playlist, setPlaylist] = useState([]);
+  const [playlist, setPlaylist] = useState({});
   const [playlistTracks, setPlayistTracks] = useState([]);
+  // const [bgColor, setBgColor] = useState('#fff');
+  // const [textColor, setTextColor] = useState('#111');
+  const [showModal, setShowModal] = useState(false);
 
   const handleFetchPlaylist = useCallback(async () => {
     if (loadingRef.current) return;
@@ -74,10 +85,11 @@ const Page = () => {
 
         <div className={styles.playlistContent}>
             {/* Playlist Header */}
-            <div className={styles.playlistHeader}>
+            <div className={styles.playlistHeader} onClick={() => setShowModal(true)}>
                 <img
                     src={`${backendUrl}/${playlist?.cover_image || 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'}`}
                     alt={playlist?.name}
+                    ref={imgRef}
                     className={styles.coverImage}
                 />
                 <div className={styles.playlistInfo}>
@@ -85,7 +97,8 @@ const Page = () => {
                         {playlist?.visibility === 'public' ? 'Public Playlist' : 'Private Playlist'}
                     </p>
                     <h1 className={styles.title}>{playlist?.name}</h1>
-                    <p className={styles.creator}>Pillorajem</p> {/* Replace with dynamic name later */}
+                    <h1 className={styles.creator}>{playlist?.description}</h1>
+                    {/* <p className={styles.creator}>Pillorajem</p> */}
                 </div>
             </div>
 
@@ -129,6 +142,17 @@ const Page = () => {
                   onRefresh={handleFetchPlaylist}
                 />
             </div>
+            { showModal && 
+              <UpdatePlaylistModal 
+               playListDetails={playlist}
+               onClose={() => {
+                setShowModal(false);
+               }}
+               onRefresh={() => {
+                handleFetchPlaylist();
+               }}
+              />
+            }
         </div>
     </div>
   );  

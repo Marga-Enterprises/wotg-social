@@ -26,32 +26,56 @@ const MusicControlsSection = () => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
   
-    if (audio.src.includes(currentTrack.audio_url)) return;
-  
     audio.pause();
     audio.src = `${backendUrlAudio}/${currentTrack.audio_url}`;
     audio.load();
   
     const onLoaded = () => {
       setDuration(audio.duration || 0);
+      setCurrentTime(0);
       audio.play().then(() => {
         dispatch({ type: types.SET_IS_PLAYING, payload: true });
+  
+        // ✅ Set media session position
+        if ('setPositionState' in navigator.mediaSession) {
+          navigator.mediaSession.setPositionState({
+            duration: audio.duration || 0,
+            playbackRate: 1.0,
+            position: 0
+          });
+        }
       });
     };
   
     const onTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
+  
+      // ✅ Sync lock screen slider
+      if ('setPositionState' in navigator.mediaSession) {
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration || 0,
+          playbackRate: 1.0,
+          position: audio.currentTime
+        });
+      }
     };
   
     const onEnded = () => {
       dispatch({ type: types.PLAY_NEXT_TRACK });
+  
+      // ✅ Optional: If it's the last song, stop playback
+      const { trackList } = store.getState().wotgsocial.musicPlayer;
+      const currentIndex = trackList.findIndex((t) => t.id === currentTrack.id);
+      if (currentIndex === trackList.length - 1) {
+        dispatch({ type: types.SET_IS_PLAYING, payload: false });
+      }
     };
   
     audio.addEventListener('loadedmetadata', onLoaded);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('ended', onEnded);
   
-    // ✅ Setup Media Session
+    // Media Session metadata + controls
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: currentTrack.title,

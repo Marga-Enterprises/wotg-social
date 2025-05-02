@@ -31,13 +31,14 @@ const MusicControlsSection = () => {
     audio.load();
   
     const onLoaded = () => {
+      audio.currentTime = 0;
       setDuration(audio.duration || 0);
       setCurrentTime(0);
+    
       audio.play().then(() => {
         dispatch({ type: types.SET_IS_PLAYING, payload: true });
-  
-        // ✅ Set media session position
-        if ('setPositionState' in navigator.mediaSession) {
+    
+        if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
           navigator.mediaSession.setPositionState({
             duration: audio.duration || 0,
             playbackRate: 1.0,
@@ -45,7 +46,7 @@ const MusicControlsSection = () => {
           });
         }
       });
-    };
+    };    
   
     const onTimeUpdate = () => {
       setCurrentTime(audio.currentTime);

@@ -43,6 +43,6 @@ export async function addMusicToPlaylist(payload) {
 }
 
 export async function removeMusicFromPlaylist(payload) {
-    return DELETE(`/playlists/${payload.playlistId}/remove`, payload); // { musicId, playlistId }
+    return DELETE(`/playlists/${payload.id}/remove`, payload); // { musicId, playlistId }
 }
 

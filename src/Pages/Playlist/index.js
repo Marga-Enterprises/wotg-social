@@ -22,6 +22,10 @@ import RecommendedTracksSection from '../../sections/RecommendedTracksSection';
 // hooks
 import useWindowDimensions from '../../hooks/useWindowDimensions';
 
+// font awesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisH, faTrash } from '@fortawesome/free-solid-svg-icons'
+
 // fast average color
 // import { FastAverageColor } from 'fast-average-color';
 
@@ -37,6 +41,7 @@ const Page = () => {
 
   const loadingRef = useRef(null);
   const imgRef = useRef(null);
+  const menuRef = useRef(null);
 
   const backendUrl = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images', []);
 
@@ -46,30 +51,75 @@ const Page = () => {
   // const [bgColor, setBgColor] = useState('#fff');
   // const [textColor, setTextColor] = useState('#111');
   const [showModal, setShowModal] = useState(false);
+  const [activeMenuIndex, setActiveMenuIndex] = useState(null);
 
   const handleFetchPlaylist = useCallback(async () => {
     if (loadingRef.current) return;
+  
     loadingRef.current = true;
     setLoading(true);
-
+  
     try {
-        const res = await dispatch(wotgsocial.playlist.getPlaylistByIdAction({id}));
-
-        if (res.success) {
-            setPlaylist(res.data)
-            setPlayistTracks(res.data.musics);
-        }
+      const res = await dispatch(wotgsocial.playlist.getPlaylistByIdAction({ id }));
+      if (res.success) {
+        setPlaylist(res.data);
+        setPlayistTracks(res.data.musics);
+      } else {
+        console.warn('❌ Fetch failed:', res.message || 'Unknown error');
+      }
     } catch (err) {
-        console.error('Unable to retrieve playist: ', err)
+      console.error('❌ Unable to retrieve playlist:', err);
     } finally {
-        loadingRef.current = false;
-        setLoading(false);
+      loadingRef.current = false;
+      setLoading(false);
     }
   }, [dispatch, id]);
+  
+  const handleRemoveFromPlaylist = useCallback(async (trackId) => {
+    if (loadingRef.current) return;
+  
+    loadingRef.current = true;
+    setLoading(true);
+  
+    const payload = {
+      id,
+      musicIds: [trackId],
+    };
+  
+    try {
+      const res = await dispatch(wotgsocial.playlist.removeMusicFromPlaylistAction(payload));
+      if (res.success) {
+        setPlayistTracks(prev => prev.filter(track => track.id !== trackId));
+        setActiveMenuIndex(false);
+        await handleFetchPlaylist(); // ✅ ensure we wait for this to complete fully
+      } else {
+        console.warn('❌ Remove failed:', res.message || 'Unknown error');
+      }
+    } catch (err) {
+      console.error('❌ Unable to remove track from playlist:', err);
+    } finally {
+      loadingRef.current = false;
+      setLoading(false);
+    }
+  }, [dispatch, id, handleFetchPlaylist]);  
 
   useEffect(() => {
     handleFetchPlaylist();
   }, [handleFetchPlaylist]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setActiveMenuIndex(null); // Close the menu
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleTrackClick = (trackId, coverImage) => {
     dispatch(wotgsocial.musicPlayer.setTrackList(playlistTracks));
@@ -82,6 +132,10 @@ const Page = () => {
   const backToMusicPage = () => {
     navigate('/music');
   }
+
+  const toggleMenu = (index) => {
+    setActiveMenuIndex((prev) => (prev === index ? null : index));
+  };
 
   if (loading) return <LoadingSpinner/>;
 
@@ -125,7 +179,6 @@ const Page = () => {
                     <div className={styles.tracksHeader}>
                         <span className={styles.colNumber}>#</span>
                         <span className={styles.colTitle}>Title</span>
-                        <span className={styles.colDuration}>⏱</span>
                     </div>
 
                     {playlistTracks.map((track, index) => (
@@ -145,7 +198,29 @@ const Page = () => {
                             </div>
 
                             <span className={styles.colDuration}>
-                                {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
+                                {/*Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')*/}
+
+                                <div className={styles.optionsWrapper}>
+                                    <FontAwesomeIcon
+                                        icon={faEllipsisH}
+                                        className={styles.optionsIcon}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleMenu(index);
+                                        }}
+                                    />
+                                    {activeMenuIndex === index && (
+                                    <div className={styles.optionsMenu} ref={menuRef}>
+                                        <button
+                                            className={styles.menuItem}
+                                            onClick={() => handleRemoveFromPlaylist(track.id)}
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} className={styles.menuIcon} />
+                                            Remove from playlist
+                                        </button>
+                                    </div>
+                                    )}
+                                </div>
                             </span>
                         </div>
                     ))}

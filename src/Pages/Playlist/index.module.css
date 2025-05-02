@@ -70,10 +70,9 @@
 
 /* Search Area */
 .searchSection {
-  margin-top: 2rem;
   border-top: 1px solid #eee;
   padding-top: 2rem;
-  margin-bottom: 7rem;
+  padding-bottom: 8rem;
 }
 
 .playlistHeaderWrapper {
@@ -177,6 +176,8 @@
   width: 40px;
   text-align: right;
   font-size: 0.85rem;
+  align-items: center;
+  display: flex;
   color: #666;
 }
 
@@ -206,6 +207,59 @@
   font-size: 0.8rem;
   color: #777;
   margin: 0;
+}
+
+.optionsWrapper {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.optionsIcon {
+  margin-left: 8px;
+  cursor: pointer;
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.optionsMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 5;
+  max-width: 500px;
+  min-width: 160px;
+  padding: 0.5rem 0;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background-color: #f2f2f2;
+}
+
+.menuIcon {
+  color: #c0392b;
 }
 
 /* ================================
@@ -253,6 +307,7 @@
     font-size: 0.9rem;
   }
 }
+
 
 /* Mobile screens */
 @media (max-width: 768px) {
@@ -308,6 +363,10 @@
 
   .playlistName {
     font-size: 0.85rem;
+  }
+
+  .searchSection {
+    padding-bottom: 10rem;
   }
 }
 

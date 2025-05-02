@@ -25,37 +25,73 @@ const MusicControlsSection = () => {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
-
-    // Don't reload if it's the same
+  
     if (audio.src.includes(currentTrack.audio_url)) return;
-
+  
     audio.pause();
     audio.src = `${backendUrlAudio}/${currentTrack.audio_url}`;
     audio.load();
-
+  
     const onLoaded = () => {
       setDuration(audio.duration || 0);
-      audio.play().then(() => dispatch({ type: types.SET_IS_PLAYING, payload: true }));
+      audio.play().then(() => {
+        dispatch({ type: types.SET_IS_PLAYING, payload: true });
+      });
     };
-
+  
     const onTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
     };
-
+  
     const onEnded = () => {
       dispatch({ type: types.PLAY_NEXT_TRACK });
     };
-
+  
     audio.addEventListener('loadedmetadata', onLoaded);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('ended', onEnded);
-
+  
+    // ✅ Setup Media Session
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: currentTrack.title,
+        artist: currentTrack.artist_name,
+        album: 'WOTG Streaming',
+        artwork: [
+          {
+            src: `${backendUrlImage}/${currentTrack.cover_image || 'default-cover.png'}`,
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      });
+  
+      navigator.mediaSession.setActionHandler('play', () => {
+        audio.play().then(() => {
+          dispatch({ type: types.SET_IS_PLAYING, payload: true });
+        });
+      });
+  
+      navigator.mediaSession.setActionHandler('pause', () => {
+        audio.pause();
+        dispatch({ type: types.SET_IS_PLAYING, payload: false });
+      });
+  
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        dispatch({ type: types.PLAY_PREVIOUS_TRACK });
+      });
+  
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        dispatch({ type: types.PLAY_NEXT_TRACK });
+      });
+    }
+  
     return () => {
       audio.removeEventListener('loadedmetadata', onLoaded);
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('ended', onEnded);
     };
-  }, [currentTrack, dispatch]);
+  }, [currentTrack, dispatch]);  
 
   const togglePlay = () => {
     const audio = audioRef.current;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
 const ChatSidebar = ({ 
   chatrooms, 
@@ -64,11 +65,11 @@ const ChatSidebar = ({
                 title="Open Menu"
               />
 
-              <a className={styles.worshipLink} href="/bible">Bible</a>
-              <a className={styles.worshipLink} href="/worship">Worship</a>
-              <a className={styles.worshipLink} href="/blogs">Devotion</a>
-              <a className={styles.worshipLink} href="/music">Music</a>
-              <a className={styles.worshipLink} href="/your-journals">Journal</a>
+            <Link className={styles.worshipLink} to="/bible">Bible</Link>
+            <Link className={styles.worshipLink} to="/worship">Worship</Link>
+            <Link className={styles.worshipLink} to="/blogs">Devotion</Link>
+            <Link className={styles.worshipLink} to="/music">Music</Link>
+            <Link className={styles.worshipLink} to="/your-journals">Journal</Link>
             </div>
           </div>
         </div>

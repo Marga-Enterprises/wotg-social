@@ -6,7 +6,7 @@ import { wotgsocial } from '../../redux/combineActions';
 import { useDispatch } from 'react-redux';
 
 //react router
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 // css
 import styles from './index.module.css';
@@ -30,7 +30,6 @@ import useWindowDimensions from '../../hooks/useWindowDimensions';
 
 const Page = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const { id } = useParams();
   const { width } = useWindowDimensions();
@@ -71,8 +70,12 @@ const Page = () => {
     handleFetchPlaylist();
   }, [handleFetchPlaylist]);
 
-  const handleRouteToMusicPage = (musicId, albumId) => {
-    navigate(`/music-in-album/${albumId}?music=${musicId}`);
+  const handleTrackClick = (trackId, coverImage) => {
+    dispatch(wotgsocial.musicPlayer.setTrackList(playlistTracks));
+    const meta = { source: "album", albumCover: coverImage };
+    const selected = playlistTracks.find((t) => t.id === trackId);
+    dispatch(wotgsocial.musicPlayer.setCurrentTrack({ ...selected, ...meta }));
+    dispatch(wotgsocial.musicPlayer.setIsPlaying(true));
   };
 
   if (loading) return <LoadingSpinner/>;
@@ -112,7 +115,7 @@ const Page = () => {
                     </div>
 
                     {playlistTracks.map((track, index) => (
-                        <div key={index} onClick={() => handleRouteToMusicPage(track.id, track.album_id)} className={styles.trackRow}>
+                        <div key={index} onClick={() => handleTrackClick(track.id, track.cover_image)} className={styles.trackRow}>
                             <span className={styles.colNumber}>{index + 1}</span>
 
                             <div className={styles.colTrackInfo}>

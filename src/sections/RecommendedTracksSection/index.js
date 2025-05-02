@@ -81,8 +81,12 @@ const RecommendedTracksSection = ({
     }
   }, [dispatch])
 
-  const handleRouteToMusicPage = (musicId, albumId) => {
-    navigate(`/music-in-album/${albumId}?music=${musicId}`);
+  const handleTrackClick = (trackId, coverImage) => {
+    dispatch(wotgsocial.musicPlayer.setTrackList(recommendedMusics));
+    const meta = { source: "album", albumCover: coverImage };
+    const selected = recommendedMusics.find((t) => t.id === trackId);
+    dispatch(wotgsocial.musicPlayer.setCurrentTrack({ ...selected, ...meta }));
+    dispatch(wotgsocial.musicPlayer.setIsPlaying(true));
   };
 
   if (loading) return <LoadingSpinner />;
@@ -94,7 +98,7 @@ const RecommendedTracksSection = ({
 
         <div className={styles.recommendedList}>
             {recommendedMusics.map((music, index) => (
-              <div key={index} onClick={() => handleRouteToMusicPage(music.id, music.album_id)} className={styles.recommendedRow}>
+              <div key={index} onClick={() => handleTrackClick(music.id, music.cover_image)} className={styles.recommendedRow}>
                   <img
                       src={`${backendUrl}/${music.cover_image || 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'}`}
                       alt={music.title}

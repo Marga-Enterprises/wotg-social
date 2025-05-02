@@ -9,6 +9,7 @@ import * as journal from './journal';
 import * as album from './album';
 import * as music from './music';
 import * as playlist from './playlist';
+import * as musicPlayer from './musicPlayer';
 
 export {
   user,
@@ -21,5 +22,6 @@ export {
   worship,
   blog,
   bible,
-  journal
+  journal,
+  musicPlayer
 };

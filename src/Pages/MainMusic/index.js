@@ -8,12 +8,20 @@ import NewReleaseSection from '../../sections/NewReleaseSection';
 import MostPopularSection from '../../sections/MostPopularSection';
 import PlayListSideBarSection from '../../sections/PlayListSideBarSection';
 import PlayListSmallScreenSection from '../../sections/PlayListSmallScreenSection';
+import MusicControlsSection from "../../sections/MusicControlsSection";
 
 // HOOKS
 import useWindowDimensions from '../../hooks/useWindowDimensions';
 
+// REDUX
+import { useSelector } from "react-redux";
+
 const Page = () => {
+  const currentTrack = useSelector((state) => state.wotgsocial.musicPlayer.currentTrack);
+
   const { width } = useWindowDimensions();
+
+  console.log('[[[[[[[[[[[[[CURRENT TRACK MAIN PAGE]]]]]]]]]]]]]', currentTrack);
 
   return (
     <div className={styles.page}>

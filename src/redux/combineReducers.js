@@ -5,7 +5,7 @@ import common from './common/reducers';
 
 const reducers = combineReducers({
   wotgsocial,
-  common
+  common,
 });
 
 export default reducers;

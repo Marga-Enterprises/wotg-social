@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
-import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
 
 const NewReleaseSection = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const scrollRef = useRef(null);
   const loadingRef = useRef(false);
@@ -40,8 +38,12 @@ const NewReleaseSection = () => {
     }
   }, [dispatch, musics.length]);
 
-  const handleRouteToMusicPage = (musicId, albumId) => {
-    navigate(`/music-in-album/${albumId}?music=${musicId}`);
+  const handleTrackClick = (trackId, coverImage) => {
+    dispatch(wotgsocial.musicPlayer.setTrackList(musics));
+    const meta = { source: "album", albumCover: coverImage };
+    const selected = musics.find((t) => t.id === trackId);
+    dispatch(wotgsocial.musicPlayer.setCurrentTrack({ ...selected, ...meta }));
+    dispatch(wotgsocial.musicPlayer.setIsPlaying(true));
   };
 
   useEffect(() => {
@@ -70,7 +72,7 @@ const NewReleaseSection = () => {
       <div className={styles.musicRowWrapper} ref={scrollRef}>
         <div className={styles.musicRow}>
           {musics.map((music) => (
-            <div key={music.id} className={styles.musicCard} onClick={() => handleRouteToMusicPage(music.id, music.album_id)}>
+            <div key={music.id} className={styles.musicCard} onClick={() => handleTrackClick(music.id, music.cover_image)}>
               <img
                 src={
                   process.env.NODE_ENV === 'development'

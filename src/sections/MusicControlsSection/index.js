@@ -62,13 +62,6 @@ const MusicControlsSection = () => {
   
     const onEnded = () => {
       dispatch({ type: types.PLAY_NEXT_TRACK });
-  
-      // ✅ Optional: If it's the last song, stop playback
-      const { trackList } = store.getState().wotgsocial.musicPlayer;
-      const currentIndex = trackList.findIndex((t) => t.id === currentTrack.id);
-      if (currentIndex === trackList.length - 1) {
-        dispatch({ type: types.SET_IS_PLAYING, payload: false });
-      }
     };
   
     audio.addEventListener('loadedmetadata', onLoaded);

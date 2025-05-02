@@ -151,9 +151,33 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
 
       <div className={styles.controls}>
         <div className={styles.icons}>
-          <FontAwesomeIcon icon={faStepBackward} className={styles.icon} onClick={onPrevious} />
+          <FontAwesomeIcon
+            icon={faStepBackward}
+            className={styles.icon}
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+                audioRef.current.removeAttribute('src');
+                audioRef.current.load();
+              }
+              onPrevious();
+            }}
+          />
           <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} className={styles.icon} onClick={togglePlay} />
-          <FontAwesomeIcon icon={faStepForward} className={styles.icon} onClick={onNext} />
+          <FontAwesomeIcon
+            icon={faStepForward}
+            className={styles.icon}
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+                audioRef.current.removeAttribute('src');
+                audioRef.current.load();
+              }
+              onNext();
+            }}
+          />
         </div>
 
         <div className={styles.progress}>
@@ -187,9 +211,14 @@ const MusicControlsSection = ({ musicId, albumCover, onPrevious, onNext }) => {
         ref={audioRef}
         preload="metadata"
         onEnded={() => {
-          setTimeout(onNext, 1000); // Then after a slight delay go to next
-          setCurrentTime(0);
-        }}
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+            audioRef.current.removeAttribute('src');
+            audioRef.current.load();
+          }
+          onNext(); // now it's safe
+        }}        
       />
     </div>
   );

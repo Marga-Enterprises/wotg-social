@@ -61,11 +61,15 @@
   padding: 0.5rem 1rem;
   background-color: #c43434;
   color: #fff;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 3rem;
+  font-size: .8rem;
   font-weight: bold;
   text-decoration: none;
   transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: #9c1919;
 }
 
 /* TRACKLIST TABLE STYLE */
@@ -74,6 +78,7 @@
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  margin-bottom: 5rem;
 }
 
 .trackListHeader {

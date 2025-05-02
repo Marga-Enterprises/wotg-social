@@ -41,7 +41,7 @@ const AlbumSection = () => {
   }, [dispatch, albums.length]);
 
   const handleRouteToMusicPage = (id) => {
-      navigate(`/music-in-album/${id}`);
+      navigate(`/album/${id}`);
   };
 
   useEffect(() => {

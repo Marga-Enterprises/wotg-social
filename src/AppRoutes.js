@@ -75,7 +75,7 @@ function AppRoutes() {
           <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
           <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
           <Route path="/albums" element={<AuthRouter><AdminMusicDashboard /></AuthRouter>} />
-          <Route path="/music-in-album/:id" element={<AuthRouter><MusicInAlbumPage /></AuthRouter>} />
+          <Route path="/album/:id" element={<AuthRouter><MusicInAlbumPage /></AuthRouter>} />
           <Route path="/playlist/:id" element={<AuthRouter><Playlist /></AuthRouter>} />
           <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
           <Route path="/music" element={<AuthRouter><MainMusic/></AuthRouter>} />

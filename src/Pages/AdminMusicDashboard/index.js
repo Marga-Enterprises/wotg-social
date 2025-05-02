@@ -52,7 +52,7 @@ const Page = () => {
     });
 
     const handleRouteToMusicPage = (id) => {
-        navigate(`/music-in-album/${id}`);
+        navigate(`/album/${id}`);
     };
 
     const handleAlbumsList = useCallback(async (pageIndex = 1) => {

@@ -40,6 +40,11 @@
   margin-bottom: 3rem;
 }
 
+.sectionAlbums {
+  margin-bottom: 7rem; /* Adjust as needed */
+}
+
+
 /* ======= Section Header ======= */
 .sectionHeader {
   display: flex;

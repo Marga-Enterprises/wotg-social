@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPause, faPlay, faVolumeUp, faStepForward, faStepBackward } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import * as types from '../../redux/wotgsocial/types';
+import { useLocation } from 'react-router-dom';
 
 const backendUrlImage = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
 const backendUrlAudio = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios';
@@ -11,10 +12,15 @@ const backendUrlAudio = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/audios';
 const MusicControlsSection = () => {
   const dispatch = useDispatch();
   const audioRef = useRef(null);
+  const location = useLocation();
 
   const { currentTrack, isPlaying, volume } = useSelector((state) => state.wotgsocial.musicPlayer);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+
+  const isMusicRoute = location.pathname === '/music';
+  const isAlbumRoute = /^\/album\/\d+$/.test(location.pathname);
+  const isPlaylistRoute = /^\/playlist\/\d+$/.test(location.pathname);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -84,7 +90,12 @@ const MusicControlsSection = () => {
   // console.log('CURRENT TRACKKK', currentTrack);
 
   return (
-    <div className={styles.musicControlsSection}>
+    <div
+      className={styles.musicControlsSection}
+      style={{
+        display: isMusicRoute || isAlbumRoute || isPlaylistRoute ? 'flex' : 'none',
+      }}
+    >
       <div className={styles.songInfo} onClick={togglePlay}>
         <img
           src={`${backendUrlImage}/${currentTrack.cover_image || 'default-cover.png'}`}

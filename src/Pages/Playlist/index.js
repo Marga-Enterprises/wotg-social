@@ -6,7 +6,7 @@ import { wotgsocial } from '../../redux/combineActions';
 import { useDispatch } from 'react-redux';
 
 //react router
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 // css
 import styles from './index.module.css';
@@ -30,7 +30,8 @@ import useWindowDimensions from '../../hooks/useWindowDimensions';
 
 const Page = () => {
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
+  
   const { id } = useParams();
   const { width } = useWindowDimensions();
 
@@ -78,6 +79,10 @@ const Page = () => {
     dispatch(wotgsocial.musicPlayer.setIsPlaying(true));
   };
 
+  const backToMusicPage = () => {
+    navigate('/music');
+  }
+
   if (loading) return <LoadingSpinner/>;
 
   return (
@@ -88,20 +93,29 @@ const Page = () => {
 
         <div className={styles.playlistContent}>
             {/* Playlist Header */}
-            <div className={styles.playlistHeader} onClick={() => setShowModal(true)}>
-                <img
-                    src={`${backendUrl}/${playlist?.cover_image || 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'}`}
-                    alt={playlist?.name}
-                    ref={imgRef}
-                    className={styles.coverImage}
-                />
-                <div className={styles.playlistInfo}>
-                    <p className={styles.visibility}>
-                        {playlist?.visibility === 'public' ? 'Public Playlist' : 'Private Playlist'}
-                    </p>
-                    <h1 className={styles.title}>{playlist?.name}</h1>
+            <div className={styles.playlistHeaderWrapper}>
+                {/* Back button positioned absolutely */}
+                <button 
+                    className={styles.backButton} 
+                    onClick={backToMusicPage}
+                >
+                    ← Back
+                </button>
+
+                <div className={styles.playlistHeader} onClick={() => setShowModal(true)}>
+                    <img
+                        src={`${backendUrl}/${playlist?.cover_image || 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'}`}
+                        alt={playlist?.name}
+                        ref={imgRef}
+                        className={styles.coverImage}
+                    />
+                    <div className={styles.playlistInfo}>
+                        <p className={styles.visibility}>
+                            {playlist?.visibility === 'public' ? 'Public Playlist' : 'Private Playlist'}
+                        </p>
+                        <h1 className={styles.title}>{playlist?.name}</h1>
                     <h1 className={styles.creator}>{playlist?.description}</h1>
-                    {/* <p className={styles.creator}>Pillorajem</p> */}
+                    </div>
                 </div>
             </div>
 

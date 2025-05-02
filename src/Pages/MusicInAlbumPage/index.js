@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useMemo, useRef, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { wotgsocial } from "../../redux/combineActions";
 
@@ -14,6 +14,7 @@ const AlbumDetailsPage = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const currentTrack = useSelector((state) => state.wotgsocial.musicPlayer.currentTrack);
   const backendUrl = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
@@ -89,6 +90,10 @@ const AlbumDetailsPage = () => {
     return `${min}:${sec < 10 ? "0" : ""}${sec}`;
   };
 
+  const backToMainMusicPage = () => {
+    navigate('/music');
+  };
+
   return (
     <>
       {loading ? (
@@ -110,6 +115,10 @@ const AlbumDetailsPage = () => {
                 {album?.release_date?.split("-")[0]} • {musics.length} songs
               </p>
             </div>
+
+            <button className={styles.addButton} onClick={backToMainMusicPage}>
+              Back
+            </button>
 
             {(role === "admin" || role === "owner") && (
               <button className={styles.addButton} onClick={() => setShowModal(true)}>

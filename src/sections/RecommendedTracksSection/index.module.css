@@ -9,7 +9,6 @@
   font-size: 1.2rem;
   font-weight: 700;
   color: #111;
-  margin-bottom: 1rem;
 }
 
 .subText {
@@ -22,6 +21,29 @@
   display: flex;
   flex-direction: column;
   gap: .5rem;
+}
+
+.refreshButton {
+  background-color: #fff;
+  color: #c51e1e;
+  border: solid 1px #c51e1e;
+  font-size: 1.1rem;
+  font-weight: 400;
+  padding: .5rem 2rem;
+  border-radius: 2rem;
+  transition: background-color 0.2s ease;
+}
+
+.refreshButton:hover {
+  background-color: #8b0d0d;
+  color: #fff;
+}
+
+.recommendedHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .recommendedRow {

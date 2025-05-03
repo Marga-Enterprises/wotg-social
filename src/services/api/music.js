@@ -6,6 +6,11 @@ export async function getMusicByParams(payload) {
     return GET(`/music?${params}`);
 };
 
+export async function getRecoByParams(payload) {
+    const params = methods.convertQueryString(payload); // { pageIndex, pageSize, userId? }
+    return GET(`/music/recommended?${params}`);
+};
+
 export async function getMusicById(payload) {
     return GET(`/music/${payload.id}`);
 };

@@ -5,9 +5,6 @@ import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { wotgsocial } from '../../redux/combineActions';
 import { useDispatch } from 'react-redux';
 
-//react router
-import { useNavigate } from 'react-router-dom';
-
 // css
 import styles from './index.module.css';
 
@@ -19,7 +16,6 @@ const RecommendedTracksSection = ({
   onRefresh
 }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   
   const loadingRef = useRef(null);
 
@@ -38,10 +34,9 @@ const RecommendedTracksSection = ({
 
     try {
       const res = await dispatch(
-        wotgsocial.music.getMusicByParamsAction({
+        wotgsocial.music.getRecoByParamsAction({
           pageIndex: 1,
-          pageSize: 10,
-          order: 'createdAt',
+          pageSize: 10
         })
       );
 
@@ -93,7 +88,10 @@ const RecommendedTracksSection = ({
 
   return (
     <div className={styles.recommendedSection}>
-        <h4 className={styles.recommendedTitle}>Recommended</h4>
+        <div className={styles.recommendedHeading}>
+          <h4 className={styles.recommendedTitle}>Recommended</h4>
+          <button onClick={handleFetchRecommended} className={styles.refreshButton}>Refresh</button>
+        </div>
         {/*<p className={styles.subText}>Based on what’s in this playlist</p>*/}
 
         <div className={styles.recommendedList}>

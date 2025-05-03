@@ -26,39 +26,81 @@ const MusicControlsSection = () => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
   
+    // Reset and play new audio
     audio.pause();
     audio.src = `${backendUrlAudio}/${currentTrack.audio_url}`;
     audio.load();
+  
+    let rafId;
   
     const onLoaded = () => {
       audio.currentTime = 0;
       setDuration(audio.duration || 0);
       setCurrentTime(0);
-    
+  
       audio.play().then(() => {
         dispatch({ type: types.SET_IS_PLAYING, payload: true });
-    
-        if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
-          navigator.mediaSession.setPositionState({
-            duration: audio.duration || 0,
-            playbackRate: 1.0,
-            position: 0
+  
+        // Set initial MediaSession state
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = new window.MediaMetadata({
+            title: currentTrack.title,
+            artist: currentTrack.artist_name,
+            album: 'WOTG Streaming',
+            artwork: [
+              {
+                src: `${backendUrlImage}/${currentTrack.cover_image || 'default-cover.png'}`,
+                sizes: '512x512',
+                type: 'image/png'
+              }
+            ]
+          });
+  
+          // Initial state
+          if ('setPositionState' in navigator.mediaSession) {
+            navigator.mediaSession.setPositionState({
+              duration: audio.duration || 0,
+              playbackRate: 1.0,
+              position: 0
+            });
+          }
+  
+          // Lock screen media handlers
+          navigator.mediaSession.setActionHandler('play', () => {
+            audio.play().then(() => {
+              dispatch({ type: types.SET_IS_PLAYING, payload: true });
+            });
+          });
+  
+          navigator.mediaSession.setActionHandler('pause', () => {
+            audio.pause();
+            dispatch({ type: types.SET_IS_PLAYING, payload: false });
+          });
+  
+          navigator.mediaSession.setActionHandler('previoustrack', () => {
+            dispatch({ type: types.PLAY_PREVIOUS_TRACK });
+          });
+  
+          navigator.mediaSession.setActionHandler('nexttrack', () => {
+            dispatch({ type: types.PLAY_NEXT_TRACK });
           });
         }
+  
+        // Start updating lock screen slider
+        const updateSlider = () => {
+          setCurrentTime(audio.currentTime);
+          if ('setPositionState' in navigator.mediaSession) {
+            navigator.mediaSession.setPositionState({
+              duration: audio.duration || 0,
+              playbackRate: 1.0,
+              position: audio.currentTime
+            });
+          }
+          rafId = requestAnimationFrame(updateSlider);
+        };
+  
+        updateSlider();
       });
-    };    
-  
-    const onTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-  
-      // ✅ Sync lock screen slider
-      if ('setPositionState' in navigator.mediaSession) {
-        navigator.mediaSession.setPositionState({
-          duration: audio.duration || 0,
-          playbackRate: 1.0,
-          position: audio.currentTime
-        });
-      }
     };
   
     const onEnded = () => {
@@ -66,48 +108,12 @@ const MusicControlsSection = () => {
     };
   
     audio.addEventListener('loadedmetadata', onLoaded);
-    audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('ended', onEnded);
-  
-    // Media Session metadata + controls
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new window.MediaMetadata({
-        title: currentTrack.title,
-        artist: currentTrack.artist_name,
-        album: 'WOTG Streaming',
-        artwork: [
-          {
-            src: `${backendUrlImage}/${currentTrack.cover_image || 'default-cover.png'}`,
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      });
-  
-      navigator.mediaSession.setActionHandler('play', () => {
-        audio.play().then(() => {
-          dispatch({ type: types.SET_IS_PLAYING, payload: true });
-        });
-      });
-  
-      navigator.mediaSession.setActionHandler('pause', () => {
-        audio.pause();
-        dispatch({ type: types.SET_IS_PLAYING, payload: false });
-      });
-  
-      navigator.mediaSession.setActionHandler('previoustrack', () => {
-        dispatch({ type: types.PLAY_PREVIOUS_TRACK });
-      });
-  
-      navigator.mediaSession.setActionHandler('nexttrack', () => {
-        dispatch({ type: types.PLAY_NEXT_TRACK });
-      });
-    }
   
     return () => {
       audio.removeEventListener('loadedmetadata', onLoaded);
-      audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('ended', onEnded);
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, [currentTrack, dispatch]);  
 

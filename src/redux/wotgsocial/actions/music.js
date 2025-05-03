@@ -4,6 +4,7 @@ import {
     createMusic,
     updateMusic,
     deleteMusic,
+    getRecoByParams
 } from "../../../services/api/music";
 
 import * as types from '../types';
@@ -11,6 +12,32 @@ import * as types from '../types';
 export const getMusicByParamsAction = (payload) => async (dispatch) => {
     try {
         const res = await getMusicByParams(payload);
+        const { success, data } = res;
+
+        if (success) {
+            dispatch({
+                type: types.MUSIC_LIST_SUCCESS,
+                payload: data,
+            });
+        } else {
+            dispatch({
+                type: types.MUSIC_LIST_FAIL,
+                payload: data.msg || "Failed to fetch music",
+            });
+        }
+
+        return res;
+    } catch (err) {
+        dispatch({
+            type: types.MUSIC_LIST_FAIL,
+            payload: err.response?.data?.msg || "Failed to fetch music",
+        })
+    }
+};
+
+export const getRecoByParamsAction = (payload) => async (dispatch) => {
+    try {
+        const res = await getRecoByParams(payload);
         const { success, data } = res;
 
         if (success) {

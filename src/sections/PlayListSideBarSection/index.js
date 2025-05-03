@@ -135,7 +135,7 @@ const PlayListSideBarSection = () => {
         <div className={styles.createBox}>
             <p className={styles.createTitle}>Create your first playlist</p>
             <p className={styles.createSubtitle}>It’s easy, we’ll help you</p>
-            <button className={styles.createButton}>Create playlist</button>
+            <button className={styles.createButton} onClick={() => handleCreateNewPlayList()}>Create playlist</button>
         </div>
        )}
 

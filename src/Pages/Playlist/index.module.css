@@ -7,7 +7,7 @@
   font-style: normal;
   color: #111;
   display: flex;
-  margin-top: 3.5rem;
+  margin-top: 3rem;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
@@ -18,7 +18,8 @@
   overflow-x: hidden;
   box-sizing: border-box;
   padding: .5rem;
-  max-height: 93.8svh;
+  margin-top: 1rem;
+  max-height: 93svh;
   -webkit-overflow-scrolling: touch;
 }
 

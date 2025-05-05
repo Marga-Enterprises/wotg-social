@@ -99,47 +99,50 @@ const PlayListSideBarSection = () => {
   return (
     <div className={styles.sidebar}>
       <div className={styles.section}>
-        <div>
-          <h2 className={styles.sidebarHeading}>Your Playlists</h2>
-        </div>
-        <div>
-            <FontAwesomeIcon
-              icon={faPlus}
-              className={styles.addButton}
-              title="Add Playlist"
-              onClick={() => handleCreateNewPlayList()}
-            />
-        </div>
+        <h2 className={styles.sidebarHeading}>Your Playlists</h2>
+        <FontAwesomeIcon
+          icon={faPlus}
+          className={styles.addButton}
+          title="Add Playlist"
+          onClick={() => handleCreateNewPlayList()}
+        />
       </div>
 
-      { playlists?.length > 0 ? (
-        playlists.map((playlist, index) => 
-            <div className={styles.playlistList}>
-                <div key={index} className={styles.playlistItem} onClick={() => selectPlaylist(playlist.id)}>
-                    <img
-                      src={
-                          playlist.cover_image ? `${backendUrl}/${playlist.cover_image}` : 
-                          'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'
-                      }
-                      alt={playlist.name}
-                      className={styles.cover}
-                    />
-                    <div className={styles.info}>
-                        <p className={styles.title}>{playlist.name}</p>
-                        <p className={styles.creator}>{playlist.creator_fname} {playlist.creator_lname}</p>
-                    </div>
+      <div className={styles.scrollableContent}>
+        {playlists?.length > 0 ? (
+          playlists.map((playlist, index) => (
+            <div className={styles.playlistList} key={index}>
+              <div className={styles.playlistItem} onClick={() => selectPlaylist(playlist.id)}>
+                <img
+                  src={
+                    playlist.cover_image
+                      ? `${backendUrl}/${playlist.cover_image}`
+                      : 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp'
+                  }
+                  alt={playlist.name}
+                  className={styles.cover}
+                />
+                <div className={styles.info}>
+                  <p className={styles.title}>{playlist.name}</p>
+                  <p className={styles.creator}>
+                    {playlist.creator_fname} {playlist.creator_lname}
+                  </p>
                 </div>
+              </div>
             </div>
-        )
-       ) : (
-        <div className={styles.createBox}>
+          ))
+        ) : (
+          <div className={styles.createBox}>
             <p className={styles.createTitle}>Create your first playlist</p>
             <p className={styles.createSubtitle}>It’s easy, we’ll help you</p>
-            <button className={styles.createButton} onClick={() => handleCreateNewPlayList()}>Create playlist</button>
-        </div>
-       )}
+            <button className={styles.createButton} onClick={() => handleCreateNewPlayList()}>
+              Create playlist
+            </button>
+          </div>
+        )}
+      </div>
 
-      <div className={styles.footer}/>
+      <div className={styles.footer} />
     </div>
   );
 };

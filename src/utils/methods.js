@@ -25,6 +25,13 @@ export const convertQueryString = (params) => {
    return moment(v).format('MM/DD/YYYY');
  };
  */
+
+ export const convertMomentWithFormat = (v) => {
+  // convert to Asian timezone
+  const date = moment(v).utcOffset('+08:00').format('MM/DD/YYYY');
+  return moment(date).fromNow();
+ };
+
  export const convertMomentWithFormatWhole = (v) => {
    return moment(v).format('MMMM DD, YYYY');
  };

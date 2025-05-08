@@ -1,0 +1,42 @@
+.sharedContainer {
+  background-color: #f0f2f5;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.sharedHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.avatarSmall {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.5rem;
+}
+
+.sharedAuthorName {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #65676b;
+}
+
+.sharedText {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #050505;
+  white-space: pre-line;
+}
+
+.sharedMediaGrid {
+  margin-top: 0.5rem;
+}

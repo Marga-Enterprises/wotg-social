@@ -10,12 +10,15 @@ import * as album from './album';
 import * as music from './music';
 import * as playlist from './playlist';
 import * as musicPlayer from './musicPlayer';
+import * as follow from './follow';
+import * as post from './post';
 
 export {
   user,
   music,
   chatroom,
   message,
+  post,
   playlist,
   album,
   subscription,
@@ -23,5 +26,6 @@ export {
   blog,
   bible,
   journal,
-  musicPlayer
+  musicPlayer,
+  follow,
 };

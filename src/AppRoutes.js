@@ -38,6 +38,7 @@ import AdminMusicDashboard from "./Pages/AdminMusicDashboard";
 import MusicInAlbumPage from "./Pages/MusicInAlbumPage";
 import MainMusic from "./Pages/MainMusic";
 import Playlist from "./Pages/Playlist";
+import Feeds from "./Pages/Feeds";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -79,6 +80,7 @@ function AppRoutes() {
           <Route path="/playlist/:id" element={<AuthRouter><Playlist /></AuthRouter>} />
           <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
           <Route path="/music" element={<AuthRouter><MainMusic/></AuthRouter>} />
+          <Route path="/feeds" element={<AuthRouter><Feeds /></AuthRouter>} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />

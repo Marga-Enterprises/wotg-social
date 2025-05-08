@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { io } from 'socket.io-client';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
-
-import { requestForToken } from "../../firebase";
 
 // Components
 import ChatSidebar from '../../components/ChatSidebar';
@@ -17,9 +14,11 @@ import AddParticipantsInChatroomForm from '../../components/AddParticpantsInChat
 
 // CONTEXT
 import { useSetHideNavbar } from "../../contexts/NavbarContext";
+import { useSocket } from '../../contexts/SocketContext';
 
 const Page = ({ onToggleMenu  }) => {
     const dispatch = useDispatch();
+    const socket = useSocket();
 
     // Local state
     const [user, setUser] = useState(null);
@@ -28,7 +27,6 @@ const Page = ({ onToggleMenu  }) => {
     const [selectedChatroom, setSelectedChatroom] = useState(null);
     const [selectedChatroomDetails, setSelectedChatroomDetails] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication status
-    const [socket, setSocket] = useState(null); // Manage Socket.IO connection
     const [isMobile, setIsMobile] = useState(false); // State to track if the screen width is 780px or below
     const [isChatVisible, setIsChatVisible] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
@@ -69,31 +67,6 @@ const Page = ({ onToggleMenu  }) => {
             window.removeEventListener('resize', handleResize); // Cleanup on unmount
         };
     }, []);
-
-
-    // Initialize Socket.IO connection
-    useEffect(() => {
-        const socketUrl = process.env.NODE_ENV === 'development' 
-            ? 'http://localhost:5000' 
-            : 'https://community.wotgonline.com';
-
-        const newSocket = io(socketUrl); // Adjust to your backend server
-        setSocket(newSocket);
-
-        // Log successful connection
-        newSocket.on('connect', () => {
-            // console.log('Socket connected successfully:', newSocket.id);
-        });
-
-        // Log disconnection
-        newSocket.on('disconnect', () => {
-            // console.log('Socket disconnected');
-        });
-
-        return () => {
-            newSocket.disconnect(); // Cleanup on component unmount
-        };
-    }, [isAuthenticated]);
 
     useEffect(() => {
         if (!socket) return;
@@ -139,78 +112,6 @@ const Page = ({ onToggleMenu  }) => {
         socket.emit("send_message_reaction", { messageId, react: reactionType });
         dispatch(wotgsocial.message.reactToMessageAction({ messageId, react: reactionType }));
     };
-
-    
-    // Web Push Notification: Request Permission and Subscribe
-    const subscribeToPushNotifications = async () => {
-        if (!("Notification" in window)) {
-            console.error("🚫 Push notifications are not supported in this browser.");
-            return;
-        }
-    
-        // Request notification permission
-        const permission = await Notification.requestPermission();
-        if (permission !== "granted") {
-            console.warn("⚠️ Push notification permission denied.");
-            return;
-        }
-    
-        try {
-            // 🔥 Get the FCM Token
-            const fcmToken = await requestForToken();
-            if (!fcmToken) {
-                console.error("❌ FCM Token is not available.");
-                return;
-            }
-    
-            // ✅ Generate a unique deviceId for this device
-            const getDeviceId = () => {
-                let deviceId = localStorage.getItem("deviceId");
-                if (!deviceId) {
-                    deviceId = crypto.randomUUID(); // Generate a unique UUID
-                    localStorage.setItem("deviceId", deviceId);
-                }
-                return deviceId;
-            };
-    
-            const deviceId = getDeviceId();
-    
-            // 🔍 Detect Device Type (Web, Android, iOS)
-            const getDeviceType = () => {
-                const userAgent = navigator.userAgent.toLowerCase();
-                if (/android/.test(userAgent)) return "android";
-                if (/iphone|ipad|ipod/.test(userAgent)) return "ios";
-                return "web"; // Default to web
-            };
-    
-            const deviceType = getDeviceType();
-    
-            // ✅ Prepare subscription data
-            const subscriptionData = {
-                userId: user.id,  // Assuming the user object contains an ID field
-                deviceId,         // Unique device ID
-                deviceType,       // Store device type
-                subscription: {   // Store FCM token inside subscription JSON
-                    fcmToken: fcmToken,
-                },
-            };
-    
-            // ✅ Send the FCM token to the backend for storage
-            const res = await dispatch(wotgsocial.subscription.addSubscriptionAction(subscriptionData));
-    
-            // 🛠 Handle backend response
-            if (res.error && res.error.status === 400) {
-                console.log("ℹ️ Subscription already exists in the backend for this device.");
-                return null; // Return null if the subscription already exists in the backend
-            }
-    
-            console.log("✅ Subscription successfully saved:", res);
-        } catch (error) {
-            console.error("❌ Error subscribing to push notifications:", error);
-            return null;
-        }
-    };    
-    
 
     // Fetch chatrooms
     const fetchChatrooms = useCallback(
@@ -385,56 +286,36 @@ const Page = ({ onToggleMenu  }) => {
             socket.off('new_participants');
         };
     }, [socket, user]);    
-       
-    
-    useEffect(() => {
-        if (!socket || !selectedChatroom) return;
-
-        chatrooms.forEach((chatroom) => {
-            socket.emit('join_room', chatroom.id); // Join each chatroom by its ID
-        });
-
-        socket.emit('join_room', selectedChatroom);
-
-        return () => {
-            socket.emit('leave_room', selectedChatroom); // Leave the room on cleanup
-        };
-    }, [socket, selectedChatroom]);
-
 
     // Handle chatroom selection
     const handleSelectChatroom = async (chatroomId) => {
         if (chatroomId) {
-            setSelectedChatroom(chatroomId); // Set the selected chatroom
-            setIsChatVisible(true); // Show the chat window
-        
-            // Update the local state to set `unreadCount` to 0 for the selected chatroom
+            setSelectedChatroom(chatroomId);
+            setIsChatVisible(true);
+    
             setChatrooms((prevChatrooms) =>
                 prevChatrooms.map((chat) =>
                     chat.id === chatroomId
-                        ? { ...chat, unreadCount: 0, hasUnread: false } // Clear unread count and hasUnread flag
+                        ? { ...chat, unreadCount: 0, hasUnread: false }
                         : chat
                 )
             );
-        
-            // Notify the backend to mark messages as read
-            if (socket) {
+    
+            if (socket && socket.connected) {
                 socket.emit('mark_as_read', { chatroomId, userId: user?.id });
             }
-        
-            // Fetch messages for the selected chatroom
+    
             await fetchMessages(chatroomId);
         }
     };
     
-    
-
     const handleBackClick = () => {
         setIsChatVisible(false);  // Hide the chat window when back is clicked
     };
     
     // Handle sending a message
     const handleSendMessage = async (messageContent, selectedFile) => {
+        console.log('Sending message:', messageContent, selectedFile);
         if (!selectedChatroom || !user) return;
       
         // 1. If file exists, send file first
@@ -453,6 +334,7 @@ const Page = ({ onToggleMenu  }) => {
             if (fileRes) {
               const { content, senderId, chatroomId } = fileRes.data;
               if (socket) {
+                console.log('TESTTTTTTTTT');
                 socket.emit('new_message', {
                   content,
                   senderId,
@@ -484,13 +366,6 @@ const Page = ({ onToggleMenu  }) => {
           }
         }
     };
-      
-    // If the user is authenticated, subscribe them to push notifications
-    useEffect(() => {
-        if (isAuthenticated) {
-            subscribeToPushNotifications();
-        }
-    }, [isAuthenticated]);
 
     return (
         /*loading ? <LoadingSpinner /> :*/

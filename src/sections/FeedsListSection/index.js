@@ -86,7 +86,7 @@ const FeedsListSection = () => {
 
   // Render each post
   const renderPost = (post, index) => (
-    <div className={styles.postCard} key={post.id || index}>
+    <div className={styles.cardPost} key={post.id || index}>
       <PostHeaderAuthor author={post.author} createdAt={post.created_at} />
       {post.original_post && <SharedPostPreview post={post.original_post} />}
       {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}

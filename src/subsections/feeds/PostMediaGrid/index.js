@@ -7,13 +7,22 @@ const PostMediaGrid = ({ media = [] }) => {
   const displayedMedia = media.slice(0, 4);
   const remainingCount = media.length - 4;
 
+  const gridClass =
+    media.length === 1
+      ? styles.one
+      : media.length === 2
+      ? styles.two
+      : media.length === 3
+      ? styles.three
+      : styles.four;
+
   return (
-    <div className={styles.mediaGrid}>
+    <div className={`${styles.mediaGrid} ${gridClass}`}>
       {displayedMedia.map((item, index) => {
         const isLast = index === 3;
 
         return (
-          <div key={item.id} className={styles.mediaItem}>
+          <div key={item.id || index} className={styles.mediaItem}>
             {item.type === 'image' && (
               <>
                 <img

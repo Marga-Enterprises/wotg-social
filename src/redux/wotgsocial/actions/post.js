@@ -24,7 +24,7 @@ export const getPostsByParamsAction = (payload) => async (dispatch) => {
         if (success) {
             dispatch({
                 type: types.POST_LIST_SUCCESS,
-                payload: data,
+                payload: data.posts,
             });
         } else {
             dispatch({

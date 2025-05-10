@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
-import { useNavigate } from 'react-router-dom';
 
-import LoadingSpinner from '../../components/LoadingSpinner';
 import styles from './index.module.css';
-
-// fontawesome
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faComment, faShare } from '@fortawesome/free-solid-svg-icons';
 
 // components
 import ExpandableText from '../../common/ExpandableText';
+import NoneOverlayCircularLoading from '../../components/NoneOverlayCircularLoading';
+import NewPost from '../../subsections/feeds/NewPost';
 
 // subsections
 import PostHeaderAuthor from '../../subsections/feeds/PostHeaderAuthor';
@@ -22,114 +18,110 @@ import PostActions from '../../subsections/feeds/PostActions';
 
 const FeedsListSection = () => {
   const dispatch = useDispatch();
-
   const observerRef = useRef(null);
   const loadingRef = useRef(false);
 
-  const backendUrl = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images', []);
-
+  const pageSize = useMemo(() => 10, []);
   const [feeds, setFeeds] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [pageDetails, setPageDetails] = useState({
     pageIndex: 1,
-    pageSize: 10,
     totalPages: 0,
-    totalRecords: 0
+    totalRecords: 0,
   });
 
-  const [loading, setLoading] = useState(false);
-
-  const fetchFeeds = useCallback(async () => {
-    if (loadingRef.current || (pageDetails.totalPages && pageDetails.pageIndex > pageDetails.totalPages)) return;
+  // Fetch Feeds
+  const fetchFeeds = useCallback((reset = false) => {
+    if (
+      loadingRef.current ||
+      (!reset && pageDetails.totalPages && pageDetails.pageIndex > pageDetails.totalPages)
+    ) return;
 
     loadingRef.current = true;
     setLoading(true);
 
-    try {
-      const res = await dispatch(wotgsocial.post.getPostsByParamsAction({
-        pageIndex: pageDetails.pageIndex,
-        pageSize: pageDetails.pageSize
-      }));
+    const pageIndex = reset ? 1 : pageDetails.pageIndex;
 
-      if (res.success && res.data?.posts) {
-        setFeeds(prev => [...prev, ...res.data.posts]);
-        setPageDetails(prev => ({
-          ...prev,
-          pageIndex: prev.pageIndex + 1,
-          totalPages: res.data.totalPages,
-          totalRecords: res.data.totalRecords
-        }));
-      }
-    } catch (err) {
-      console.error("Error fetching feeds:", err);
-    } finally {
-      loadingRef.current = false;
-      setLoading(false);
-    }
-  }, [dispatch, pageDetails.pageIndex, pageDetails.pageSize, pageDetails.totalPages]);
+    dispatch(wotgsocial.post.getPostsByParamsAction({ pageIndex, pageSize }))
+      .then((res) => {
+        if (res.success && res.data?.posts) {
+          setFeeds((prev) => reset ? res.data.posts : [...prev, ...res.data.posts]);
+          setPageDetails({
+            pageIndex: pageIndex + 1,
+            totalPages: res.data.totalPages,
+            totalRecords: res.data.totalRecords
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching feeds:", err);
+      })
+      .finally(() => {
+        loadingRef.current = false;
+        setLoading(false);
+      });
+  }, [dispatch, pageDetails.pageIndex, pageDetails.totalPages, pageSize]);
 
+  // Initial Fetch
   useEffect(() => {
-    fetchFeeds();
-  }, []);
+    fetchFeeds(true);
+  }, [fetchFeeds]);
 
-  // Infinite Scroll Intersection Observer
+  // Infinite Scroll
   useEffect(() => {
-    if (feeds.length === 0) return;
+    if (!observerRef.current || feeds.length === 0) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) fetchFeeds();
+        if (entries[0].isIntersecting) {
+          fetchFeeds();
+        }
       },
       { threshold: 1 }
     );
 
-    if (observerRef.current) observer.observe(observerRef.current);
-
+    observer.observe(observerRef.current);
     return () => observer.disconnect();
-  }, [fetchFeeds]);
+  }, [fetchFeeds, feeds.length]);
 
-  const renderPost = (post) => {
-    return (
-      <div className={styles.postCard} key={post.id}>
-        {/* Author */}
-        <PostHeaderAuthor author={post.author} createdAt={post.created_at} />
-  
-        {/* Shared Post */}
-        {post.original_post && <SharedPostPreview post={post.original_post} />}
-  
-        {/* Post Content */}
-        {post.content && (
-          <ExpandableText text={post.content} className={styles.sharedText} />
-        )}
-  
-        {/* Media */}
-        {post.media?.length > 0 && (
-          <PostMediaGrid media={post.media} />
-        )}
-  
-        {/* Reaction / Comment / Share Count Summary */}
-        <PostFooterSummary
-          reactionCount={post.reaction_count}
-          commentsCount={post.comments_count}
-          sharesCount={post.shares_count}
-        />
-  
-        {/* Action Buttons */}
-        <PostActions
-          onLike={() => console.log('Liked Post ID:', post.id)}
-          onComment={() => console.log('Comment on Post ID:', post.id)}
-          onShare={() => console.log('Shared Post ID:', post.id)}
-        />
-      </div>
-    );
-  };  
+  // Render each post
+  const renderPost = (post, index) => (
+    <div className={styles.postCard} key={post.id || index}>
+      <PostHeaderAuthor author={post.author} createdAt={post.created_at} />
+      {post.original_post && <SharedPostPreview post={post.original_post} />}
+      {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}
+      {post.media?.length > 0 && <PostMediaGrid media={post.media} />}
+      <PostFooterSummary
+        reactionCount={post.reaction_count}
+        commentsCount={post.comments_count}
+        sharesCount={post.shares_count}
+      />
+      <PostActions
+        onLike={() => console.log('Liked Post ID:', post.id)}
+        onComment={() => console.log('Comment on Post ID:', post.id)}
+        onShare={() => console.log('Shared Post ID:', post.id)}
+      />
+    </div>
+  );
 
   return (
     <div className={styles.feedWrapper}>
-      {feeds.length === 0 && !loading && <p>No posts found.</p>}
+      <NewPost triggerRefresh={() => fetchFeeds(true)} />
+
+      {feeds.length === 0 && loading && (
+        <div className={styles.loadingArea}>
+          <NoneOverlayCircularLoading />
+        </div>
+      )}
+
+      {feeds.length === 0 && !loading && (
+        <p className={styles.noPostsText}>No posts found.</p>
+      )}
 
       {feeds.map(renderPost)}
 
       <div ref={observerRef} className={styles.loadingArea}>
-        {loading && <LoadingSpinner />}
+        {loading && feeds.length > 0 && <NoneOverlayCircularLoading />}
       </div>
     </div>
   );

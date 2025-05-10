@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+.newPostBox {
+    background: #ffffff;
+    border: 1px solid #e4e6eb;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: 0.2s ease-in-out;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.inputRow {
+    display: flex;
+    margin-bottom: 1.5rem;
+    margin-top: .5rem;
+    align-items: center;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+}
+
+.input {
+    background: #e8eaee;
+    border: none;
+    border-radius: 5rem;
+    padding: 10px 15px;
+    font-size: 14px;
+    width: 100%;
+    color: #050505;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.input:hover {
+    outline: none;
+    background: #dfdfe0;
+}
+
+.input:focus {
+    outline: none;
+}
+
+.input::placeholder {
+    color: #65676b;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #dddfe2;
+    margin: 8px 0;
+}

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPrayingHands, faComments, faBookOpen,
-  faBible, faPenFancy, faMusic
+  faBible, faPenFancy, faMusic, faNewspaper
 } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './index.module.css';
@@ -16,6 +16,7 @@ const menuItems = [
   { label: "Bible", href: "/bible", icon: faBible },
   { label: "Journal", href: "/your-journals", icon: faPenFancy },
   { label: "Music", href: "/music", icon: faMusic },
+  { label: "Feeds", href: "/feeds", icon: faNewspaper },
 ];
 
 const Page = () => {
@@ -45,7 +46,7 @@ const Page = () => {
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
+              transition={{ delay: index * 0.05, duration: 0.25 }}
             >
               <FontAwesomeIcon icon={item.icon} className={styles.icon} />
               <span>{item.label}</span>

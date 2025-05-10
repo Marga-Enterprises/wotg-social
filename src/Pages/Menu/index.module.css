@@ -40,26 +40,36 @@
 }
 
 .gridMenu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
+  justify-content: center;
 }
 
 .gridItem {
   background: linear-gradient(145deg, #c93929, #d95343);
   padding: 1rem;
   border-radius: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   color: #fff;
   text-decoration: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  width: calc(50% - 0.5rem); /* Two per row with gap adjustment */
+  min-width: 140px; /* Optional, prevent items from becoming too narrow */
 }
 
+/* If the last item is odd, make it stretch full width */
+.gridItem:last-child:nth-child(odd) {
+  width: 100%;
+}
+
+
+/*
 .gridItem::after {
   content: '';
   position: absolute;
@@ -89,8 +99,15 @@
   font-weight: 500;
   z-index: 1;
 }
-
+*/
 .icon {
   font-size: 1.8rem;
   z-index: 1;
+}
+
+/* Media Queries */ 
+@media (max-width: 405px) {
+  .gridItem {
+    width: 100%; /* 1 column by default */
+  }
 }

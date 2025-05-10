@@ -8,11 +8,12 @@ import ChatWindowStream from '../../components/ChatWindowStream';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 
+// context
+import { useSocket } from '../../contexts/SocketContext';
+
 const Page = () => {
   const dispatch = useDispatch();
-
-  // Global state
-  const { ui: { loading } } = useSelector((state) => state.common);
+  const socket = useSocket();
 
   let wotglivechatroom = process.env.NODE_ENV === 'development' ? 40 : 7;
   const userRole = Cookies.get('role');
@@ -21,7 +22,6 @@ const Page = () => {
   const [messages, setMessages] = useState([]);
   const [selectedChatroomDetails, setSelectedChatroomDetails] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [socket, setSocket] = useState(null);
   const [user, setUser] = useState(null);
   const [videoId, setVideoId] = useState(''); // YouTube video ID
   const [newVideoId, setNewVideoId] = useState('');
@@ -44,20 +44,6 @@ const Page = () => {
       setIsAuthenticated(false);
     }
   }, []);
-
-  // Initialize Socket.IO
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const socketUrl = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:5000' 
-      : 'https://community.wotgonline.com';
-
-    const newSocket = io(socketUrl, { transports: ['websocket'] });
-    setSocket(newSocket);
-
-    return () => newSocket.disconnect();
-  }, [isAuthenticated]);
 
   const handleUpdateWorship = async () => {
     if (!newVideoId) return;
@@ -215,17 +201,6 @@ const Page = () => {
     });
 
     return () => socket.off('new_message');
-  }, [socket]);
-
-  // Join and leave chatrooms dynamically
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.emit('join_room', wotglivechatroom);
-
-    return () => {
-      socket.emit('leave_room', wotglivechatroom);
-    };
   }, [socket]);
 
   useEffect(() => {

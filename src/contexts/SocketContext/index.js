@@ -30,7 +30,7 @@ export const SocketProvider = ({ children }) => {
 
     newSocket.on('connect', () => {
       console.log(`✅ Connected: ${newSocket.id}`);
-      newSocket.emit('join_room', `user_${account.id}`);
+      newSocket.emit('join_room', account.id);
     });
 
     newSocket.on('disconnect', () => {

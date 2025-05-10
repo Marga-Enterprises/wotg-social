@@ -12,6 +12,7 @@ import * as playlist from './playlist';
 import * as musicPlayer from './musicPlayer';
 import * as follow from './follow';
 import * as post from './post';
+import * as notification from './notification';
 
 export {
   user,
@@ -28,4 +29,5 @@ export {
   journal,
   musicPlayer,
   follow,
+  notification,
 };

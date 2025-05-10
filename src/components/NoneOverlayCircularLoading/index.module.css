@@ -1,0 +1,20 @@
+.smallSpinnerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* Ensure it fills parent container height */
+}
+
+.smallSpinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #ccc;
+  border-top: 3px solid #1877f2;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

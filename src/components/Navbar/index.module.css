@@ -8,7 +8,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000; /* Ensures navbar stays on top of all elements */
+    z-index: 3000; /* Ensures navbar stays on top of all elements */
 }
 
 /* Logo Styling */
@@ -73,6 +73,7 @@
   border-radius: 100%;
   font-size: 1.3rem;
   cursor: pointer;
+  margin-right: 1rem;
 }
 
 @media (max-width: 600px) {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './index.module.css';
 
@@ -6,10 +6,15 @@ import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+
+import { faRightFromBracket, faBell } from '@fortawesome/free-solid-svg-icons';
+
+// components
+import Notifications from '../Notifications';
 
 function Navbar({ onToggleMenu }) {
   const dispatch = useDispatch();
+  const [notificationsMounted, setNotificationsMounted] = useState(false);
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());
@@ -32,6 +37,7 @@ function Navbar({ onToggleMenu }) {
         <Link to="/your-journals" className={styles.navLink}>Journal</Link>
         <Link to="/music" className={styles.navLink}>Music</Link>
         <Link to="/worship" className={styles.navLink}>Worship</Link>
+        <Link to="/feeds" className={styles.navLink}>Feeds</Link>
         <a
           href="https://wotgonline.com/donate/"
           target="_blank"
@@ -40,6 +46,17 @@ function Navbar({ onToggleMenu }) {
         >
           Partner
         </a>
+        <FontAwesomeIcon
+          icon={faBell} 
+          size="2x" 
+          className={styles.headerIcon}
+          onClick={() => setNotificationsMounted(
+            (prev) => !prev
+          )}
+        />
+
+        {notificationsMounted && <Notifications />}
+
         <FontAwesomeIcon 
           icon={faRightFromBracket} 
           size="2x" 
@@ -69,4 +86,4 @@ function Navbar({ onToggleMenu }) {
   );
 }
 
-export default Navbar;
+export default React.memo(Navbar);

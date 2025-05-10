@@ -70,6 +70,7 @@ const ChatSidebar = ({
             <Link className={styles.worshipLink} to="/blogs">Devotion</Link>
             <Link className={styles.worshipLink} to="/music">Music</Link>
             <Link className={styles.worshipLink} to="/your-journals">Journal</Link>
+            <Link className={styles.worshipLink} to="/feeds">Feeds</Link>
             </div>
           </div>
         </div>

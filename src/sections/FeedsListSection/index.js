@@ -84,26 +84,6 @@ const FeedsListSection = () => {
     return () => observer.disconnect();
   }, [fetchFeeds, feeds.length]);
 
-  // Render each post
-  const renderPost = (post, index) => (
-    <div className={styles.cardPost} key={post.id || index}>
-      <PostHeaderAuthor author={post.author} createdAt={post.created_at} />
-      {post.original_post && <SharedPostPreview post={post.original_post} />}
-      {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}
-      {post.media?.length > 0 && <PostMediaGrid media={post.media} />}
-      <PostFooterSummary
-        reactionCount={post.reaction_count}
-        commentsCount={post.comments_count}
-        sharesCount={post.shares_count}
-      />
-      <PostActions
-        onLike={() => console.log('Liked Post ID:', post.id)}
-        onComment={() => console.log('Comment on Post ID:', post.id)}
-        onShare={() => console.log('Shared Post ID:', post.id)}
-      />
-    </div>
-  );
-
   return (
     <div className={styles.feedWrapper}>
       <NewPost triggerRefresh={() => fetchFeeds(true)} />
@@ -118,7 +98,24 @@ const FeedsListSection = () => {
         <p className={styles.noPostsText}>No posts found.</p>
       )}
 
-      {feeds.map(renderPost)}
+      {feeds.map((post, index) => (
+        <div className={styles.cardPost} key={post.id || index}>
+          <PostHeaderAuthor author={post.author} createdAt={post.created_at} />
+          {post.original_post && <SharedPostPreview post={post.original_post} />}
+          {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}
+          {post.media?.length > 0 && <PostMediaGrid media={post.media} />}
+          <PostFooterSummary
+            reactionCount={post.reaction_count}
+            commentsCount={post.comments_count}
+            sharesCount={post.shares_count}
+          />
+          <PostActions
+            onLike={() => console.log('Liked Post ID:', post.id)}
+            onComment={() => console.log('Comment on Post ID:', post.id)}
+            onShare={() => console.log('Shared Post ID:', post.id)}
+          />
+        </div>
+      ))}
 
       <div ref={observerRef} className={styles.loadingArea}>
         {loading && feeds.length > 0 && <NoneOverlayCircularLoading />}

@@ -5,16 +5,10 @@ import { wotgsocial } from '../../redux/combineActions';
 import styles from './index.module.css';
 
 // components
-import ExpandableText from '../../common/ExpandableText';
 import NoneOverlayCircularLoading from '../../components/NoneOverlayCircularLoading';
 import NewPost from '../../subsections/feeds/NewPost';
 
 // subsections
-import PostHeaderAuthor from '../../subsections/feeds/PostHeaderAuthor';
-import PostMediaGrid from '../../subsections/feeds/PostMediaGrid';
-import SharedPostPreview from '../../subsections/feeds/SharedPostPreview';
-import PostFooterSummary from '../../subsections/feeds/PostFooterSummary';
-import PostActions from '../../subsections/feeds/PostActions';
 import PostCard from '../../subsections/feeds/PostCard';
 
 const FeedsListSection = () => {

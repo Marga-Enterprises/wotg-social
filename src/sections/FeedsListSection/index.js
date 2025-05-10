@@ -15,6 +15,7 @@ import PostMediaGrid from '../../subsections/feeds/PostMediaGrid';
 import SharedPostPreview from '../../subsections/feeds/SharedPostPreview';
 import PostFooterSummary from '../../subsections/feeds/PostFooterSummary';
 import PostActions from '../../subsections/feeds/PostActions';
+import PostCard from '../../subsections/feeds/PostCard';
 
 const FeedsListSection = () => {
   const dispatch = useDispatch();
@@ -99,22 +100,7 @@ const FeedsListSection = () => {
       )}
 
       {feeds.map((post, index) => (
-        <div className={styles.cardPost} key={post.id || index}>
-          <PostHeaderAuthor author={post.author} createdAt={post.created_at} />
-          {post.original_post && <SharedPostPreview post={post.original_post} />}
-          {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}
-          {post.media?.length > 0 && <PostMediaGrid media={post.media} />}
-          <PostFooterSummary
-            reactionCount={post.reaction_count}
-            commentsCount={post.comments_count}
-            sharesCount={post.shares_count}
-          />
-          <PostActions
-            onLike={() => console.log('Liked Post ID:', post.id)}
-            onComment={() => console.log('Comment on Post ID:', post.id)}
-            onShare={() => console.log('Shared Post ID:', post.id)}
-          />
-        </div>
+        <PostCard key={post.id || index} post={post} />
       ))}
 
       <div ref={observerRef} className={styles.loadingArea}>

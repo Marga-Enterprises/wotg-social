@@ -24,7 +24,7 @@ export const requestForToken = async () => {
         });
 
         if (token) {
-            console.log("🔥 FCM Token:", token);
+            // console.log("🔥 FCM Token:", token);
             return token;
         } else {
             console.warn("❌ No registration token available.");
@@ -51,12 +51,14 @@ onMessage(messaging, (payload) => {
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker
         .register("/firebase-messaging-sw.js")
+        /*
         .then((registration) => {
             console.log("✅ Service Worker Registered:", registration);
         })
         .catch((error) => {
             console.error("❌ Service Worker Registration Failed:", error);
         });
+        */
 }
 
 export default messaging;

@@ -2,12 +2,12 @@ import React from 'react';
 import styles from './index.module.css';
 
 // utils
-import { convertMomentWithFormat } from '../../../utils/methods';
+import { convertMomentWithFormatWhole } from '../../../utils/methods';
 
 const PostAuthorHeader = ({ author, createdAt }) => {
   const avatar = author?.user_profile_picture || 'default.png';
   const fullName = `${author?.user_fname || ''} ${author?.user_lname || ''}`;
-  const formattedDate = convertMomentWithFormat(createdAt);
+  const formattedDate = convertMomentWithFormatWhole(createdAt);
 
   return (
     <div className={styles.postHeader}>

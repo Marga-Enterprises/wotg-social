@@ -3,12 +3,15 @@ import styles from './index.module.css';
 import ExpandableText from '../../../common/ExpandableText';
 import PostMediaGrid from '../PostMediaGrid';
 
+// utils
+import { convertMomentWithFormatWhole } from '../../../utils/methods';
+
 const SharedPostPreview = ({ post }) => {
   if (!post) return null;
 
   const fullName = `${post.author?.user_fname || ''} ${post.author?.user_lname || ''}`;
-  const avatar = post.author?.user_profile_picture || 'default.png';
-  const formattedDate = new Date(post.createdAt).toLocaleString();
+  const avatar = post.author?.user_profile_picture || 'profile_place_holder.webp';
+  const formattedDate = convertMomentWithFormatWhole(post.createdAt);
 
   return (
     <div className={styles.sharedContainer}>

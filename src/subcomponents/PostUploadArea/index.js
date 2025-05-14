@@ -1,16 +1,18 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPen, faImage } from '@fortawesome/free-solid-svg-icons';
 
-
 const MAX_FILES = 3;
 
-const PostUploadArea = ({ onFilesChange, onClose }) => {
+const PostUploadArea = ({ onFilesChange, onClose, filesFromPost, onFilesDelete }) => {
+    const backendUrl = useMemo(() => 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images', []);
+
     const fileInputRef = useRef(null);
+
     const [previews, setPreviews] = useState([]);
     const [error, setError] = useState('');
-
+    const [selectedFilesToDelete, setSelectedFilesToDelete] = useState('');
 
     const handleFiles = (selectedFiles) => {
         const incoming = Array.from(selectedFiles);
@@ -36,16 +38,40 @@ const PostUploadArea = ({ onFilesChange, onClose }) => {
         handleFiles(e.dataTransfer.files);
     };
 
-    const removeFile = (index) => {
+    const removeFile = (url, index) => {
+        const fileName = url.replace('https://wotg.sgp1.cdn.digitaloceanspaces.com/images/', '');
         const updated = [...previews];
         updated.splice(index, 1);
         setPreviews(updated);
         onFilesChange?.(updated.map(p => p.file));
+
+        if (filesFromPost?.length > 0) {
+            if (fileName) {
+                // no space in the string
+                setSelectedFilesToDelete((prev) => prev ? `${prev},${fileName}` : fileName);
+            }
+        }
     };
 
     useEffect(() => {
         return () => previews.forEach(p => URL.revokeObjectURL(p.url));
     }, [previews]);
+
+    useEffect(() => {
+        if (filesFromPost?.length > 0) {
+            const initialPreviews = filesFromPost.map((file) => ({
+                file,
+                url: `${backendUrl}/${file.url}`,
+            }));
+            setPreviews(initialPreviews);
+        }
+    }, [filesFromPost]);
+
+    useEffect(() => {
+        if (selectedFilesToDelete) {
+            onFilesDelete(selectedFilesToDelete);
+        }
+    }, [selectedFilesToDelete]);
 
     return (
         <div className={styles.wrapper}>
@@ -67,7 +93,7 @@ const PostUploadArea = ({ onFilesChange, onClose }) => {
                                     <img src={p.url} alt={`preview-${index}`} className={styles.previewImage} />
                                     <button className={styles.removeBtn} onClick={(e) => {
                                         e.stopPropagation();
-                                        removeFile(index);
+                                        removeFile(p.url, index);
                                     }}>×</button>
                                 </div>
                             ))}

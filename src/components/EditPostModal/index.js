@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useRef } from 'react';
+import React, { useMemo, useEffect, useCallback, useState, useRef } from 'react';
 import styles from './index.module.css';
 
 // components
@@ -20,7 +20,7 @@ import {
     faImage,
  } from '@fortawesome/free-solid-svg-icons';
 
-const NewPostModal = ({ user, onClose, onRefresh }) => {
+const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
     const dispatch = useDispatch();
 
     const loadingRef = useRef(false);
@@ -32,7 +32,30 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
     const [showUploadArea, setShowUploadArea] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
     const [files, setFiles] = useState([]);
+    const [filesToDeleteString, setFilesToDeleteString] = useState('');
+    const [filesFromPost, setFilesFromPost] = useState([]);
 
+    const handleFetchPost = useCallback(() => {
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        dispatch(wotgsocial.post.getPostByIdAction({ id: postId })).then((res) => {
+            if (res?.success) {
+                setContent(res.data.content);
+                setFilesFromPost(res.data.media || []);
+
+                if (res.data.media?.length > 0) {
+                    setShowUploadArea(true);
+                }
+            }
+        }).finally(() => {
+            loadingRef.current = false;
+            setLoading(false);
+        });
+
+    }, [dispatch, postId]);
+    
     const handleSubmitPost = useCallback(async () => {
         if (loadingRef.current) return;
         loadingRef.current = true;
@@ -40,26 +63,32 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
 
         try {
             const payload = {
+                id: postId,
                 content,
                 file: files,
-                visibility: 'public',   
-            };
+                visibility: 'public',
+                filesToDelete: filesToDeleteString,
+            };            
 
-            const res = await dispatch(wotgsocial.post.createPostAction(payload));
+            const res = await dispatch(wotgsocial.post.updatePostAction(payload));
 
             if (res.success) {
-                setSnackbar({ open: true, message: 'Post created successfully!', type: 'success' });
+                setSnackbar({ open: true, message: 'Post updated successfully!', type: 'success' });
 
                 await Promise.resolve(onClose());
                 await Promise.resolve(onRefresh(res.data));
             }
         } catch (error) {
-            console.error('Error creating post:', error);
+            console.error('Error updating post:', error);
         } finally {
             loadingRef.current = false;
             setLoading(false);
         }
-    }, [dispatch, content, files]);
+    }, [dispatch, content, files, filesToDeleteString]);
+
+    useEffect(() => {
+        handleFetchPost();
+    }, [handleFetchPost]);
 
     if (loading) return <LoadingSpinner />;
 
@@ -74,7 +103,7 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
             <div className={styles.modalOverlay}>
                 <div className={styles.modal}>
                     <div className={styles.header}>
-                        <span>Create post</span>
+                        <span>Edit post</span>
                         <button className={styles.closeButton}>
                             <FontAwesomeIcon icon={faTimes} onClick={onClose} />
                         </button>
@@ -99,6 +128,10 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
                         <PostUploadArea 
                             onFilesChange={(files) => setFiles(files)} 
                             onClose={() => setShowUploadArea(false)}
+                            filesFromPost={filesFromPost}
+                            onFilesDelete={(files) => {
+                                setFilesToDeleteString(files);
+                            }}
                         />
                     )}
 
@@ -122,4 +155,4 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
     );
 };
 
-export default React.memo(NewPostModal);
+export default React.memo(EditPostModal);

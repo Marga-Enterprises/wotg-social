@@ -1,6 +1,7 @@
 .postHeader {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Added */
   margin-bottom: 1rem;
 }
 
@@ -14,6 +15,7 @@
 }
 
 .authorInfo {
+  flex-grow: 1; /* Added */
   display: flex;
   flex-direction: column;
 }
@@ -26,4 +28,16 @@
 .timestamp {
   font-size: 0.8rem;
   color: #65676b;
+}
+
+.menuIcon {
+  font-size: 1.2rem;
+  color: #65676b;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.menuWrapper {
+  position: relative; /* Important: so the menu is positioned relative to this */
+  display: inline-block;
 }

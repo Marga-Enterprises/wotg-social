@@ -18,7 +18,9 @@ const NewPost = ({ triggerRefresh }) => {
                 <NewPostModal
                     user={parsedAccount}
                     onClose={() => setOpenPostModal(false)}
-                    onRefresh={triggerRefresh}
+                    onRefresh={(newPost) => {
+                        triggerRefresh(newPost);
+                    }}
                 />
             )}
 
@@ -26,7 +28,10 @@ const NewPost = ({ triggerRefresh }) => {
                 <div className={styles.inputRow}>
                     <img
                         alt="Profile"
-                        src={parsedAccount.user_profile_picture ? `${backendUrl}/${parsedAccount.user_profile_picture}` : '/assets/images/default-avatar.png'}
+                        src={
+                            parsedAccount.user_profile_picture ? `${backendUrl}/${parsedAccount.user_profile_picture}` : 
+                            'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/profile_place_holder.webp'
+                        }
                         className={styles.avatar}
                     />
                     <input

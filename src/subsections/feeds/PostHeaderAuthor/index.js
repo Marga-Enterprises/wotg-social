@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './index.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 
-// utils
 import { convertMomentWithFormatWhole } from '../../../utils/methods';
 
-const PostAuthorHeader = ({ author, createdAt }) => {
-  const avatar = author?.user_profile_picture || 'default.png';
+import PostMenu from '../../../components/PostMenu';
+
+const PostAuthorHeader = ({ author, createdAt, postId, userId, onRefresh }) => {
+  const avatar = author?.user_profile_picture || 'profile_place_holder.webp';
   const fullName = `${author?.user_fname || ''} ${author?.user_lname || ''}`;
   const formattedDate = convertMomentWithFormatWhole(createdAt);
+
+  const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div className={styles.postHeader}>
@@ -20,6 +25,24 @@ const PostAuthorHeader = ({ author, createdAt }) => {
         <div className={styles.authorName}>{fullName}</div>
         <div className={styles.timestamp}>{formattedDate}</div>
       </div>
+
+      { userId === author?.id && (
+        <div className={styles.menuIcon} onClick={() => setShowMenu(!showMenu)}>
+          <FontAwesomeIcon icon={faEllipsisH} />
+        </div>
+      )}
+
+      { showMenu && (
+        <div className={styles.menuWrapper}>
+          <PostMenu 
+            postId={postId} 
+            onRefresh={onRefresh}
+            postAuthor={author}
+            onClose={() => setShowMenu(false)}
+            onClickOutside={() => setShowMenu(false)} 
+          />
+        </div>
+      )}
     </div>
   );
 };

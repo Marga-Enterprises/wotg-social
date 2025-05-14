@@ -8,10 +8,16 @@ import SharedPostPreview from '../SharedPostPreview';
 import PostFooterSummary from '../PostFooterSummary';
 import PostActions from '../PostActions';
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post, userId, triggerRefresh }) => {
   return (
     <div className={styles.cardPost}>
-      <PostHeaderAuthor author={post.author} createdAt={post.created_at} />
+      <PostHeaderAuthor 
+        author={post.author} 
+        createdAt={post.created_at} 
+        postId={post.id}
+        userId={userId}
+        onRefresh={triggerRefresh} // Pass the triggerRefresh function to the header
+      />
 
       {post.original_post && <SharedPostPreview post={post.original_post} />}
       {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}

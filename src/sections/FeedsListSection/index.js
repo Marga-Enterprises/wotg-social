@@ -7,44 +7,54 @@ import styles from './index.module.css';
 // components
 import NoneOverlayCircularLoading from '../../components/NoneOverlayCircularLoading';
 import NewPost from '../../subsections/feeds/NewPost';
-
-// subsections
 import PostCard from '../../subsections/feeds/PostCard';
+
+// cookies
+import Cookies from 'js-cookie';
 
 const FeedsListSection = () => {
   const dispatch = useDispatch();
   const observerRef = useRef(null);
   const loadingRef = useRef(false);
+  const pageIndexRef = useRef(1); // ✅ Persistent, up-to-date page index
+
+  const account = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
+  const userId = account?.id || null;
 
   const pageSize = useMemo(() => 10, []);
   const [feeds, setFeeds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageDetails, setPageDetails] = useState({
-    pageIndex: 1,
     totalPages: 0,
     totalRecords: 0,
   });
 
   // Fetch Feeds
-  const fetchFeeds = useCallback((reset = false) => {
+  const fetchFeeds = useCallback((reset = false, newPost) => {
     if (
       loadingRef.current ||
-      (!reset && pageDetails.totalPages && pageDetails.pageIndex > pageDetails.totalPages)
+      (!reset && pageDetails.totalPages && pageIndexRef.current > pageDetails.totalPages)
     ) return;
 
     loadingRef.current = true;
     setLoading(true);
 
-    const pageIndex = reset ? 1 : pageDetails.pageIndex;
+    const currentPage = reset ? 1 : pageIndexRef.current;
 
-    dispatch(wotgsocial.post.getPostsByParamsAction({ pageIndex, pageSize }))
+    dispatch(wotgsocial.post.getPostsByParamsAction({ pageIndex: currentPage, pageSize }))
       .then((res) => {
         if (res.success && res.data?.posts) {
-          setFeeds((prev) => reset ? res.data.posts : [...prev, ...res.data.posts]);
+          setFeeds((prev) =>
+            reset ? res.data.posts : [...prev, ...res.data.posts]
+          );
+
+          // ✅ Update page index and total pages correctly
+          const nextPage = currentPage + 1;
+          pageIndexRef.current = nextPage;
+
           setPageDetails({
-            pageIndex: pageIndex + 1,
             totalPages: res.data.totalPages,
-            totalRecords: res.data.totalRecords
+            totalRecords: res.data.totalRecords,
           });
         }
       })
@@ -55,33 +65,37 @@ const FeedsListSection = () => {
         loadingRef.current = false;
         setLoading(false);
       });
-  }, [dispatch, pageDetails.pageIndex, pageDetails.totalPages, pageSize]);
+  }, [dispatch, pageDetails.totalPages, pageSize]);
 
-  // Initial Fetch
+  // Initial load
   useEffect(() => {
     fetchFeeds(true);
   }, [fetchFeeds]);
 
-  // Infinite Scroll
+  // Infinite Scroll setup
   useEffect(() => {
-    if (!observerRef.current || feeds.length === 0) return;
+    const sentinel = observerRef.current;
+    if (!sentinel) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          fetchFeeds();
+          fetchFeeds(false);
         }
       },
-      { threshold: 1 }
+      { threshold: 0.25 }
     );
 
-    observer.observe(observerRef.current);
+    observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [fetchFeeds, feeds.length]);
+  }, [fetchFeeds]);
 
   return (
     <div className={styles.feedWrapper}>
-      <NewPost triggerRefresh={() => fetchFeeds(true)} />
+      <NewPost triggerRefresh={(newPost) => {
+        pageIndexRef.current = 1;
+        fetchFeeds(true, newPost);
+      }} />
 
       {feeds.length === 0 && loading && (
         <div className={styles.loadingArea}>
@@ -94,7 +108,15 @@ const FeedsListSection = () => {
       )}
 
       {feeds.map((post, index) => (
-        <PostCard key={post.id || index} post={post} />
+        <PostCard 
+          key={index} 
+          post={post} 
+          triggerRefresh={() => {
+            pageIndexRef.current = 1;
+            fetchFeeds(true);
+          }}
+          userId={userId} 
+        />
       ))}
 
       <div ref={observerRef} className={styles.loadingArea}>

@@ -1,0 +1,87 @@
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100svw;
+  height: 100svh;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Modal Box */
+.modal {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Title and text */
+.modalTitle {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+}
+
+.modalText {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancelBtn {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cancelBtn:hover {
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+
+.confirmBtn {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirmBtn:hover {
+  background-color: #165cbd;
+}
+
+/* Close Button */
+.closeBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+}

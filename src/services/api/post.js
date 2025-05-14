@@ -38,13 +38,21 @@ export async function updatePost(payload) {
     const formData = new FormData();
 
     for (const key in payload) {
-        if (payload[key] !== null && payload[key] !== undefined) {
-            formData.append(key, payload[key]);
+        const value = payload[key];
+        if (value !== null && value !== undefined) {
+            // If it's an array (like files), append each one
+            if (Array.isArray(value)) {
+                value.forEach((item) => {
+                    formData.append(`${key}`, item);
+                });
+            } else {
+                formData.append(key, value);
+            }
         }
     }
 
     return PUT_FORM_DATA(`/posts/${payload.id}`, { formData });
-};
+}
 
 // DELETE A POST BY ID
 export async function deletePost(payload) {

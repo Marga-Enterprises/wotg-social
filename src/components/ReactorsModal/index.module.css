@@ -1,0 +1,119 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: #fff;
+  width: 400px;
+  max-height: 80vh;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #555;
+}
+
+.reactorList {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.reactorItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userInfo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.name {
+  font-weight: 500;
+  color: #111;
+}
+
+.reactionIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.followButton {
+  background-color: #dfdfdf;
+  color: rgb(129, 129, 129);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 0.25rem;
+  border-bottom: 1px solid #eee;
+  overflow-x: auto;
+}
+
+.tabButton {
+  background: none;
+  border: none;
+  font-weight: 500;
+  color: #555;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tabButton img {
+  width: 20px;
+  height: 20px;
+}
+
+.activeTab {
+  background-color: #f0f2f5;
+  color: #000;
+}

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from './index.module.css';
 
+// components
+import ReactorsModal from '../../../components/ReactorsModal';
+
 const reactionTypeToImage = {
   haha: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/haha.webp',
   pray: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/pray.webp',
@@ -21,6 +24,7 @@ const PostFooterSummary = ({
 }) => {
   const [reactionList, setReactionList] = useState(reactions);
   const [reactionsCount, setReactionsCount] = useState(reactionCount);
+  const [isReactorModalOpen, setReactorModalOpen] = useState(false);
 
   useEffect(() => {
     if (!socket || !postId) return;
@@ -94,7 +98,7 @@ const PostFooterSummary = ({
 
   return (
     <div className={styles.footerSummary}>
-      <div className={styles.reactions}>
+      <div className={styles.reactions} onClick={() => setReactorModalOpen(true)}>
         {topReactions.length > 0 && (
           <>
             {topReactions.map(([type], idx) => (
@@ -118,6 +122,16 @@ const PostFooterSummary = ({
           <span>{sharesCount} share{sharesCount > 1 ? 's' : ''}</span>
         )}
       </div>
+
+      {isReactorModalOpen && (
+        <ReactorsModal
+          onClose={() => setReactorModalOpen(false)}
+          postId={postId}
+          socket={socket}
+          reactions={reactionList}
+          reactionsCount={reactionsCount}
+        />
+      )}
     </div>
   );
 };

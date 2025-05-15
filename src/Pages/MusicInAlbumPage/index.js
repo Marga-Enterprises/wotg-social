@@ -5,10 +5,13 @@ import { wotgsocial } from "../../redux/combineActions";
 
 import LoadingSpinner from "../../components/LoadingSpinner";
 import AddMusicModal from "../../components/AddMusicModal";
-import MusicControlsSection from "../../sections/MusicControlsSection";
 
 import styles from "./index.module.css";
 import Cookies from "js-cookie";
+
+// font awesome
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const AlbumDetailsPage = () => {
   const dispatch = useDispatch();
@@ -76,6 +79,28 @@ const AlbumDetailsPage = () => {
     handleFetchDetails();
   }, [handleFetchDetails]);
 
+  const handleDeleteTrack = useCallback((trackId) => {
+    // confirm first
+
+    if (!window.confirm("Are you sure you want to delete this track?")) return;
+
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setLoading(true);
+
+    dispatch(wotgsocial.music.deleteMusicAction({ id: trackId, albumId: id }))
+    .then((res) => {
+      if (res.success) {
+        setMusics((prevMusics) => prevMusics.filter((music) => music.id !== trackId));
+      } else {
+        console.error("Failed to delete track:", res.message);
+      }
+    }).finally(() => {
+      setLoading(false);
+      loadingRef.current = false;
+    })
+  }, [dispatch, id]);
+
   const handleTrackClick = (trackId) => {
     dispatch(wotgsocial.musicPlayer.setTrackList(musics));
     const meta = { source: "album", albumCover: album?.cover_image };
@@ -131,7 +156,10 @@ const AlbumDetailsPage = () => {
             <div className={styles.trackListHeader}>
               <span>#</span>
               <span>Title</span>
-              <span>Duration</span>
+              <span className={styles.durationHeader}>Duration</span>
+              {(role === "admin" || role === "owner") && (
+                <span className={styles.actionHeader}>Action</span>
+              )}
             </div>
 
             {musics.map((music, index) => (
@@ -153,13 +181,33 @@ const AlbumDetailsPage = () => {
                 </span>
 
                 <div className={styles.trackInfo}>
-                  <p className={currentTrack?.id === music.id ? styles.trackTitleSelected : styles.trackTitle}>
+                  <p
+                    className={
+                      currentTrack?.id === music.id
+                        ? styles.trackTitleSelected
+                        : styles.trackTitle
+                    }
+                  >
                     {music.title}
                   </p>
-                  <p className={styles.trackArtist}>{music.artist_name || album?.artist_name}</p>
+                  <p className={styles.trackArtist}>
+                    {music.artist_name || album?.artist_name}
+                  </p>
                 </div>
 
-                <span className={styles.trackDuration}>{formatDuration(music.duration)}</span>
+                <span className={styles.trackDuration}>
+                  {formatDuration(music.duration)}
+                </span>
+
+                <span className={styles.trackAction}>
+                  {(role === "admin" || role === "owner") && (
+                    <FontAwesomeIcon
+                      icon={faTrash}
+                      className={styles.trashIcon}
+                      onClick={() => handleDeleteTrack(music.id)}
+                    />
+                  )}
+                </span>
               </div>
             ))}
           </div>

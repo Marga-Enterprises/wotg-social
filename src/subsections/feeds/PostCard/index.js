@@ -8,7 +8,7 @@ import SharedPostPreview from '../SharedPostPreview';
 import PostFooterSummary from '../PostFooterSummary';
 import PostActions from '../PostActions';
 
-const PostCard = ({ post, userId, triggerRefresh }) => {
+const PostCard = ({ post, userId, triggerRefresh, socket }) => {
   return (
     <div className={styles.cardPost}>
       <PostHeaderAuthor 
@@ -27,12 +27,18 @@ const PostCard = ({ post, userId, triggerRefresh }) => {
         reactionCount={post.reaction_count}
         commentsCount={post.comments_count}
         sharesCount={post.shares_count}
+        reactions={post.reactions}
+        socket={socket}
+        postId={post.id}
       />
 
       <PostActions
         onLike={() => console.log('Liked Post ID:', post.id)}
         onComment={() => console.log('Comment on Post ID:', post.id)}
         onShare={() => console.log('Shared Post ID:', post.id)}
+        reactions={post.reactions}
+        userId={userId}
+        postId={post.id}
       />
     </div>
   );

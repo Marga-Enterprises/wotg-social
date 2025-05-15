@@ -1,0 +1,56 @@
+.reactionPopup {
+  position: absolute;
+  bottom: 40px;
+  left: 25%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 8px 10px;
+  border-radius: 20px;
+  display: flex;
+  gap: 8px;
+  z-index: 999;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: translateX(-50%) scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.reactionImage {
+  width: 36px;
+  height: 36px;
+  background-color: #f0f2f5;
+  border-radius: 50%;
+  padding: 4px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reactionImage:hover {
+  transform: scale(1.2);
+  background-color: #e4e6eb;
+}
+
+@media (max-width: 768px) {
+  .reactionPopup {
+    bottom: 60px;
+    left: 27%;
+    padding: 6px 8px;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .reactionImage {
+    width: 30px;
+    height: 30px;
+  }
+}

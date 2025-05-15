@@ -12,7 +12,7 @@ import PostCard from '../../subsections/feeds/PostCard';
 // cookies
 import Cookies from 'js-cookie';
 
-const FeedsListSection = () => {
+const FeedsListSection = ({ socket }) => {
   const dispatch = useDispatch();
   const observerRef = useRef(null);
   const loadingRef = useRef(false);
@@ -116,6 +116,7 @@ const FeedsListSection = () => {
             fetchFeeds(true);
           }}
           userId={userId} 
+          socket={socket}
         />
       ))}
 

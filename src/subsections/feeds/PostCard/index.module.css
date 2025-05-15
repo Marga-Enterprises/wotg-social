@@ -2,9 +2,23 @@
   background: #ffffff;
   border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 1rem .5rem;
-  margin-bottom: .5rem;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
   transition: 0.2s ease-in-out;
   width: 100%;
   box-sizing: border-box;
+}
+
+.sharedText {
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+/* 📱 Mobile Devices: Reduce padding for smaller viewports */
+@media (max-width: 768px) {
+  .cardPost {
+    padding: 0.5rem;
+  }
 }

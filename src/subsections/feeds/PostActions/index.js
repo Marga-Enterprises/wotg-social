@@ -9,6 +9,7 @@ import { wotgsocial } from '../../../redux/combineActions';
 
 // components
 import ReactionPopup from '../../../components/PostReactionsOption';
+import PostCommentsModal from '../../../components/PostCommentsModal';
 
 const REACTIONS = [
   { label: 'Haha', src: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/haha.webp' },
@@ -18,7 +19,7 @@ const REACTIONS = [
   { label: 'Praise', src: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/praise.webp' },
 ];
 
-const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
+const PostActions = ({ onShare, reactions, userId, postId, post, socket, author }) => {
   const dispatch = useDispatch();
 
   const showTimeout = useRef(null);
@@ -27,6 +28,7 @@ const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
   const longPressTimeoutRef = useRef(null);
 
   const [showReactions, setShowReactions] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [localReactions, setLocalReactions] = useState(reactions);
 
   const handleReactToPost = useCallback((reaction, option) => {
@@ -166,7 +168,7 @@ const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
       </div>
 
       {/* Comment */}
-      <div className={styles.actionButton} onClick={onComment}>
+      <div className={styles.actionButton} onClick={() => setShowComments(true)}>
         <FontAwesomeIcon icon={faComment} />
         <span>Comment</span>
       </div>
@@ -183,6 +185,16 @@ const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onReact={handleReactToPost}
+        />
+      )}
+
+      {/* Comments Modal */}
+      {showComments && (
+        <PostCommentsModal
+          post={post}
+          socket={socket}
+          onClose={() => setShowComments(false)}
+          author={author}
         />
       )}
     </div>

@@ -1,20 +1,97 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './index.module.css';
-
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { wotgsocial } from '../../redux/combineActions';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import { faRightFromBracket, faBell } from '@fortawesome/free-solid-svg-icons';
 
 // components
 import Notifications from '../Notifications';
+import { useSocket } from '../../contexts/SocketContext';
+import { set } from 'lodash';
 
 function Navbar({ onToggleMenu }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const socket = useSocket();
+
+  const user = useSelector((state) => state.wotgsocial.user.loggedUser);
   const [notificationsMounted, setNotificationsMounted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [notifList, setNotifList] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const loadingRef = useRef(false);
+  const pageSize = 10;
+
+  // Fetch notifications from server
+  const fetchNotifications = useCallback(async () => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setLoading(true);
+
+    try {
+      const res = await dispatch(wotgsocial.notification.getNotifications({ pageIndex: 1, pageSize }));
+      if (res.success) {
+        setNotifList(res.data.notifications);
+        setUnreadCount(res.data.notifications.filter((n) => !n.is_read).length);
+      } else {
+        console.error('Error fetching notifications:', res.msg);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    } finally {
+      loadingRef.current = false;
+      setLoading(false);
+    }
+  }, [dispatch]);
+
+  // Fetch when dropdown is opened
+  useEffect(() => {
+    fetchNotifications();
+  }, fetchNotifications);
+
+  const handleNotificationClick = () => {
+    // detect if the device is android phone and IOS phones
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isMobile = isAndroid || isIOS;
+    
+    if (isMobile) {
+      navigate('/notifications');
+    } else {
+      setNotificationsMounted((prev) => !prev);
+    }
+  };
+
+  // Real-time notification handling
+  useEffect(() => {
+    if (!socket || !user?.id) return;
+
+    const notificationSound = new Audio('https://wotg.sgp1.cdn.digitaloceanspaces.com/audios/notif_sound.mp3');
+    notificationSound.volume = 0.7;
+
+    const handleNewNotification = (notification) => {
+      if (notification.senderId !== user.id) {
+        try {
+          notificationSound.play().catch((e) => {
+            console.warn('Notification sound blocked or failed:', e);
+          });
+        } catch (e) {
+          console.error('Error playing sound:', e);
+        }
+      }
+
+      setNotifList((prev) => [notification, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+    };
+
+    socket.on('new_notification', handleNewNotification);
+
+    return () => {
+      socket.off('new_notification', handleNewNotification);
+    };
+  }, [socket, user?.id]);
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());
@@ -46,20 +123,33 @@ function Navbar({ onToggleMenu }) {
         >
           Partner
         </a>
-        <FontAwesomeIcon
-          icon={faBell} 
-          size="2x" 
-          className={styles.headerIcon}
-          onClick={() => setNotificationsMounted(
-            (prev) => !prev
+
+        <div className={styles.notificationWrapper}>
+          <FontAwesomeIcon
+            icon={faBell}
+            size="2x"
+            className={styles.headerIcon}
+            onClick={handleNotificationClick}
+          />
+          {unreadCount > 0 && (
+            <span className={styles.unreadBadge}>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
           )}
-        />
+        </div>
 
-        {notificationsMounted && <Notifications />}
+        {notificationsMounted && (
+          <Notifications
+            notifList={notifList}
+            unreadCount={unreadCount}
+            onNavigate={navigate}
+            loading={loading}
+          />
+        )}
 
-        <FontAwesomeIcon 
-          icon={faRightFromBracket} 
-          size="2x" 
+        <FontAwesomeIcon
+          icon={faRightFromBracket}
+          size="2x"
           className={styles.headerIcon}
           onClick={handleSignOut}
         />
@@ -75,7 +165,6 @@ function Navbar({ onToggleMenu }) {
         >
           Partner
         </a>
-
         <div className={styles.burger} onClick={onToggleMenu}>
           <span></span>
           <span></span>

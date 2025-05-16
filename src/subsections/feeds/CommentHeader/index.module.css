@@ -1,0 +1,30 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #ddd;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1c1e21;
+}
+
+.closeButton {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #606770;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: #000;
+}

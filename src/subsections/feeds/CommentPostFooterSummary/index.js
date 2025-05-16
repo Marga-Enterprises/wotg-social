@@ -24,8 +24,8 @@ const PostFooterSummary = ({
 }) => {
   const [reactionList, setReactionList] = useState(reactions);
   const [reactionsCount, setReactionsCount] = useState(reactionCount);
-  const [isReactorModalOpen, setReactorModalOpen] = useState(false);
   const [commentCount, setCommentsCount] = useState(commentsCount);
+  const [isReactorModalOpen, setReactorModalOpen] = useState(false);
 
   useEffect(() => {
     if (!socket || !postId) return;
@@ -61,8 +61,8 @@ const PostFooterSummary = ({
     
         return alreadyExists ? updatedList : [...updatedList, updatedReaction];
       });
-    };      
-
+    };
+    
     socket.on('new_comment', (newComment) => {
       const parsedPostId = parseInt(newComment.post_id);
       if (parsedPostId !== postId) return;

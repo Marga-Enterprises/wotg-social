@@ -69,7 +69,7 @@ export async function addCommentToPost(payload) {
         }
     }
 
-    return POST_FORM_DATA(`/posts/add-comment/${payload.postId}/comments`, { formData });
+    return POST_FORM_DATA(`/posts/add-comment/${payload.postId}`, { formData });
 };
 
 // ADD A REPLY TO A COMMENT

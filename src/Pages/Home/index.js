@@ -70,20 +70,37 @@ const Page = ({ onToggleMenu  }) => {
 
     useEffect(() => {
         if (!socket) return;
-        
-        socket.on("new_message_reaction", (newReaction) => {
-            setMessages((prevMessages) =>
+      
+        const reactionSound = new Audio('https://wotg.sgp1.cdn.digitaloceanspaces.com/audios/chat_sound.mp3');
+        reactionSound.volume = 0.5;
+        reactionSound.preload = 'auto';
+      
+        const handleNewReaction = (newReaction) => {
+          setMessages((prevMessages) =>
             prevMessages.map((msg) =>
-                msg.id === newReaction.messageId
-                ? { ...msg, reactions: [...(msg.reactions || []), newReaction] } // ✅ Ensure reactions is always an array
+              msg.id === newReaction.messageId
+                ? { ...msg, reactions: [...(msg.reactions || []), newReaction] }
                 : msg
             )
-            );
-        });
-        
-        return () => socket.off("new_message_reaction");
-    }, [socket]); 
-
+          );
+      
+          // 🔇 Do not play sound if the current user is the one who reacted
+          if (newReaction.userId !== user?.id) {
+            try {
+              reactionSound.play().catch((e) => {
+                console.warn('🔇 Reaction sound blocked or failed:', e);
+              });
+            } catch (e) {
+              console.error('❌ Error playing reaction sound:', e);
+            }
+          }
+        };
+      
+        socket.on("new_message_reaction", handleNewReaction);
+      
+        return () => socket.off("new_message_reaction", handleNewReaction);
+    }, [socket, user?.id]);
+      
     const handleOpenCreateChatroomModal = () => {
         setIsModalOpen(true);
     };
@@ -179,49 +196,55 @@ const Page = ({ onToggleMenu  }) => {
     // Listen for new messages in real-time
     useEffect(() => {
         if (!socket) return;
-    
+      
+        const messageSound = new Audio('https://wotg.sgp1.cdn.digitaloceanspaces.com/audios/chat_sound.mp3');
+        messageSound.volume = 0.6;
+        messageSound.preload = 'auto';
+      
         const handleNewMessage = (message) => {
-            setMessages((prevMessages) => {
-                /*const isDuplicate = prevMessages.some((msg) => msg.id === message.id);
-    
-                if (isDuplicate) {
-                    console.log('[⚠️ Duplicate message skipped]', message.id);
-                    return prevMessages;
-                }*/
-    
-                const updatedMessages = [message, ...prevMessages].sort((a, b) =>
-                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                );
-    
-                return updatedMessages;
+          setMessages((prevMessages) => {
+            const updatedMessages = [message, ...prevMessages].sort((a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            return updatedMessages;
+          });
+      
+          setChatrooms((prevChatrooms) => {
+            const updated = prevChatrooms.map((chat) => {
+              if (chat.id !== message.chatroomId) return chat;
+      
+              const isUnread = message.senderId !== user?.id;
+              return {
+                ...chat,
+                RecentMessage: message,
+                unreadCount: isUnread ? (chat.unreadCount || 0) + 1 : chat.unreadCount || 0,
+                hasUnread: chat.hasUnread || isUnread,
+              };
             });
-    
-            setChatrooms((prevChatrooms) => {
-                const updated = prevChatrooms.map((chat) => {
-                    if (chat.id !== message.chatroomId) return chat;
-    
-                    const isUnread = message.senderId !== user?.id;
-                    return {
-                        ...chat,
-                        RecentMessage: message,
-                        unreadCount: isUnread ? (chat.unreadCount || 0) + 1 : chat.unreadCount || 0,
-                        hasUnread: chat.hasUnread || isUnread,
-                    };
-                });
-    
-                return updated.sort((a, b) =>
-                    new Date(b.RecentMessage?.createdAt || 0) - new Date(a.RecentMessage?.createdAt || 0)
-                );
-            });
+      
+            return updated.sort((a, b) =>
+              new Date(b.RecentMessage?.createdAt || 0) - new Date(a.RecentMessage?.createdAt || 0)
+            );
+          });
+      
+          // 🔊 Play sound if message is from someone else
+          if (message.senderId !== user?.id) {
+            try {
+              messageSound.play().catch((e) => {
+                console.warn('🔇 Message sound blocked or failed:', e);
+              });
+            } catch (e) {
+              console.error('❌ Error playing message sound:', e);
+            }
+          }
         };
-    
+      
         socket.on('new_message', handleNewMessage);
-    
+      
         return () => {
-            socket.off('new_message', handleNewMessage);
+          socket.off('new_message', handleNewMessage);
         };
-    }, [socket, user?.id]);
-    
+    }, [socket, user?.id]);      
     
     useEffect(() => {
         if (!socket) return;

@@ -39,6 +39,7 @@ import MusicInAlbumPage from "./Pages/MusicInAlbumPage";
 import MainMusic from "./Pages/MainMusic";
 import Playlist from "./Pages/Playlist";
 import Feeds from "./Pages/Feeds";
+import Notifications from "./Pages/Notifications";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ function AppRoutes() {
           <Route path="/view-journal/:id" element={<AuthRouter><ViewJournalPage /></AuthRouter>} />
           <Route path="/update-journal/:id" element={<AuthRouter><UpdateJournal /></AuthRouter>} />
           <Route path="/commentary/:book/:chapter/:verse/:language/" element={<AuthRouter><Commentary /></AuthRouter>} />
+          <Route path="/notifications" element={<AuthRouter><Notifications /></AuthRouter>} />
           <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
           <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
           <Route path="/albums" element={<AuthRouter><AdminMusicDashboard /></AuthRouter>} />

@@ -1,0 +1,29 @@
+.postHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #050505;
+}
+
+.time {
+  font-size: 0.85rem;
+  color: #65676b;
+}

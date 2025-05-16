@@ -1,0 +1,30 @@
+.footerActions {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #dddfe2;
+  padding: 0.5rem 0;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.95rem;
+  color: #65676b;
+}
+
+.actionButton:hover {
+  background-color: #f0f2f5;
+  color: #050505;
+}
+
+.reactionEmoji {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}

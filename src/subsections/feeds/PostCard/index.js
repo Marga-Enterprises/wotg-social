@@ -33,12 +33,12 @@ const PostCard = ({ post, userId, triggerRefresh, socket }) => {
       />
 
       <PostActions
-        onLike={() => console.log('Liked Post ID:', post.id)}
-        onComment={() => console.log('Comment on Post ID:', post.id)}
         onShare={() => console.log('Shared Post ID:', post.id)}
         reactions={post.reactions}
-        userId={userId}
+        author={post.author}
         postId={post.id}
+        post={post}
+        socket={socket}
       />
     </div>
   );

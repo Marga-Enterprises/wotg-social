@@ -76,6 +76,25 @@
   margin-right: 1rem;
 }
 
+.notificationWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.unreadBadge {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  background-color: red;
+  color: white;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+
 @media (max-width: 600px) {
     .navLinks1 {
         display: flex;

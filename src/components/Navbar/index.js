@@ -66,20 +66,18 @@ function Navbar({ onToggleMenu }) {
 
   // Real-time notification handling
   useEffect(() => {
-    if (!socket || !user?.id) return;
+    if (!socket) return;
 
     const notificationSound = new Audio('https://wotg.sgp1.cdn.digitaloceanspaces.com/audios/notif_sound.mp3');
     notificationSound.volume = 0.7;
 
     const handleNewNotification = (notification) => {
-      if (notification.senderId !== user.id) {
-        try {
-          notificationSound.play().catch((e) => {
-            console.warn('Notification sound blocked or failed:', e);
-          });
-        } catch (e) {
-          console.error('Error playing sound:', e);
-        }
+      try {
+        notificationSound.play().catch((e) => {
+          console.warn('Notification sound blocked or failed:', e);
+        });
+      } catch (e) {
+        console.error('Error playing sound:', e);
       }
 
       setNotifList((prev) => [notification, ...prev]);
@@ -91,7 +89,7 @@ function Navbar({ onToggleMenu }) {
     return () => {
       socket.off('new_notification', handleNewNotification);
     };
-  }, [socket, user?.id]);
+  }, [socket]);
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());

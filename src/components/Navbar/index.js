@@ -165,6 +165,19 @@ function Navbar({ onToggleMenu }) {
         >
           Partner
         </a>
+        <div className={styles.notificationWrapper}>
+          <FontAwesomeIcon
+            icon={faBell}
+            size="2x"
+            className={styles.headerIcon}
+            onClick={handleNotificationClick}
+          />
+          {unreadCount > 0 && (
+            <span className={styles.unreadBadge}>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </div>
         <div className={styles.burger} onClick={onToggleMenu}>
           <span></span>
           <span></span>

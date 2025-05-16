@@ -7,9 +7,6 @@ import { faHeart, faComment, faShare } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../../redux/combineActions';
 
-// socket
-import { useSocket } from '../../../contexts/SocketContext';
-
 // components
 import ReactionPopup from '../../../components/PostReactionsOption';
 
@@ -26,11 +23,18 @@ const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
 
   const showTimeout = useRef(null);
   const hideTimeout = useRef(null);
+  const touchStartTimeRef = useRef(null);
+  const longPressTimeoutRef = useRef(null);
 
   const [showReactions, setShowReactions] = useState(false);
   const [localReactions, setLocalReactions] = useState(reactions);
 
-  const handleReactToPost = useCallback((reaction) => {
+  const handleReactToPost = useCallback((reaction, option) => {
+    clearTimeout(showTimeout.current);
+
+    // Optionally clear hide timeout too (for safety)
+    clearTimeout(hideTimeout.current);
+
     const reactionType = typeof reaction === 'string'
       ? reaction.toLowerCase()
       : reaction?.label?.toLowerCase();
@@ -40,6 +44,12 @@ const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
     );
 
     if (existingReaction && existingReaction.type === reactionType) {
+      if (option === 2) {
+        // If the user long-pressed and the reaction is the same, remove it
+        setShowReactions(false);
+        return;
+      };
+
       setLocalReactions(prev =>
         prev.filter(r => !(r.user_id === userId && r.post_id === postId))
       );
@@ -68,14 +78,28 @@ const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
     setShowReactions(false);
   }, [dispatch, postId, userId, localReactions]);
 
-  const handleTouchStart = () => {
-    hideTimeout.current = setTimeout(() => {
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    touchStartTimeRef.current = Date.now();
+  
+    longPressTimeoutRef.current = setTimeout(() => {
       setShowReactions(true);
     }, 800);
   };
-
-  const handleTouchEnd = () => {
-    clearTimeout(hideTimeout.current);
+  
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    clearTimeout(longPressTimeoutRef.current);
+  
+    const wasLongPressed = showReactions;
+  
+    if (!wasLongPressed) {
+      userReaction && reactionMeta
+        ? handleReactToPost(reactionMeta, 1)
+        : handleReactToPost('Heart', 1);
+    }
+  
+    touchStartTimeRef.current = null;
   };
 
   useEffect(() => {
@@ -114,10 +138,14 @@ const PostActions = ({ onComment, onShare, reactions, userId, postId }) => {
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTouchMove={() => {
+          clearTimeout(longPressTimeoutRef.current);
+          touchStartTimeRef.current = null;
+        }}               
         onClick={() =>
           userReaction && reactionMeta
-            ? handleReactToPost(reactionMeta)
-            : handleReactToPost('Heart')
+            ? handleReactToPost(reactionMeta, 1)
+            : handleReactToPost('Heart', 1)
         }
       >
         {userReaction && reactionMeta ? (

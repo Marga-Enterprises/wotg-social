@@ -23,7 +23,10 @@ const ReactionPopup = ({ onMouseEnter, onMouseLeave, onReact }) => {
           alt={reaction.label}
           title={reaction.label}
           className={styles.reactionImage}
-          onClick={() => onReact(reaction)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onReact(reaction, 2);
+          }}          
         />
       ))}
     </div>

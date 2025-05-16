@@ -156,7 +156,10 @@ const AlbumDetailsPage = () => {
             <div className={styles.trackListHeader}>
               <span>#</span>
               <span>Title</span>
-              <span className={styles.durationHeader}>Duration</span>
+
+              {(role === "member") && (
+                <span className={styles.durationHeader}>Duration</span>
+              )}
               {(role === "admin" || role === "owner") && (
                 <span className={styles.actionHeader}>Action</span>
               )}
@@ -195,9 +198,11 @@ const AlbumDetailsPage = () => {
                   </p>
                 </div>
 
-                <span className={styles.trackDuration}>
-                  {formatDuration(music.duration)}
-                </span>
+                {(role === "member") && (
+                  <span className={styles.trackDuration}>
+                    {formatDuration(music.duration)}
+                  </span>
+                )}
 
                 <span className={styles.trackAction}>
                   {(role === "admin" || role === "owner") && (
@@ -207,6 +212,8 @@ const AlbumDetailsPage = () => {
                       onClick={() => handleDeleteTrack(music.id)}
                     />
                   )}
+
+                  
                 </span>
               </div>
             ))}

@@ -9,20 +9,25 @@ import { faRightFromBracket, faBell } from '@fortawesome/free-solid-svg-icons';
 // components
 import Notifications from '../Notifications';
 import { useSocket } from '../../contexts/SocketContext';
-import { set } from 'lodash';
+
+// cookies
+import Cookies from 'js-cookie';
 
 function Navbar({ onToggleMenu }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const socket = useSocket();
-
-  const user = useSelector((state) => state.wotgsocial.user.loggedUser);
+  
   const [notificationsMounted, setNotificationsMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notifList, setNotifList] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const loadingRef = useRef(false);
   const pageSize = 10;
+
+  // parse
+  const account = Cookies.get('account');
+  const parsedAccount = account ? JSON.parse(account) : null;
 
   // Fetch notifications from server
   const fetchNotifications = useCallback(async () => {
@@ -72,6 +77,8 @@ function Navbar({ onToggleMenu }) {
     notificationSound.volume = 0.7;
 
     const handleNewNotification = (notification) => {
+      console.log('New notification received:', notification);
+
       try {
         notificationSound.play().catch((e) => {
           console.warn('Notification sound blocked or failed:', e);
@@ -142,6 +149,8 @@ function Navbar({ onToggleMenu }) {
             unreadCount={unreadCount}
             onNavigate={navigate}
             loading={loading}
+            socket={socket}
+            user={parsedAccount}
           />
         )}
 

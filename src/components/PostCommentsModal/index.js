@@ -11,7 +11,7 @@ import CommentPostActions from '../../subsections/feeds/CommentPostActions';
 import CommentsList from '../../subsections/feeds/CommentsList';
 import CommentTextInput from '../../subsections/feeds/CommentTextInput';
 
-const PostCommentsModal = ({ post, onClose, socket, author }) => {
+const PostCommentsModal = ({ post, onClose, socket, user }) => {
   const scrollRef = useRef(null);
 
   const handleScrollToBottom = () => {
@@ -54,7 +54,7 @@ const PostCommentsModal = ({ post, onClose, socket, author }) => {
         {/* 4. Comment Input */}
         <CommentTextInput 
           postId={post.id} 
-          author={author} 
+          user={user} 
           onScrollToBottom={handleScrollToBottom}
         />
       </div>

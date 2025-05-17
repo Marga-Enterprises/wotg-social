@@ -116,6 +116,7 @@ const FeedsListSection = ({ socket }) => {
             fetchFeeds(true);
           }}
           userId={userId} 
+          user={account}
           socket={socket}
         />
       ))}

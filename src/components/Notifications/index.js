@@ -1,10 +1,25 @@
 // components/Notifications.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './index.module.css';
 import NoneOverlayCircularLoading from '../NoneOverlayCircularLoading';
 import { convertMomentWithFormat } from '../../utils/methods';
 
-const Notifications = ({ notifList, unreadCount, onNavigate, loading }) => {
+// sub sections
+import PostCommentsModal from '../PostCommentsModal';
+
+const Notifications = ({ notifList, unreadCount, onNavigate, loading, socket, user }) => {
+  const backendUrl = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
+
+  const [showPostComments, setShowPostComments] = useState(false);
+  const [targetPost, setTargetPost] = useState({});
+
+  const handleNotificationClick = (notification) => {
+    if (notification.targetPost) {
+      setTargetPost(notification.targetPost);
+      setShowPostComments(true);
+    }
+  }
+
   return (
     <div className={styles.notificationPanel}>
       <div className={styles.header}>
@@ -17,10 +32,10 @@ const Notifications = ({ notifList, unreadCount, onNavigate, loading }) => {
           <div
             key={index}
             className={`${styles.notificationItem} ${!n.is_read ? styles.unread : ''}`}
-            onClick={() => onNavigate(n.redirectTo || '/')}
+            onClick={() => handleNotificationClick(n)}
           >
             <img
-              src={n.sender?.profilePic || '/default-profile.png'}
+              src={n.sender?.user_profile_picture ? `${backendUrl}/${n.sender.user_profile_picture}` : `${backendUrl}/profile_place_holder.webp`}
               alt="profile"
               className={styles.avatar}
             />
@@ -43,6 +58,16 @@ const Notifications = ({ notifList, unreadCount, onNavigate, loading }) => {
       <div className={styles.footer}>
         <button onClick={() => onNavigate('/notifications')}>See previous notifications</button>
       </div>
+
+      {showPostComments && targetPost && (
+        <PostCommentsModal
+          post={targetPost}
+          socket={socket}
+          onClose={() => setShowPostComments(false)}
+          author={targetPost.author}
+          user={user}
+        />
+      )}
     </div>
   );
 };

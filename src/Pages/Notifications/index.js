@@ -6,6 +6,8 @@ import { wotgsocial } from '../../redux/combineActions';
 import { convertMomentWithFormat } from '../../utils/methods';
 
 const Page = () => {
+  const backendUrl = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -27,7 +29,7 @@ const Page = () => {
             onClick={() => navigate(n.redirectTo || '/')}
           >
             <img
-              src={n.sender?.profilePic || '/default-profile.png'}
+              src={n.sender?.user_profile_picture ? `${backendUrl}/${n.sender.user_profile_picture}` : `${backendUrl}/profile_place_holder.webp`}
               alt="profile"
               className={styles.avatar}
             />

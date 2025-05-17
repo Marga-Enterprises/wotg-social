@@ -8,7 +8,7 @@ import SharedPostPreview from '../SharedPostPreview';
 import PostFooterSummary from '../PostFooterSummary';
 import PostActions from '../PostActions';
 
-const PostCard = ({ post, userId, triggerRefresh, socket }) => {
+const PostCard = ({ post, userId, triggerRefresh, socket, user }) => {
   return (
     <div className={styles.cardPost}>
       <PostHeaderAuthor 
@@ -38,6 +38,7 @@ const PostCard = ({ post, userId, triggerRefresh, socket }) => {
         author={post.author}
         postId={post.id}
         post={post}
+        user={user}
         socket={socket}
       />
     </div>

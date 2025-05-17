@@ -3,7 +3,7 @@ import styles from './index.module.css';
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../../redux/combineActions';
 
-const CommentTextInput = ({ postId, author, onScrollToBottom }) => {
+const CommentTextInput = ({ postId, user, onScrollToBottom }) => {
   const dispatch = useDispatch();
   const textareaRef = useRef(null);
   const [content, setContent] = useState('');
@@ -49,7 +49,7 @@ const CommentTextInput = ({ postId, author, onScrollToBottom }) => {
     <div className={styles.inputWrapper}>
       <img
         className={styles.avatar}
-        src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${author?.user_profile_picture || 'profile_place_holder.webp'}`}
+        src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${user?.user_profile_picture || 'profile_place_holder.webp'}`}
         alt="avatar"
       />
 

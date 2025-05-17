@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
@@ -12,6 +12,10 @@ import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
 import styles from './index.module.css';
 import AddParticipantsInChatroomForm from '../../components/AddParticpantsInChatroomForm';
 
+// use sound
+import { Howl } from 'howler';
+
+
 // CONTEXT
 import { useSetHideNavbar } from "../../contexts/NavbarContext";
 import { useSocket } from '../../contexts/SocketContext';
@@ -19,6 +23,16 @@ import { useSocket } from '../../contexts/SocketContext';
 const Page = ({ onToggleMenu  }) => {
     const dispatch = useDispatch();
     const socket = useSocket();
+
+    const messageSound = useRef(
+        new Howl({
+            src: ['https://wotg.sgp1.cdn.digitaloceanspaces.com/audios/chat_sound.mp3'],
+            volume: 0.6,
+            html5: false, // ✅ uses Web Audio API, no pool issues
+        })
+    ).current;
+
+    const lastPlayedRef = useRef(0); // to throttle playback
 
     // Local state
     const [user, setUser] = useState(null);
@@ -86,12 +100,10 @@ const Page = ({ onToggleMenu  }) => {
       
           // 🔇 Do not play sound if the current user is the one who reacted
           if (newReaction.userId !== user?.id) {
-            try {
-              reactionSound.play().catch((e) => {
-                console.warn('🔇 Reaction sound blocked or failed:', e);
-              });
-            } catch (e) {
-              console.error('❌ Error playing reaction sound:', e);
+            const now = Date.now();
+            if (now - lastPlayedRef.current > 1000) {
+                messageSound.play();
+                lastPlayedRef.current = now;
             }
           }
         };
@@ -171,6 +183,19 @@ const Page = ({ onToggleMenu  }) => {
         }
     }, [fetchChatrooms, isAuthenticated]);
 
+    useEffect(() => {
+        const unlock = () => {
+            try {
+                messageSound.play();
+                messageSound.stop();
+            } catch {}
+            window.removeEventListener('click', unlock);
+        };
+
+        window.addEventListener('click', unlock);
+        return () => window.removeEventListener('click', unlock);
+    }, []);
+
     // Fetch messages for the selected chatroom
     const fetchMessages = useCallback(async (chatroomId) => {
         if (!selectedChatroom && !isAuthenticated) return;
@@ -196,10 +221,6 @@ const Page = ({ onToggleMenu  }) => {
     // Listen for new messages in real-time
     useEffect(() => {
         if (!socket) return;
-      
-        const messageSound = new Audio('https://wotg.sgp1.cdn.digitaloceanspaces.com/audios/chat_sound.mp3');
-        messageSound.volume = 0.6;
-        messageSound.preload = 'auto';
       
         const handleNewMessage = (message) => {
           setMessages((prevMessages) => {
@@ -227,14 +248,14 @@ const Page = ({ onToggleMenu  }) => {
             );
           });
       
-          // 🔊 Play sound if message is from someone else
-          if (message.senderId !== user?.id) {
-            try {
-              messageSound.play().catch((e) => {
-                console.warn('🔇 Message sound blocked or failed:', e);
-              });
-            } catch (e) {
-              console.error('❌ Error playing message sound:', e);
+
+          if (
+            message.senderId !== user?.id
+          ) {
+            const now = Date.now();
+            if (now - lastPlayedRef.current > 1000) {
+                messageSound.play();
+                lastPlayedRef.current = now;
             }
           }
         };
@@ -244,7 +265,7 @@ const Page = ({ onToggleMenu  }) => {
         return () => {
           socket.off('new_message', handleNewMessage);
         };
-    }, [socket, user?.id]);      
+    }, [socket]);      
     
     useEffect(() => {
         if (!socket) return;

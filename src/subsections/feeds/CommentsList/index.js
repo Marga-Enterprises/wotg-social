@@ -35,13 +35,13 @@ const CommentsList = ({ post, socket, focusComment }) => {
         if (focusComment) {
           const focusIndex = comments.findIndex(c => c.id === focusComment.id);
 
-          if (focusIndex !== -1) {
+          /*if (focusIndex !== -1) {
             setTimeout(() => {
               if (observerRef.current) {
                 observerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }
             }, 100); // Ensure the comment is rendered before scrolling
-          }
+          }*/
 
           setComments(() => {
             const remainingComments = comments.filter(c => c.id !== focusComment.id);

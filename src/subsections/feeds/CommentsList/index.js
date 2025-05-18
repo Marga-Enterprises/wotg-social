@@ -5,10 +5,11 @@ import { wotgsocial } from '../../../redux/combineActions';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import NoneOverlayCircularLoading from '../../../components/NoneOverlayCircularLoading';
+import { set } from 'lodash';
 
 dayjs.extend(relativeTime);
 
-const CommentsList = ({ post, socket }) => {
+const CommentsList = ({ post, socket, focusComment }) => {
   const dispatch = useDispatch();
   const observerRef = useRef(null);
   const loadingRef = useRef(false);
@@ -30,7 +31,27 @@ const CommentsList = ({ post, socket }) => {
     dispatch(wotgsocial.post.getCommentsByPostIdAction({ postId: post.id, pageIndex, pageSize }))
       .then((res) => {
         const { comments = [], totalPages, totalRecords } = res.data || {};
-        setComments(prev => (pageIndex === 1 ? comments : [...prev, ...comments]));
+
+        if (focusComment) {
+          const focusIndex = comments.findIndex(c => c.id === focusComment.id);
+
+          if (focusIndex !== -1) {
+            setTimeout(() => {
+              if (observerRef.current) {
+                observerRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }, 100); // Ensure the comment is rendered before scrolling
+          }
+
+          setComments(() => {
+            const remainingComments = comments.filter(c => c.id !== focusComment.id);
+            return [focusComment, ...remainingComments];
+          });
+
+        } else {
+          // If no focused comment, normal pagination behavior
+          setComments(prev => (pageIndex === 1 ? comments : [...prev, ...comments]));
+        }
 
         setPageDetails({
           pageIndex,

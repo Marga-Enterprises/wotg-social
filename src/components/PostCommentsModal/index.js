@@ -11,7 +11,7 @@ import CommentPostActions from '../../subsections/feeds/CommentPostActions';
 import CommentsList from '../../subsections/feeds/CommentsList';
 import CommentTextInput from '../../subsections/feeds/CommentTextInput';
 
-const PostCommentsModal = ({ post, onClose, socket, user }) => {
+const PostCommentsModal = ({ post, onClose, socket, user, comment }) => {
   const scrollRef = useRef(null);
 
   const handleScrollToBottom = () => {
@@ -43,13 +43,11 @@ const PostCommentsModal = ({ post, onClose, socket, user }) => {
               postId={post.id}
             />
           )}
-          <CommentPostActions post={post} socket={socket} />
+          {/*<CommentPostActions post={post} socket={socket} />*/}
 
-          <CommentsList post={post} socket={socket} />
+          {/* 3. Comment Thread */}
+          <CommentsList post={post} socket={socket} focusComment={comment} />
         </div>
-
-        {/* 3. Comment Thread */}
-        
 
         {/* 4. Comment Input */}
         <CommentTextInput 

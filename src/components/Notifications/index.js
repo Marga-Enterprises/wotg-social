@@ -12,9 +12,17 @@ const Notifications = ({ notifList, unreadCount, onNavigate, loading, socket, us
 
   const [showPostComments, setShowPostComments] = useState(false);
   const [targetPost, setTargetPost] = useState({});
+  const [targetComment, setTargetComment] = useState({});
 
   const handleNotificationClick = (notification) => {
+    console.log('Notification Clicked:', notification);
+
     if (notification.targetPost) {
+      if (notification.targetComment) {
+        // console.log('Target Comment:', notification.targetComment);
+        setTargetComment(notification.targetComment);
+      }
+
       setTargetPost(notification.targetPost);
       setShowPostComments(true);
     }
@@ -63,6 +71,7 @@ const Notifications = ({ notifList, unreadCount, onNavigate, loading, socket, us
         <PostCommentsModal
           post={targetPost}
           socket={socket}
+          comment={targetComment}
           onClose={() => setShowPostComments(false)}
           author={targetPost.author}
           user={user}

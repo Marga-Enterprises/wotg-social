@@ -20,8 +20,6 @@ const messaging = firebase.messaging();
 
 // 🔔 Handle Background Notifications
 messaging.onBackgroundMessage((payload) => {
-    console.log("📩 Received background notification:", payload);
-
     const { title, body, image } = payload.notification;
 
     self.registration.showNotification(title, {

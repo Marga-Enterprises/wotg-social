@@ -33,3 +33,10 @@
   display: flex;
   gap: 1rem;
 }
+
+.spanCount {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

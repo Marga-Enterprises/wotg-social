@@ -50,3 +50,10 @@
   color: #65676b;
   text-align: right;
 }
+
+.mediaImage {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}

@@ -30,6 +30,8 @@ const PostCard = ({ post, userId, triggerRefresh, socket, user }) => {
         reactions={post.reactions}
         socket={socket}
         postId={post.id}
+        post={post}
+        user={user}
       />
 
       <PostActions

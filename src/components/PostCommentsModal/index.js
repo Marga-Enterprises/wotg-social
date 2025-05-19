@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './index.module.css';
 
 // subsections
@@ -7,19 +7,17 @@ import CommentPostHeader from '../../subsections/feeds/CommentPostHeader';
 import CommentPostContent from '../../subsections/feeds/CommentPostContent';
 import CommentPostMedia from '../../subsections/feeds/CommentPostMedia';
 import CommentPostFooterSummary from '../../subsections/feeds/CommentPostFooterSummary';
-import CommentPostActions from '../../subsections/feeds/CommentPostActions';
+// import CommentPostActions from '../../subsections/feeds/CommentPostActions';
 import CommentsList from '../../subsections/feeds/CommentsList';
 import CommentTextInput from '../../subsections/feeds/CommentTextInput';
 
 const PostCommentsModal = ({ post, onClose, socket, user, comment }) => {
   const scrollRef = useRef(null);
 
-  const handleScrollToBottom = () => {
-    setTimeout(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
-    }, 500); // Give time for content to render
+  const [focusComment, setFocusComment] = useState(comment);
+
+  const handleGetFocusComment = (comment) => {
+    setFocusComment(comment);
   };
 
   return (
@@ -41,19 +39,22 @@ const PostCommentsModal = ({ post, onClose, socket, user, comment }) => {
               reactions={post.reactions}
               socket={socket}
               postId={post.id}
+              post={post}
+              author={post.author}
+              user={user}
             />
           )}
           {/*<CommentPostActions post={post} socket={socket} />*/}
 
           {/* 3. Comment Thread */}
-          <CommentsList post={post} socket={socket} focusComment={comment} />
+          <CommentsList post={post} socket={socket} focusComment={focusComment} />
         </div>
 
         {/* 4. Comment Input */}
         <CommentTextInput 
           postId={post.id} 
           user={user} 
-          onScrollToBottom={handleScrollToBottom}
+          onGetFocusComment={handleGetFocusComment}
         />
       </div>
     </div>

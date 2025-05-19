@@ -54,7 +54,7 @@ function Navbar({ onToggleMenu }) {
   // Fetch when dropdown is opened
   useEffect(() => {
     fetchNotifications();
-  }, fetchNotifications);
+  }, [fetchNotifications]);
 
   const handleNotificationClick = () => {
     // detect if the device is android phone and IOS phones

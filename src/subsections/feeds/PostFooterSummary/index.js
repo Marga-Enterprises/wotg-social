@@ -3,6 +3,11 @@ import styles from './index.module.css';
 
 // components
 import ReactorsModal from '../../../components/ReactorsModal';
+import PostCommentsModal from '../../../components/PostCommentsModal';
+
+// font awesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faComment, faShare } from '@fortawesome/free-solid-svg-icons';
 
 const reactionTypeToImage = {
   haha: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/haha.webp',
@@ -20,10 +25,13 @@ const PostFooterSummary = ({
   commentsCount, 
   sharesCount, 
   reactions, 
-  socket 
+  socket,
+  post,
+  user 
 }) => {
   const [reactionList, setReactionList] = useState(reactions);
   const [reactionsCount, setReactionsCount] = useState(reactionCount);
+  const [showComments, setShowComments] = useState(false);
   const [isReactorModalOpen, setReactorModalOpen] = useState(false);
   const [commentCount, setCommentsCount] = useState(commentsCount);
 
@@ -123,10 +131,16 @@ const PostFooterSummary = ({
 
       <div className={styles.counters}>
         {commentCount > 0 && (
-          <span>{commentCount} comment{commentCount > 1 ? 's' : ''}</span>
+          <div className={styles.spanCount} onClick={() => setShowComments(true)}>
+            {commentCount}
+            <FontAwesomeIcon icon={faComment} />
+          </div>
         )}
         {sharesCount > 0 && (
-          <span>{sharesCount} share{sharesCount > 1 ? 's' : ''}</span>
+          <div className={styles.spanCount}>
+            {sharesCount}
+            <FontAwesomeIcon icon={faShare} />
+          </div>
         )}
       </div>
 
@@ -137,6 +151,17 @@ const PostFooterSummary = ({
           socket={socket}
           reactions={reactionList}
           reactionsCount={reactionsCount}
+        />
+      )}
+
+      {/* Comments Modal */}
+      {showComments && (
+        <PostCommentsModal
+          post={post}
+          socket={socket}
+          onClose={() => setShowComments(false)}
+          author={post.author}
+          user={user}
         />
       )}
     </div>

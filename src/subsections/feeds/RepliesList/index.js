@@ -11,13 +11,10 @@ import { wotgsocial } from '../../../redux/combineActions';
 import NoneOverlayCircularLoading from '../../../components/NoneOverlayCircularLoading';
 import ReplyToCommentInput from '../../../components/ReplyToCommentInput';
 
-// subsections
-import RepliesList from '../../../subsections/feeds/RepliesList'
-
 // utils
 import { convertMomentWithFormatWhole } from '../../../utils/methods';
 
-const CommentsList = ({ post, socket, focusComment }) => {
+const RepliesList = ({ post, socket, focusReply, parentComment }) => {
   const backendUrl = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
 
   const dispatch = useDispatch();
@@ -25,48 +22,42 @@ const CommentsList = ({ post, socket, focusComment }) => {
   const loadingRef = useRef(false);
   const focusRef = useRef(null);
 
-  const [comments, setComments] = useState([]);
+  const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageSize] = useState(10);
   const [activeReplyId, setActiveReplyId] = useState(null);
-  const [showReplies, setShowReplies] = useState(false);
   const [pageDetails, setPageDetails] = useState({
     pageIndex: 1,
     totalPages: 0,
     totalRecords: 0,
   });
 
-  const handleShowReplies = (commentId) => {
-    setShowReplies(prev => !prev);
-    setActiveReplyId(commentId);
-  };
-
   const fetchComments = useCallback((pageIndex = 1) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
     setLoading(true);
 
-    dispatch(wotgsocial.post.getCommentsByPostIdAction({ postId: post.id, pageIndex, pageSize }))
+    dispatch(wotgsocial.post.getRepliesByCommentIdAction({ commentId: parentComment.id, pageIndex, pageSize }))
       .then((res) => {
-        const { comments = [], totalPages, totalRecords } = res.data || {};
+        const { replies = [], totalPages, totalRecords } = res.data || {};
 
-        if (focusComment) {
+        if (focusReply) {
           // scroll to the focused comment
-          const focusedCommentIndex = comments.findIndex(c => c.id === focusComment.id);
+          const focusedCommentIndex = replies.findIndex(c => c.id === focusReply.id);
           if (focusedCommentIndex !== -1) {
-            const focusedComment = comments[focusedCommentIndex];
-            comments.splice(focusedCommentIndex, 1); // Remove the focused comment from its original position
-            comments.unshift(focusedComment); // Add it to the top
+            const focusedComment = replies[focusedCommentIndex];
+            replies.splice(focusedCommentIndex, 1); // Remove the focused comment from its original position
+            replies.unshift(focusedComment); // Add it to the top
           }
 
-          setComments(() => {
-            const remainingComments = comments.filter(c => c.id !== focusComment.id);
-            return [focusComment, ...remainingComments];
+          setReplies(() => {
+            const remainingReplies = replies.filter(c => c.id !== focusReply.id);
+            return [focusReply, ...remainingReplies];
           });
 
         } else {
           // If no focused comment, normal pagination behavior
-          setComments(prev => (pageIndex === 1 ? comments : [...prev, ...comments]));
+          setReplies(prev => (pageIndex === 1 ? replies : [...prev, ...replies]));
         }
 
         setPageDetails({
@@ -75,12 +66,12 @@ const CommentsList = ({ post, socket, focusComment }) => {
           totalRecords,
         });
       })
-      .catch((err) => console.error('Failed to fetch comments:', err))
+      .catch((err) => console.error('Failed to fetch replies:', err))
       .finally(() => {
         loadingRef.current = false;
         setLoading(false);
       });
-  }, [dispatch, post.id, pageSize, focusComment]);
+  }, [dispatch, post.id, pageSize, focusReply]);
 
   useEffect(() => {
     fetchComments();
@@ -91,13 +82,13 @@ const CommentsList = ({ post, socket, focusComment }) => {
 
     const handleNewComment = (comment) => {
       if (parseInt(comment.post_id) === post.id) {
-        setComments(prev => [...prev, comment]);
+        setReplies(prev => [...prev, comment]);
       }
     };
 
-    socket.on('new_comment', handleNewComment);
+    socket.on('new_reply', handleNewComment);
     return () => {
-      socket.off('new_comment', handleNewComment);
+      socket.off('new_reply', handleNewComment);
     };
   }, [socket, post.id]);
 
@@ -128,15 +119,15 @@ const CommentsList = ({ post, socket, focusComment }) => {
         focusRef.current.scrollIntoView({ behavior: 'auto', block: 'center' });
       }, 100); // Ensure the DOM has rendered
     }
-  }, [comments, focusComment]);  
+  }, [replies, focusReply]);  
 
   return (
     <div className={styles.commentsList}>
-      {comments?.map((comment, index) => (
+      {replies?.map((comment, index) => (
         <React.Fragment key={index}>
           <div
             className={styles.commentItem}
-            ref={comment.id === focusComment?.id ? focusRef : null}
+            ref={comment.id === focusReply?.id ? focusRef : null}
           >
             <img
               className={styles.avatar}
@@ -160,14 +151,6 @@ const CommentsList = ({ post, socket, focusComment }) => {
               </div>
               <div className={styles.commentFooter}>
                 <span className={styles.time}>{convertMomentWithFormatWhole(comment.created_at)}</span>
-                {comment?.reply_count > 0 && (
-                  <button
-                    className={styles.replyButton}
-                    onClick={() => handleShowReplies(comment.id)}
-                  >
-                    {comment.reply_count} {comment.reply_count > 1 ? 'Replies' : 'Reply'}
-                  </button>
-                )}
                 <button
                   className={styles.replyButton}
                   onClick={() => setActiveReplyId(prev => (prev === comment.id ? null : comment.id))}
@@ -177,18 +160,6 @@ const CommentsList = ({ post, socket, focusComment }) => {
               </div>
             </div>
           </div>
-
-          {/* ✅ REPLIES LIST */}
-          {showReplies && activeReplyId === comment.id && (
-            <div className={styles.repliesListWrapper}>
-              <RepliesList
-                post={post}
-                parentComment={comment}
-                socket={socket}
-                focusReply={focusComment}
-              />
-            </div>
-          )}
 
           {/* ✅ REPLY INPUT OUTSIDE COMMENT CARD */}
           {activeReplyId === comment.id && (
@@ -216,4 +187,4 @@ const CommentsList = ({ post, socket, focusComment }) => {
   );
 };
 
-export default React.memo(CommentsList);
+export default React.memo(RepliesList);

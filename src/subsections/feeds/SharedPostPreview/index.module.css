@@ -40,3 +40,9 @@
 .sharedMediaGrid {
   margin-top: 0.5rem;
 }
+
+@media (max-width: 768px) {
+  .sharedText {
+    font-size: .85rem;
+  }
+}

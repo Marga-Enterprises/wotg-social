@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+
+// css
 import styles from './index.module.css';
+
+// redux
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../../redux/combineActions';
+
+// components
 import NoneOverlayCircularLoading from '../../../components/NoneOverlayCircularLoading';
+import ReplyToCommentInput from '../../../components/ReplyToCommentInput';
+
+// utils
 import { convertMomentWithFormatWhole } from '../../../utils/methods';
 
 const CommentsList = ({ post, socket, focusComment }) => {
@@ -16,6 +25,7 @@ const CommentsList = ({ post, socket, focusComment }) => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageSize] = useState(10);
+  const [activeReplyId, setActiveReplyId] = useState(null);
   const [pageDetails, setPageDetails] = useState({
     pageIndex: 1,
     totalPages: 0,
@@ -114,30 +124,54 @@ const CommentsList = ({ post, socket, focusComment }) => {
   return (
     <div className={styles.commentsList}>
       {comments?.map((comment, index) => (
-        <div className={styles.commentItem} key={index} ref={comment.id === focusComment?.id ? focusRef : null}>
-          <img
-            className={styles.avatar}
-            src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${comment.author?.user_profile_picture || 'profile_place_holder.webp'}`}
-            alt={comment.author?.user_fname}
-          />
-          <div className={styles.commentBody}>
-            <div className={styles.name}>
-              {comment.author?.user_fname} {comment.author?.user_lname}
+        <React.Fragment key={index}>
+          <div
+            className={styles.commentItem}
+            ref={comment.id === focusComment?.id ? focusRef : null}
+          >
+            <img
+              className={styles.avatar}
+              src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${comment.author?.user_profile_picture || 'profile_place_holder.webp'}`}
+              alt={comment.author?.user_fname}
+            />
+            <div className={styles.commentBody}>
+              <div className={styles.name}>
+                {comment.author?.user_fname} {comment.author?.user_lname}
+              </div>
+              <div className={styles.text}>{comment.content}</div>
+              <div className={styles.media}>
+                {comment?.media?.map((media, idx) => (
+                  <img
+                    key={idx}
+                    src={`${backendUrl}/${media.url}`}
+                    alt="media"
+                    className={styles.mediaImage}
+                  />
+                ))}
+              </div>
+              <div className={styles.commentFooter}>
+                <span className={styles.time}>{convertMomentWithFormatWhole(comment.created_at)}</span>
+                <button
+                  className={styles.replyButton}
+                  onClick={() => setActiveReplyId(prev => (prev === comment.id ? null : comment.id))}
+                >
+                  Reply
+                </button>
+              </div>
             </div>
-            <div className={styles.text}>{comment.content}</div>
-            <div className={styles.media}>
-              {comment?.media?.map((media, idx) => (
-                <img
-                  key={idx}
-                  src={`${backendUrl}/${media.url}`}
-                  alt="media"
-                  className={styles.mediaImage}
-                />
-              ))}
-            </div>
-            <div className={styles.time}>{convertMomentWithFormatWhole(comment.created_at)}</div>
           </div>
-        </div>
+
+          {/* ✅ REPLY INPUT OUTSIDE COMMENT CARD */}
+          {activeReplyId === comment.id && (
+            <div className={styles.replyInputWrapper}>
+              <ReplyToCommentInput
+                parentComment={comment}
+                postId={post.id}
+                onClose={() => setActiveReplyId(null)}
+              />
+            </div>
+          )}
+        </React.Fragment>
       ))}
 
       {/* 👇 Invisible element to detect scroll */}

@@ -37,7 +37,7 @@ const PostMediaGrid = ({ media = [] }) => {
             )}
             {item.type === 'video' && (
               <video
-                src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${item.url}`}
+                src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/videos/${item.url}`}
                 controls
                 className={styles.mediaVideo}
               />

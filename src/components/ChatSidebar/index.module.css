@@ -21,7 +21,7 @@
   padding: 0;
   margin: 0;
   overflow-y: auto; /* Enable scrolling inside */
-  max-height: calc(100vh - 100px); /* Adjust height based on parent */
+  max-height: calc(100svh - 100px); /* Adjust height based on parent */
   flex-grow: 1; /* Makes it take up remaining space */
 }
 

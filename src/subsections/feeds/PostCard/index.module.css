@@ -26,4 +26,8 @@
   .cardPost {
     padding: 0.5rem;
   }
+
+  .sharedText {
+    font-size: .85rem;
+  }
 }

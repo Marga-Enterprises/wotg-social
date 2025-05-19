@@ -44,11 +44,33 @@
   word-break: break-word;
 }
 
-.time {
+.commentFooter {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
   margin-top: 4px;
-  font-size: 0.75rem;
-  color: #65676b;
-  text-align: right;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.time {
+  color: #aaa;
+}
+
+.replyButton {
+  background: none;
+  border: none;
+  color: #3a8bfd;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+  margin: 0;
+  transition: color 0.2s;
+}
+
+.replyButton:hover {
+  color: #71abff;
+  text-decoration: underline;
 }
 
 .mediaImage {
@@ -56,4 +78,36 @@
   max-height: 300px;
   border-radius: 8px;
   margin-top: 0.5rem;
+}
+
+.replyInputWrapper {
+  margin-left: 3rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .commentItem {
+    gap: 0.5rem;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .name {
+    font-size: 0.80rem;
+  }
+
+  .text {
+    font-size: 0.80rem;
+  }
+
+  .commentFooter {
+    font-size: 0.7rem;
+  }
+
+  .replyButton {
+    font-size: 0.7rem;
+  }
 }

@@ -1,0 +1,105 @@
+.replyWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.replyBox {
+  background-color: #f0f2f5;
+  border-radius: 20px;
+  padding: 0.75rem 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  box-shadow: inset 0 0 0 1px #e5e5e5;
+}
+
+.textarea {
+  border: none;
+  resize: none;
+  background: transparent;
+  font-size: 0.95rem;
+  padding: 0;
+  outline: none;
+  width: 100%;
+  color: #050505;
+  font-family: inherit;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.iconRow {
+  display: flex;
+  gap: 0.75rem;
+  color: #65676b;
+  font-size: 1.1rem;
+}
+
+.icon {
+  cursor: pointer;
+}
+
+.sendBtn {
+  background: none;
+  border: none;
+  color: #1877f2;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.sendBtn:disabled {
+  color: #b0b3b8;
+  cursor: not-allowed;
+}
+
+.previewContainer {
+  position: relative;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.previewImage {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+.removePreviewButton {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  padding: 2px 5px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #555;
+}
+
+
+@media (max-width: 768px) {
+  .textarea {
+    font-size: .85rem;
+    line-height: 1;
+  }
+}

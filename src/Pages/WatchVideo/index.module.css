@@ -46,7 +46,7 @@
 }
 
 .videoWrapper {
-    width: 100vw; /* ✅ Full width */
+    width: 100svw; /* ✅ Full width */
     background: black; /* ✅ Ensures full black background */
     display: flex;
     justify-content: center;

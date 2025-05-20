@@ -12,7 +12,7 @@ import NoneOverlayCircularLoading from '../../../components/NoneOverlayCircularL
 import ReplyToCommentInput from '../../../components/ReplyToCommentInput';
 
 // subsections
-import RepliesList from '../../../subsections/feeds/RepliesList'
+import RepliesList from '../../../subsections/feeds/RepliesList';
 
 // utils
 import { convertMomentWithFormatWhole } from '../../../utils/methods';
@@ -28,8 +28,11 @@ const CommentsList = ({ post, socket, focusComment }) => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pageSize] = useState(10);
+
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [showReplies, setShowReplies] = useState(false);
+  const [targetReply, setTargetReply] = useState(null);
+
   const [pageDetails, setPageDetails] = useState({
     pageIndex: 1,
     totalPages: 0,
@@ -41,8 +44,15 @@ const CommentsList = ({ post, socket, focusComment }) => {
     setActiveReplyId(commentId);
   };
 
+  const handleGetTargetReply = (reply) => {
+    setTargetReply(reply);
+    setActiveReplyId(reply.parent_comment_id);
+    setShowReplies(true);
+  };
+
   const fetchComments = useCallback((pageIndex = 1) => {
     if (loadingRef.current) return;
+
     loadingRef.current = true;
     setLoading(true);
 
@@ -50,30 +60,48 @@ const CommentsList = ({ post, socket, focusComment }) => {
       .then((res) => {
         const { comments = [], totalPages, totalRecords } = res.data || {};
 
-        if (focusComment) {
-          // scroll to the focused comment
-          const focusedCommentIndex = comments.findIndex(c => c.id === focusComment.id);
-          if (focusedCommentIndex !== -1) {
-            const focusedComment = comments[focusedCommentIndex];
-            comments.splice(focusedCommentIndex, 1); // Remove the focused comment from its original position
-            comments.unshift(focusedComment); // Add it to the top
+        if (focusComment && focusComment.level === 0) {
+          const focusedIndex = comments.findIndex(c => c.id === focusComment.id);
+          if (focusedIndex !== -1) {
+            const focused = comments[focusedIndex];
+            comments.splice(focusedIndex, 1);
+            comments.unshift(focused);
           }
 
           setComments(() => {
-            const remainingComments = comments.filter(c => c.id !== focusComment.id);
-            return [focusComment, ...remainingComments];
+            const others = comments.filter(c => c.id !== focusComment.id);
+            return [focusComment, ...others];
+          });
+
+        } else if (focusComment && focusComment.level === 1) {
+          const focusedIndex = comments.findIndex(c => c.id === focusComment.id);
+          if (focusedIndex !== -1) {
+            const focused = comments[focusedIndex];
+            comments.splice(focusedIndex, 1);
+            comments.unshift(focused);
+          }
+
+          setTargetReply(focusComment);
+          setActiveReplyId(focusComment.parent_comment_id);
+          setShowReplies(true);
+
+          setComments(() => {
+            const others = comments.filter(c => c.id !== focusComment.id);
+            return [focusComment, ...others];
           });
 
         } else {
-          // If no focused comment, normal pagination behavior
           setComments(prev => (pageIndex === 1 ? comments : [...prev, ...comments]));
+
+          if (pageIndex === 1 && comments.length > 0) {
+            setTimeout(() => {
+              const first = document.querySelector(`.${styles.commentItem}`);
+              if (first) first.scrollIntoView({ behavior: 'auto', block: 'center' });
+            }, 100);
+          }
         }
 
-        setPageDetails({
-          pageIndex,
-          totalPages,
-          totalRecords,
-        });
+        setPageDetails({ pageIndex, totalPages, totalRecords });
       })
       .catch((err) => console.error('Failed to fetch comments:', err))
       .finally(() => {
@@ -96,26 +124,23 @@ const CommentsList = ({ post, socket, focusComment }) => {
     };
 
     const handleIncrementCommentReplyCount = (reply) => {
-      setComments(prev => {
-        const updatedComments = prev.map(comment => {
-          if (comment.id === reply.parent_comment_id) {
-            return { ...comment, reply_count: comment.reply_count + 1 };
-          }
-          return comment;
-        });
-        return updatedComments;
-      });
+      setComments(prev => prev.map(comment => {
+        if (comment.id === reply.parent_comment_id) {
+          return { ...comment, reply_count: comment.reply_count + 1 };
+        }
+        return comment;
+      }));
     };
 
     socket.on('new_comment', handleNewComment);
     socket.on('new_reply', handleIncrementCommentReplyCount);
+
     return () => {
       socket.off('new_reply', handleIncrementCommentReplyCount);
       socket.off('new_comment', handleNewComment);
     };
   }, [socket, post.id]);
 
-  // 🔁 Infinite scroll observer
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (
@@ -125,12 +150,9 @@ const CommentsList = ({ post, socket, focusComment }) => {
       ) {
         fetchComments(pageDetails.pageIndex + 1);
       }
-    }, {
-      threshold: 1,
-    });
+    }, { threshold: 1 });
 
     if (observerRef.current) observer.observe(observerRef.current);
-
     return () => {
       if (observerRef.current) observer.unobserve(observerRef.current);
     };
@@ -140,9 +162,9 @@ const CommentsList = ({ post, socket, focusComment }) => {
     if (focusRef.current) {
       setTimeout(() => {
         focusRef.current.scrollIntoView({ behavior: 'auto', block: 'center' });
-      }, 100); // Ensure the DOM has rendered
+      }, 100);
     }
-  }, [comments, focusComment]);  
+  }, [comments, focusComment]);
 
   return (
     <div className={styles.commentsList}>
@@ -154,7 +176,7 @@ const CommentsList = ({ post, socket, focusComment }) => {
           >
             <img
               className={styles.avatar}
-              src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${comment.author?.user_profile_picture || 'profile_place_holder.webp'}`}
+              src={`${backendUrl}/${comment.author?.user_profile_picture || 'profile_place_holder.webp'}`}
               alt={comment.author?.user_fname}
             />
             <div className={styles.commentBody}>
@@ -162,6 +184,7 @@ const CommentsList = ({ post, socket, focusComment }) => {
                 {comment.author?.user_fname} {comment.author?.user_lname}
               </div>
               <div className={styles.text}>{comment.content}</div>
+
               <div className={styles.media}>
                 {comment?.media?.map((media, idx) => (
                   <img
@@ -172,8 +195,10 @@ const CommentsList = ({ post, socket, focusComment }) => {
                   />
                 ))}
               </div>
+
               <div className={styles.commentFooter}>
                 <span className={styles.time}>{convertMomentWithFormatWhole(comment.created_at)}</span>
+
                 {comment?.reply_count > 0 && (
                   <button
                     className={styles.replyButton}
@@ -182,9 +207,12 @@ const CommentsList = ({ post, socket, focusComment }) => {
                     {comment.reply_count} {comment.reply_count > 1 ? 'Replies' : 'Reply'}
                   </button>
                 )}
+
                 <button
                   className={styles.replyButton}
-                  onClick={() => setActiveReplyId(prev => (prev === comment.id ? null : comment.id))}
+                  onClick={() =>
+                    setActiveReplyId(prev => (prev === comment.id ? null : comment.id))
+                  }
                 >
                   Reply
                 </button>
@@ -192,35 +220,32 @@ const CommentsList = ({ post, socket, focusComment }) => {
             </div>
           </div>
 
-          {/* ✅ REPLIES LIST */}
           {showReplies && activeReplyId === comment.id && (
             <div className={styles.repliesListWrapper}>
               <RepliesList
                 post={post}
                 parentComment={comment}
                 socket={socket}
-                focusReply={focusComment}
+                focusReply={targetReply}
               />
             </div>
           )}
 
-          {/* ✅ REPLY INPUT OUTSIDE COMMENT CARD */}
           {activeReplyId === comment.id && (
             <div className={styles.replyInputWrapper}>
               <ReplyToCommentInput
                 parentComment={comment}
                 postId={post.id}
                 onClose={() => setActiveReplyId(null)}
+                onGetFocusReply={handleGetTargetReply}
               />
             </div>
           )}
         </React.Fragment>
       ))}
 
-      {/* 👇 Invisible element to detect scroll */}
       <div ref={observerRef} style={{ height: '1px' }} />
 
-      {/* 👇 Loader at the bottom if more data available */}
       {loading && (
         <div style={{ marginTop: '1rem' }}>
           <NoneOverlayCircularLoading />

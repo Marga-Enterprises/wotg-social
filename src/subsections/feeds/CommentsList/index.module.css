@@ -68,6 +68,17 @@
   transition: color 0.2s;
 }
 
+.repliesListWrapper {
+  margin-left: 1rem;
+  padding-left: 0;
+  border-left: 2px solid #dcdcdc;
+}
+
+.repliesListWrapper {
+  border-left: 2px solid rgba(0, 0, 0, 0.1); /* light gray */
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
 .replyButton:hover {
   color: #71abff;
   text-decoration: underline;

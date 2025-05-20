@@ -10,7 +10,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import Cookie from 'js-cookie';
 
-const ReplyToCommentInput = ({ parentComment, postId, onClose }) => {
+const ReplyToCommentInput = ({ parentComment, postId, onClose, onGetFocusReply }) => {
   const dispatch = useDispatch();
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -35,11 +35,12 @@ const ReplyToCommentInput = ({ parentComment, postId, onClose }) => {
       };
 
       dispatch(wotgsocial.post.addReplyToCommentAction(data))
-        .then(() => {
+        .then((res) => {
           setContent('');
           setFile(null);
           setPreviewUrl('');
           // onClose();
+          onGetFocusReply(res.data)
         })
         .catch((error) => {
           console.error('Error sending reply:', error);

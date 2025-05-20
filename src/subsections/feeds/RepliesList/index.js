@@ -24,7 +24,7 @@ const RepliesList = ({ post, socket, focusReply, parentComment }) => {
 
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(100);
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [pageDetails, setPageDetails] = useState({
     pageIndex: 1,
@@ -51,8 +51,8 @@ const RepliesList = ({ post, socket, focusReply, parentComment }) => {
           }
 
           setReplies(() => {
-            const remainingReplies = replies.filter(c => c.id !== focusReply.id);
-            return [focusReply, ...remainingReplies];
+            const remainingReplies = replies.filter(r => r.id !== focusReply.id);
+            return [...remainingReplies, focusReply];
           });
 
         } else {

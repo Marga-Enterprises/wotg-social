@@ -13,13 +13,12 @@ const Notifications = ({ notifList, unreadCount, onNavigate, loading, socket, us
   const [showPostComments, setShowPostComments] = useState(false);
   const [targetPost, setTargetPost] = useState({});
   const [targetComment, setTargetComment] = useState({});
+  const [targetReply, setTargetReply] = useState({});
 
   const handleNotificationClick = (notification) => {
-    console.log('Notification Clicked:', notification);
-
     if (notification.targetPost) {
       if (notification.targetComment) {
-        // console.log('Target Comment:', notification.targetComment);
+        console.log('Target Comment:', notification.targetComment);
         setTargetComment(notification.targetComment);
       }
 

@@ -10,6 +10,7 @@ import { wotgsocial } from '../../../redux/combineActions';
 // components
 import ReactionPopup from '../../../components/PostReactionsOption';
 import PostCommentsModal from '../../../components/PostCommentsModal';
+import SharePostModal from '../../../components/SharePostModal';
 
 const REACTIONS = [
   { label: 'Haha', src: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/haha.webp' },
@@ -30,6 +31,7 @@ const PostActions = ({ onShare, reactions, userId, postId, post, socket, author,
   const [showReactions, setShowReactions] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [localReactions, setLocalReactions] = useState(reactions);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleReactToPost = useCallback((reaction, option) => {
     clearTimeout(showTimeout.current);
@@ -174,7 +176,7 @@ const PostActions = ({ onShare, reactions, userId, postId, post, socket, author,
       </div>
 
       {/* Share */}
-      <div className={styles.actionButton} onClick={onShare}>
+      <div className={styles.actionButton} onClick={() => setShowShareModal(true)}>
         <FontAwesomeIcon icon={faShare} />
         <span>Share</span>
       </div>
@@ -194,6 +196,17 @@ const PostActions = ({ onShare, reactions, userId, postId, post, socket, author,
           post={post}
           socket={socket}
           onClose={() => setShowComments(false)}
+          author={author}
+          user={user}
+        />
+      )}
+
+      {/* Share Post Modal */}
+      {showShareModal && (
+        <SharePostModal
+          post={post}
+          socket={socket}
+          onClose={() => setShowShareModal(false)}
           author={author}
           user={user}
         />

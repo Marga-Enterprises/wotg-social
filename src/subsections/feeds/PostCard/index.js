@@ -35,7 +35,6 @@ const PostCard = ({ post, userId, triggerRefresh, socket, user }) => {
       />
 
       <PostActions
-        onShare={() => console.log('Shared Post ID:', post.id)}
         reactions={post.reactions}
         author={post.author}
         postId={post.id}

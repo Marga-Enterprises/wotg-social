@@ -5,8 +5,8 @@ import styles from './index.module.css';
 import LoadingSpinner from '../LoadingSpinner';
 import DynamicSnackbar from '../DynamicSnackbar';
 
-// subcomponents
-import PostUploadArea from '../../subcomponents/PostUploadArea';
+// subsections
+import PostCard from '../../subsections/feeds/PostCard';
 
 // redux
 import { useDispatch } from 'react-redux';
@@ -17,10 +17,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faTimes, 
     faUserTag,
-    faImage,
- } from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
 
-const NewPostModal = ({ user, onClose, onRefresh }) => {
+const SharePostModal = ({ user, onClose, onRefresh, post, socket }) => {
     const dispatch = useDispatch();
 
     const loadingRef = useRef(false);
@@ -29,9 +28,7 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
 
     const [loading, setLoading] = useState(false);
     const [content, setContent] = useState('');
-    const [showUploadArea, setShowUploadArea] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
-    const [files, setFiles] = useState([]);
 
     const handleSubmitPost = useCallback(async () => {
         if (loadingRef.current) return;
@@ -40,16 +37,15 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
 
         try {
             const payload = {
+                postId: post.id,
                 content,
-                file: files,
-                visibility: 'public',   
+                visibility: 'public',
             };
 
-            const res = await dispatch(wotgsocial.post.createPostAction(payload));
+            const res = await dispatch(wotgsocial.post.sharePostByIdAction(payload));
 
             if (res.success) {
                 setSnackbar({ open: true, message: 'Post created successfully!', type: 'success' });
-
                 await Promise.resolve(onClose());
                 await Promise.resolve(onRefresh(res.data));
             }
@@ -59,7 +55,7 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
             loadingRef.current = false;
             setLoading(false);
         }
-    }, [dispatch, content, files]);
+    }, [dispatch, content]);
 
     if (loading) return <LoadingSpinner />;
 
@@ -84,7 +80,6 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
                         <img src={user?.profileImage || `${backendUrl}/${user.user_profile_picture}`} alt="Profile" className={styles.avatar} />
                         <div className={styles.profileDetails}>
                             <span className={styles.name}>{user?.user_fname} {user?.user_lname}</span>
-                            {/*<button className={styles.privacyBtn}>🌐 Public</button>*/}
                         </div>
                     </div>
 
@@ -95,19 +90,21 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
                         onChange={(e) => setContent(e.target.value)}
                     />
 
-                    { showUploadArea && (
-                        <PostUploadArea 
-                            onFilesChange={(files) => setFiles(files)} 
-                            onClose={() => setShowUploadArea(false)}
-                        />
+                    {post && (
+                        <div className={styles.postPreview}>
+                            <PostCard
+                                post={post}
+                                user={user}
+                                userId={user?.user_id}
+                                socket={socket}
+                                showSummaryAndActions={false}
+                            />
+                        </div>
                     )}
 
                     <div className={styles.actions}>
                         <span>Add to your post</span>
                         <div className={styles.icons}>
-                            <button className={styles.iconButton}>
-                                <FontAwesomeIcon onClick={() => setShowUploadArea(true)} icon={faImage} className={styles.imageIcon} />
-                            </button>
                             <button className={styles.iconButton}>
                                 <FontAwesomeIcon icon={faUserTag} className={styles.tagIcon} />
                             </button>
@@ -118,8 +115,7 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
                 </div>
             </div>
         </>
-
     );
 };
 
-export default React.memo(NewPostModal);
+export default React.memo(SharePostModal);

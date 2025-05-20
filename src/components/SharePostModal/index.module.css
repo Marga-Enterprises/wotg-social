@@ -19,11 +19,6 @@
     color: #1482a3;
 }
 
-.imageIcon {
-    font-size: 1.4rem;
-    color: #1b9b0b;
-}
-
 .modal {
     width: 500px;
     background: #fff;
@@ -105,25 +100,6 @@
     outline: none;
     background: transparent;
     color: #1c1e21;
-}
-
-.colorOptions {
-    display: flex;
-    gap: 6px;
-    padding: 8px 0;
-}
-
-.colorBox {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    transition: transform 0.1s ease;
-}
-
-.colorBox:hover {
-    transform: scale(1.05);
 }
 
 .actions {

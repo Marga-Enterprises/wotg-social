@@ -92,10 +92,12 @@ const FeedsListSection = ({ socket }) => {
 
   return (
     <div className={styles.feedWrapper}>
-      <NewPost triggerRefresh={(newPost) => {
-        pageIndexRef.current = 1;
-        fetchFeeds(true, newPost);
-      }} />
+      <NewPost 
+        triggerRefresh={(newPost) => {
+          pageIndexRef.current = 1;
+          fetchFeeds(true, newPost);
+        }} 
+      />
 
       {feeds.length === 0 && loading && (
         <div className={styles.loadingArea}>
@@ -118,6 +120,7 @@ const FeedsListSection = ({ socket }) => {
           userId={userId} 
           user={account}
           socket={socket}
+          showSummaryAndActions={true}
         />
       ))}
 

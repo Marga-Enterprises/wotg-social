@@ -20,7 +20,7 @@ const REACTIONS = [
   { label: 'Praise', src: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/praise.webp' },
 ];
 
-const PostActions = ({ onShare, reactions, userId, postId, post, socket, author, user }) => {
+const PostActions = ({ onRefresh, reactions, userId, postId, post, socket, author, user }) => {
   const dispatch = useDispatch();
 
   const showTimeout = useRef(null);
@@ -209,6 +209,7 @@ const PostActions = ({ onShare, reactions, userId, postId, post, socket, author,
           onClose={() => setShowShareModal(false)}
           author={author}
           user={user}
+          onRefresh={onRefresh}
         />
       )}
     </div>

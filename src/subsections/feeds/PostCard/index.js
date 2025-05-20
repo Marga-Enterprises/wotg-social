@@ -8,7 +8,7 @@ import SharedPostPreview from '../SharedPostPreview';
 import PostFooterSummary from '../PostFooterSummary';
 import PostActions from '../PostActions';
 
-const PostCard = ({ post, userId, triggerRefresh, socket, user }) => {
+const PostCard = ({ post, userId, triggerRefresh, socket, user, showSummaryAndActions }) => {
   return (
     <div className={styles.cardPost}>
       <PostHeaderAuthor 
@@ -23,25 +23,30 @@ const PostCard = ({ post, userId, triggerRefresh, socket, user }) => {
       {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}
       {post.media?.length > 0 && <PostMediaGrid media={post.media} />}
 
-      <PostFooterSummary
-        reactionCount={post.reaction_count}
-        commentsCount={post.comments_count}
-        sharesCount={post.shares_count}
-        reactions={post.reactions}
-        socket={socket}
-        postId={post.id}
-        post={post}
-        user={user}
-      />
+      {showSummaryAndActions && (
+        <>
+          <PostFooterSummary
+            reactionCount={post.reaction_count}
+            commentsCount={post.comments_count}
+            sharesCount={post.shares_count}
+            reactions={post.reactions}
+            socket={socket}
+            postId={post.id}
+            post={post}
+            user={user}
+          />
 
-      <PostActions
-        reactions={post.reactions}
-        author={post.author}
-        postId={post.id}
-        post={post}
-        user={user}
-        socket={socket}
-      />
+          <PostActions
+            reactions={post.reactions}
+            author={post.author}
+            postId={post.id}
+            post={post}
+            user={user}
+            socket={socket}
+            onRefresh={triggerRefresh}
+          />
+        </>
+      )}
     </div>
   );
 };

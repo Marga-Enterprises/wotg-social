@@ -21,7 +21,7 @@ const ReplyToCommentInput = ({ parentComment, postId, onClose }) => {
   const backendUrl = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
   const avatarUrl = `${backendUrl}/${parsedAccount?.user_profile_picture || 'profile_place_holder.webp'}`;
 
-  const [content, setContent] = useState(`${parentComment.author?.user_fname} ${parentComment.author?.user_lname} `);
+  const [content, setContent] = useState('');
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
@@ -39,7 +39,7 @@ const ReplyToCommentInput = ({ parentComment, postId, onClose }) => {
           setContent('');
           setFile(null);
           setPreviewUrl('');
-          onClose();
+          // onClose();
         })
         .catch((error) => {
           console.error('Error sending reply:', error);

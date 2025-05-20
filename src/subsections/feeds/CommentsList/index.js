@@ -95,8 +95,22 @@ const CommentsList = ({ post, socket, focusComment }) => {
       }
     };
 
+    const handleIncrementCommentReplyCount = (reply) => {
+      setComments(prev => {
+        const updatedComments = prev.map(comment => {
+          if (comment.id === reply.parent_comment_id) {
+            return { ...comment, reply_count: comment.reply_count + 1 };
+          }
+          return comment;
+        });
+        return updatedComments;
+      });
+    };
+
     socket.on('new_comment', handleNewComment);
+    socket.on('new_reply', handleIncrementCommentReplyCount);
     return () => {
+      socket.off('new_reply', handleIncrementCommentReplyCount);
       socket.off('new_comment', handleNewComment);
     };
   }, [socket, post.id]);

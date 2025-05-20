@@ -80,15 +80,15 @@ const RepliesList = ({ post, socket, focusReply, parentComment }) => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleNewComment = (comment) => {
-      if (parseInt(comment.post_id) === post.id) {
-        setReplies(prev => [...prev, comment]);
+    const handleNewReply = (reply) => {
+      if (parseInt(reply.parent_comment_id) === parentComment.id) {
+        setReplies(prev => [...prev, reply]);
       }
     };
 
-    socket.on('new_reply', handleNewComment);
+    socket.on('new_reply', handleNewReply);
     return () => {
-      socket.off('new_reply', handleNewComment);
+      socket.off('new_reply', handleNewReply);
     };
   }, [socket, post.id]);
 

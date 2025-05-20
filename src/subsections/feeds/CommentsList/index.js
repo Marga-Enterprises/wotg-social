@@ -40,8 +40,12 @@ const CommentsList = ({ post, socket, focusComment }) => {
   });
 
   const handleShowReplies = (commentId) => {
-    setShowReplies(prev => !prev);
-    setActiveReplyId(commentId);
+    if (activeReplyId === commentId) {
+      setShowReplies(false);
+    } else {
+      setShowReplies(true);
+      setActiveReplyId(commentId);
+    }
   };
 
   const handleGetTargetReply = (reply) => {

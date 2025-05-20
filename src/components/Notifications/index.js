@@ -1,5 +1,4 @@
-// components/Notifications.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './index.module.css';
 import NoneOverlayCircularLoading from '../NoneOverlayCircularLoading';
 import { convertMomentWithFormat } from '../../utils/methods';
@@ -7,25 +6,59 @@ import { convertMomentWithFormat } from '../../utils/methods';
 // sub sections
 import PostCommentsModal from '../PostCommentsModal';
 
-const Notifications = ({ notifList, unreadCount, onNavigate, loading, socket, user }) => {
+const Notifications = ({
+  notifList,
+  unreadCount,
+  onNavigate,
+  loading,
+  socket,
+  user,
+  fetchMoreNotifications, // 👈 You must provide this prop
+  pageIndex,
+  totalPages
+}) => {
   const backendUrl = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images';
 
   const [showPostComments, setShowPostComments] = useState(false);
   const [targetPost, setTargetPost] = useState({});
   const [targetComment, setTargetComment] = useState({});
-  const [targetReply, setTargetReply] = useState({});
+
+  const observerRef = useRef(null);
 
   const handleNotificationClick = (notification) => {
     if (notification.targetPost) {
       if (notification.targetComment) {
-        console.log('Target Comment:', notification.targetComment);
         setTargetComment(notification.targetComment);
       }
-
       setTargetPost(notification.targetPost);
       setShowPostComments(true);
     }
-  }
+  };
+
+  const handleObserver = useCallback(
+    (entries) => {
+      if (
+        entries[0].isIntersecting &&
+        !loading &&
+        pageIndex < totalPages
+      ) {
+        fetchMoreNotifications(pageIndex + 1);
+      }
+    },
+    [loading, pageIndex, totalPages, fetchMoreNotifications]
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 1.0,
+    });
+
+    if (observerRef.current) observer.observe(observerRef.current);
+
+    return () => {
+      if (observerRef.current) observer.unobserve(observerRef.current);
+    };
+  }, [handleObserver]);
 
   return (
     <div className={styles.notificationPanel}>
@@ -58,6 +91,8 @@ const Notifications = ({ notifList, unreadCount, onNavigate, loading, socket, us
             </div>
           </div>
         ))}
+
+        <div ref={observerRef} style={{ height: '1px' }} />
       </div>
 
       {loading && <NoneOverlayCircularLoading />}
@@ -81,3 +116,4 @@ const Notifications = ({ notifList, unreadCount, onNavigate, loading, socket, us
 };
 
 export default React.memo(Notifications);
+  

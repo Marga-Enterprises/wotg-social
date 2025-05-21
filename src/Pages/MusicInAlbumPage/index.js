@@ -105,6 +105,9 @@ const AlbumDetailsPage = () => {
     dispatch(wotgsocial.musicPlayer.setTrackList(musics));
     const meta = { source: "album", albumCover: album?.cover_image };
     const selected = musics.find((t) => t.id === trackId);
+
+    console.log("[[[[[[[[Selected track:]]]]]]]]", selected);
+    console.log('[[[[[[[[[[[[[[[META]]]]]]]]]]]]]]]', meta);
     dispatch(wotgsocial.musicPlayer.setCurrentTrack({ ...selected, ...meta }));
     dispatch(wotgsocial.musicPlayer.setIsPlaying(true));
   };

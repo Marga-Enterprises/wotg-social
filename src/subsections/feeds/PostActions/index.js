@@ -20,7 +20,7 @@ const REACTIONS = [
   { label: 'Praise', src: 'https://wotg.sgp1.cdn.digitaloceanspaces.com/images/praise.webp' },
 ];
 
-const PostActions = ({ onRefresh, reactions, userId, postId, post, socket, author, user }) => {
+const PostActions = ({ onRefresh, reactions, postId, post, socket, author, user }) => {
   const dispatch = useDispatch();
 
   const showTimeout = useRef(null);
@@ -44,7 +44,7 @@ const PostActions = ({ onRefresh, reactions, userId, postId, post, socket, autho
       : reaction?.label?.toLowerCase();
 
     const existingReaction = localReactions.find(
-      (r) => r.user_id === userId && r.post_id === postId
+      (r) => r.user_id === user.id && r.post_id === postId
     );
 
     if (existingReaction && existingReaction.type === reactionType) {
@@ -55,7 +55,7 @@ const PostActions = ({ onRefresh, reactions, userId, postId, post, socket, autho
       };
 
       setLocalReactions(prev =>
-        prev.filter(r => !(r.user_id === userId && r.post_id === postId))
+        prev.filter(r => !(r.user_id === user.id && r.post_id === postId))
       );
 
       dispatch(wotgsocial.post.reactToPostByIdAction({
@@ -64,10 +64,10 @@ const PostActions = ({ onRefresh, reactions, userId, postId, post, socket, autho
       }));
     } else {
       setLocalReactions(prev => {
-        const withoutUser = prev.filter(r => r.user_id !== userId);
+        const withoutUser = prev.filter(r => r.user_id !== user.id);
         return [...withoutUser, {
           id: Date.now(),
-          user_id: userId,
+          user_id: user.id,
           post_id: postId,
           type: reactionType,
         }];
@@ -80,7 +80,7 @@ const PostActions = ({ onRefresh, reactions, userId, postId, post, socket, autho
     }
 
     setShowReactions(false);
-  }, [dispatch, postId, userId, localReactions]);
+  }, [dispatch, postId, user.id, localReactions]);
 
   const handleTouchStart = (e) => {
     e.preventDefault();
@@ -111,7 +111,7 @@ const PostActions = ({ onRefresh, reactions, userId, postId, post, socket, autho
   }, [reactions]);
 
   const userReaction = localReactions.find(
-    (r) => r.user_id === userId && r.post_id === postId
+    (r) => r.user_id === user.id && r.post_id === postId
   );
 
   const reactionMeta = userReaction

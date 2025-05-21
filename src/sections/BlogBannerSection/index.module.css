@@ -1,0 +1,64 @@
+/* src/sections/BlogBannerSection.module.css */
+
+.banner {
+  width: 100%;
+  height: 100svh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.bannerContent {
+  position: absolute;
+  color: white;
+  text-align: left;
+  max-width: 80%;
+  font-family: 'Playfair Display', serif;
+  font-size: 4rem;
+  font-weight: 400;
+  z-index: 2;
+  line-height: 1.5;
+}
+
+/* Responsive font resizing */
+@media (max-width: 1000px) {
+  .bannerContent {
+    font-size: 3.25rem;
+  }
+}
+
+@media (max-width: 850px) {
+  .bannerContent {
+    font-size: 2.75rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .bannerContent {
+    font-size: 2.25rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 450px) {
+  .bannerContent {
+    font-size: 1.75rem;
+  }
+}

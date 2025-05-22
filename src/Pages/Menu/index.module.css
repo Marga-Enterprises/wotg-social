@@ -42,7 +42,7 @@
 .gridMenu {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: .5rem;
   justify-content: center;
 }
 
@@ -59,55 +59,45 @@
   display: flex;
   gap: 1rem;
   align-items: center;
-  width: calc(50% - 0.5rem); /* Two per row with gap adjustment */
-  min-width: 140px; /* Optional, prevent items from becoming too narrow */
+  width: calc(50% - 0.5rem);
+  min-width: 120px;
+  flex: 1 1 calc(50% - 0.5rem);
 }
 
-/* If the last item is odd, make it stretch full width */
 .gridItem:last-child:nth-child(odd) {
   width: 100%;
+  flex: 1 1 100%;
 }
 
-
-/*
-.gridItem::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  transition: width 0.3s ease;
-  border-radius: 0.75rem;
-  z-index: 0;
-}
-
-.gridItem:hover::after {
-  width: 100%;
-}
-
-.gridItem:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.gridItem span {
-  margin-top: 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  z-index: 1;
-}
-*/
 .icon {
   font-size: 1.8rem;
   z-index: 1;
 }
 
-/* Media Queries */ 
+.gridItem span {
+  font-size: 1rem;
+  font-weight: 500;
+  z-index: 1;
+}
+
+/* Media Queries */
 @media (max-width: 405px) {
   .gridItem {
-    width: 100%; /* 1 column by default */
+    min-width: 45%;
+    flex: 1 1 45%;
+    padding: 0.75rem;
+    gap: .5rem;
+  }
+
+  .gridItem:last-child:nth-child(odd) {
+    flex-basis: 100%;
+  }
+
+  .icon {
+    font-size: 1rem;
+  }
+
+  .gridItem span {
+    font-size: 0.75rem;
   }
 }

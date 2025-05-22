@@ -81,98 +81,86 @@ const Page = () => {
                 <div className={styles.formWrapper}>
                     <h1 className={styles.heading}>Register</h1>
                     <form className={styles.form} onSubmit={handleSubmitSignUp}>
+                    <div className={styles.twoColumnRow}>
                         <div className={styles.formGroup}>
-                            <label htmlFor="firstName" className={styles.label}>
-                                First Name
-                            </label>
+                        <label htmlFor="firstName" className={styles.label}>First Name</label>
+                        <input
+                            id="firstName"
+                            name="firstName"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            className={styles.input}
+                            required
+                        />
+                        </div>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="lastName" className={styles.label}>Last Name</label>
+                        <input
+                            id="lastName"
+                            name="lastName"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className={styles.input}
+                            required
+                        />
+                        </div>
+                    </div>
+
+                    <div className={styles.twoColumnRow}>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="email" className={styles.label}>Email Address</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className={styles.input}
+                            required
+                        />
+                        </div>
+                        <div className={styles.formGroup}>
+                        <label htmlFor="password" className={styles.label}>Password</label>
+                        <div className={styles.passwordContainer}>
                             <input
-                                id="firstName"
-                                name="firstName"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                className={styles.input}
-                                required
+                            type={showPassword ? "" : "password"}
+                            id="password"
+                            name="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className={styles.input}
+                            required
                             />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label htmlFor="lastName" className={styles.label}>
-                                Last Name
-                            </label>
-                            <input
-                                id="lastName"
-                                name="lastName"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                className={styles.input}
-                                required
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="email" className={styles.label}>
-                                Email Address
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className={styles.input}
-                                required
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="password" className={styles.label}>
-                                Password
-                            </label>
-                            <div className={styles.passwordContainer}>
-                                <input
-                                    type={showPassword ? "" : "password"}
-                                    id="password"
-                                    name="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className={styles.input}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    className={styles.eyeButton}
-                                    onClick={togglePasswordVisibility}
-                                >
-                                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label htmlFor="gender" className={styles.label}>
-                                Gender
-                            </label>
-                            <select
-                                id="gender"
-                                name="gender"
-                                value={gender}
-                                onChange={(e) => setGender(e.target.value)}
-                                className={styles.input}
-                                required
-                            >
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                            </select>
-                        </div>
-
-                        <div>
                             <button
-                                type="submit"
-                                className={styles.button}
+                            type="button"
+                            className={styles.eyeButton}
+                            onClick={togglePasswordVisibility}
                             >
-                                Register
+                            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                             </button>
                         </div>
+                        </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label htmlFor="gender" className={styles.label}>Gender</label>
+                        <select
+                        id="gender"
+                        name="gender"
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
+                        className={styles.input}
+                        required
+                        >
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <button type="submit" className={styles.button}>Register</button>
+                    </div>
                     </form>
 
                     {openErrorSnackbar && (

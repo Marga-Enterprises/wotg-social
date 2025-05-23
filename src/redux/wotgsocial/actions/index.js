@@ -13,9 +13,11 @@ import * as musicPlayer from './musicPlayer';
 import * as follow from './follow';
 import * as post from './post';
 import * as notification from './notification';
+import * as media from './media';
 
 export {
   user,
+  media,
   music,
   chatroom,
   message,

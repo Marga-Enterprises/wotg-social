@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './index.module.css';
 
-const LoadingSpinner = () => {
+const LoadingSpinner = ({ uploadProgress }) => {
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(true);
   const intervalRef = useRef(null);

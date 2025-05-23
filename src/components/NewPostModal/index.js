@@ -20,6 +20,9 @@ import {
     faImage,
  } from '@fortawesome/free-solid-svg-icons';
 
+// utils
+import { uploadFileToSpaces } from '../../utils/methods.js';
+
 const NewPostModal = ({ user, onClose, onRefresh }) => {
     const dispatch = useDispatch();
 
@@ -32,34 +35,67 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
     const [showUploadArea, setShowUploadArea] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
     const [files, setFiles] = useState([]);
+    const [uploadProgress, setUploadProgress] = useState({});
 
     const handleSubmitPost = useCallback(async () => {
         if (loadingRef.current) return;
         loadingRef.current = true;
         setLoading(true);
 
+        const uploadedFiles = [];
+
         try {
+            if (files.length > 0) {
+                for (const file of files) {
+                    try {
+                        const res = await dispatch(
+                            wotgsocial.media.getPresignedUrlAction({
+                                fileName: file.name,
+                                fileType: file.type
+                            })
+                        );
+
+                        const { url, fileName } = res.data;
+
+                        await uploadFileToSpaces(file, url, (percent) => {
+                            setUploadProgress(prev => ({ ...prev, [file.name]: percent }));
+                        });
+
+                        const fileCategory = file.type.split('/')[0]; // "image", "video", "audio"
+
+                        uploadedFiles.push({
+                            url: fileName,
+                            type: fileCategory
+                        });
+                    } catch (err) {
+                        console.error('❌ Failed to upload:', file.name, err);
+                    }
+                }
+            }
+
+            console.log('🟢 Uploaded Files:', uploadedFiles);
+
             const payload = {
                 content,
-                file: files,
-                visibility: 'public',   
+                files: uploadedFiles,
+                visibility: 'public',
             };
 
-            const res = await dispatch(wotgsocial.post.createPostAction(payload));
+            const postRes = await dispatch(wotgsocial.post.createPostAction(payload));
 
-            if (res.success) {
-                setSnackbar({ open: true, message: 'Post created successfully!', type: 'success' });
-
+            if (postRes.success) {
+                setSnackbar({ open: true, message: "Post created successfully", type: "success" });
                 await Promise.resolve(onClose());
-                await Promise.resolve(onRefresh(res.data));
+                await Promise.resolve(onRefresh(postRes.data));
             }
+
         } catch (error) {
-            console.error('Error creating post:', error);
+            console.error('🚨 Error creating post:', error);
         } finally {
             loadingRef.current = false;
             setLoading(false);
         }
-    }, [dispatch, content, files]);
+    }, [dispatch, content, files, onClose, onRefresh]);
 
     if (loading) return <LoadingSpinner />;
 

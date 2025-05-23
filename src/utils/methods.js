@@ -1,5 +1,10 @@
 import moment from 'moment';
+import axios from 'axios';
 import { useEffect } from 'react';
+
+
+const plainAxios = axios.create();
+
 /**
  * convert object to query string
  * @param {*} params
@@ -82,3 +87,30 @@ export const useScrollRestore = (key = "bibleScrollY", delay = 50) => {
 export const saveScrollPosition = (key = "bibleScrollY") => {
   sessionStorage.setItem(key, window.scrollY.toString());
 };
+
+export const uploadFileToSpaces = async (file, presignedUrl, onProgress) => {
+  const isolatedAxios = axios.create(); // fresh instance
+
+  return isolatedAxios.put(presignedUrl, file, {
+    headers: {
+      'Content-Type': file.type, // must match what you signed!
+      'x-amz-acl': 'public-read'
+    },
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+    onUploadProgress: (e) => {
+      if (onProgress && e.total) {
+        const percent = Math.round((e.loaded * 100) / e.total);
+        onProgress(percent);
+      }
+    },
+    transformRequest: [(data, headers) => {
+      // REMOVE all inherited headers — especially from axios.defaults or interceptors
+      Object.keys(headers).forEach(key => delete headers[key]);
+      headers['Content-Type'] = file.type;
+      headers['x-amz-acl'] = 'public-read';
+      return data;
+    }]
+  });
+};
+

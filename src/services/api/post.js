@@ -1,4 +1,4 @@
-import { GET, POST, POST_FORM_DATA, PUT_FORM_DATA, DELETE } from '../request.js';
+import { GET, POST, POST_FORM_DATA, PUT_FORM_DATA, PUT, DELETE } from '../request.js';
 import * as methods from '../../utils/methods.js';
 
 // GET POST BY PARAMS
@@ -14,44 +14,12 @@ export async function getPostById(payload) {
 
 // CREATE A POST USING POST FORM DATA METHOD
 export async function createPost(payload) {
-    const formData = new FormData();
-
-    for (const key in payload) {
-        const value = payload[key];
-        if (value !== null && value !== undefined) {
-            // If it's an array (like files), append each one
-            if (Array.isArray(value)) {
-                value.forEach((item) => {
-                    formData.append(`${key}`, item);
-                });
-            } else {
-                formData.append(key, value);
-            }
-        }
-    }
-
-    return POST_FORM_DATA('/posts', { formData });
+    return POST('/posts', payload);
 }
 
 // UPDATE A POST USING PUT FORM DATA METHOD
 export async function updatePost(payload) {
-    const formData = new FormData();
-
-    for (const key in payload) {
-        const value = payload[key];
-        if (value !== null && value !== undefined) {
-            // If it's an array (like files), append each one
-            if (Array.isArray(value)) {
-                value.forEach((item) => {
-                    formData.append(`${key}`, item);
-                });
-            } else {
-                formData.append(key, value);
-            }
-        }
-    }
-
-    return PUT_FORM_DATA(`/posts/${payload.id}`, { formData });
+    return PUT(`/posts/${payload.id}`, payload);
 }
 
 // DELETE A POST BY ID

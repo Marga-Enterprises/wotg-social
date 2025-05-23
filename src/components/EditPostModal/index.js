@@ -18,7 +18,10 @@ import {
     faTimes, 
     faUserTag,
     faImage,
- } from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
+
+// utils
+import { uploadFileToSpaces } from '../../utils/methods.js';
 
 const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
     const dispatch = useDispatch();
@@ -32,7 +35,7 @@ const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
     const [showUploadArea, setShowUploadArea] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
     const [files, setFiles] = useState([]);
-    const [filesToDeleteString, setFilesToDeleteString] = useState('');
+    const [filesToDeleteArray, setFilesToDeleteArray] = useState('');
     const [filesFromPost, setFilesFromPost] = useState([]);
 
     const handleFetchPost = useCallback(() => {
@@ -61,14 +64,45 @@ const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
         loadingRef.current = true;
         setLoading(true);
 
+        const uploadedFiles = [];
+
         try {
+            if (files.length > 0) {
+                for (const file of files) {
+                    try {
+                        const res = await dispatch(
+                            wotgsocial.media.getPresignedUrlAction({
+                                fileName: file.name,
+                                fileType: file.type
+                            })
+                        );
+
+                        const { url, fileName } = res.data;
+
+                        await uploadFileToSpaces(file, url, (percent) => {
+                            // Optional: Track progress if needed
+                            console.log(`Upload progress for ${file.name}: ${percent}%`);
+                        });
+
+                        const fileCategory = file.type.split('/')[0]; // "image", "video", "audio"
+
+                        uploadedFiles.push({
+                            url: fileName, // same as in NewPostModal
+                            type: fileCategory
+                        });
+                    } catch (err) {
+                        console.error('❌ Failed to upload:', file.name, err);
+                    }
+                }
+            }
+
             const payload = {
                 id: postId,
                 content,
-                file: files,
+                files: uploadedFiles,
                 visibility: 'public',
-                filesToDelete: filesToDeleteString,
-            };            
+                filesToDelete: filesToDeleteArray // assumed to be an array of filenames/keys
+            };
 
             const res = await dispatch(wotgsocial.post.updatePostAction(payload));
 
@@ -78,13 +112,14 @@ const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
                 await Promise.resolve(onClose());
                 await Promise.resolve(onRefresh(res.data));
             }
+
         } catch (error) {
             console.error('Error updating post:', error);
         } finally {
             loadingRef.current = false;
             setLoading(false);
         }
-    }, [dispatch, content, files, filesToDeleteString]);
+    }, [dispatch, content, files, filesToDeleteArray, postId, onClose, onRefresh]);
 
     useEffect(() => {
         handleFetchPost();
@@ -130,7 +165,7 @@ const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
                             onClose={() => setShowUploadArea(false)}
                             filesFromPost={filesFromPost}
                             onFilesDelete={(files) => {
-                                setFilesToDeleteString(files);
+                                setFilesToDeleteArray(files);
                             }}
                         />
                     )}

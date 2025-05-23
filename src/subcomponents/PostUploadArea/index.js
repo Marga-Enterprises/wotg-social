@@ -11,19 +11,31 @@ const PostUploadArea = ({ onFilesChange, onClose, filesFromPost, onFilesDelete }
 
   const [previews, setPreviews] = useState([]);
   const [error, setError] = useState('');
-  const [selectedFilesToDelete, setSelectedFilesToDelete] = useState('');
+  const [selectedFilesToDelete, setSelectedFilesToDelete] = useState([]);
 
   const guessFileType = (file) => {
-    if (file.type) {
+    if (!file) return 'unknown';
+
+    // Check MIME type if available
+    if (file.type && typeof file.type === 'string') {
       if (file.type.startsWith('image/')) return 'image';
       if (file.type.startsWith('video/')) return 'video';
       if (file.type.startsWith('audio/')) return 'audio';
-    } else if (file.url) {
-      const url = file.url.toLowerCase();
-      if (url.match(/\.(jpg|jpeg|png|webp|gif)$/)) return 'image';
-      if (url.match(/\.(mp4|mov|webm)$/)) return 'video';
-      if (url.match(/\.(mp3|wav|ogg)$/)) return 'audio';
     }
+
+    // Fallback to file extension from URL
+    if (file.url && typeof file.url === 'string') {
+      const ext = file.url.split('.').pop().toLowerCase();
+
+      const imageExts = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+      const videoExts = ['mp4', 'mov', 'webm'];
+      const audioExts = ['mp3', 'wav', 'ogg'];
+
+      if (imageExts.includes(ext)) return 'image';
+      if (videoExts.includes(ext)) return 'video';
+      if (audioExts.includes(ext)) return 'audio';
+    }
+
     return 'unknown';
   };
 
@@ -65,7 +77,10 @@ const PostUploadArea = ({ onFilesChange, onClose, filesFromPost, onFilesDelete }
     onFilesChange?.(updated.map(p => p.file));
 
     if (filesFromPost?.length > 0 && fileName) {
-      setSelectedFilesToDelete(prev => (prev ? `${prev},${fileName}` : fileName));
+      const fileToDelete = filesFromPost.find(file => file.url === fileName);
+      if (fileToDelete) {
+        setSelectedFilesToDelete(prev => [...prev, fileToDelete.url]);
+      }
     }
   };
 
@@ -75,11 +90,13 @@ const PostUploadArea = ({ onFilesChange, onClose, filesFromPost, onFilesDelete }
 
   useEffect(() => {
     if (filesFromPost?.length > 0) {
-      const initialPreviews = filesFromPost.map((file) => ({
-        file,
-        url: `${backendUrl}/${file.url}`,
-        type: guessFileType(file),
-      }));
+      const initialPreviews = filesFromPost.map((file) => (
+        {
+          file,
+          url: `${backendUrl}/${file.url}`,
+          type: guessFileType(file),
+        }
+      ));
       setPreviews(initialPreviews);
     }
   }, [filesFromPost]);

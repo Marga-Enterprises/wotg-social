@@ -102,7 +102,7 @@ const PostUploadArea = ({ onFilesChange, onClose, filesFromPost, onFilesDelete }
   }, [filesFromPost]);
 
   useEffect(() => {
-    if (selectedFilesToDelete) {
+    if (selectedFilesToDelete.length > 0) {
       onFilesDelete(selectedFilesToDelete);
     }
   }, [selectedFilesToDelete]);

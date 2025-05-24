@@ -209,7 +209,7 @@
   width: 100%;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 550px) {
   .worshipLink {
     display: none;
   }

@@ -2,6 +2,7 @@
   position: relative; /* Important for absolutely positioned children */
   display: flex;
   align-items: stretch;
+  margin-bottom: 5rem;
 }
 
 

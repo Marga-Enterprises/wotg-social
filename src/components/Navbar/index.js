@@ -60,7 +60,8 @@ function Navbar({ onToggleMenu }) {
     // detect if the device is android phone and IOS phones
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isMobile = isAndroid || isIOS;
+    const isFlutter =  window.flutter_inappwebview || window.flutterWebviewPlugin;
+    const isMobile = isAndroid || isIOS || isFlutter;
     
     if (isMobile) {
       navigate('/notifications');

@@ -50,7 +50,7 @@
 
 .controls .icon {
   margin: 0 0.6rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: #747070;
   cursor: pointer;
 }
@@ -132,25 +132,34 @@
   .volumeSlider {
     width: 100%;
   }
+
+  .progress {
+    margin-top: 0rem;
+  }
 }
 
 /* ✅ Responsive for small phones (≤480px) */
 @media (max-width: 480px) {
+  .musicControlsSection {
+    padding: 0.5rem;
+    gap: .2rem;
+  }
+
   .songTitle {
-    font-size: 0.85rem;
+    font-size: 0.60rem;
   }
 
   .songArtist {
-    font-size: 0.7rem;
+    font-size: 0.60rem;
   }
 
   .albumThumb {
-    width: 42px;
-    height: 42px;
+    width: 30px;
+    height: 30px;
   }
 
-  .controls .playButton {
-    font-size: 1.2rem;
+  .controls .icon {
+    font-size: 1rem;
   }
 
   .slider {

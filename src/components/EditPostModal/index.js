@@ -21,7 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 // utils
-import { uploadFileToSpaces } from '../../utils/methods.js';
+import { uploadFileToSpaces, convertImagetoWebp } from '../../utils/methods.js';
 
 const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
     const dispatch = useDispatch();
@@ -70,19 +70,18 @@ const EditPostModal = ({ user, onClose, onRefresh, postId }) => {
             if (files.length > 0) {
                 for (const file of files) {
                     try {
+                        const convertedFile = file.type.startsWith('image/') ? await convertImagetoWebp(file) : file;
+
                         const res = await dispatch(
                             wotgsocial.media.getPresignedUrlAction({
-                                fileName: file.name,
-                                fileType: file.type
+                                fileName: convertedFile.name,
+                                fileType: convertedFile.type
                             })
                         );
 
                         const { url, fileName } = res.data;
 
-                        await uploadFileToSpaces(file, url, (percent) => {
-                            // Optional: Track progress if needed
-                            console.log(`Upload progress for ${file.name}: ${percent}%`);
-                        });
+                        await uploadFileToSpaces(convertedFile, url);
 
                         const fileCategory = file.type.split('/')[0]; // "image", "video", "audio"
 

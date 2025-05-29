@@ -21,7 +21,7 @@ import {
  } from '@fortawesome/free-solid-svg-icons';
 
 // utils
-import { uploadFileToSpaces } from '../../utils/methods.js';
+import { uploadFileToSpaces, convertImagetoWebp } from '../../utils/methods.js';
 
 const NewPostModal = ({ user, onClose, onRefresh }) => {
     const dispatch = useDispatch();
@@ -35,7 +35,6 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
     const [showUploadArea, setShowUploadArea] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: "", type: "success" });
     const [files, setFiles] = useState([]);
-    const [uploadProgress, setUploadProgress] = useState({});
 
     const handleSubmitPost = useCallback(async () => {
         if (loadingRef.current) return;
@@ -48,18 +47,18 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
             if (files.length > 0) {
                 for (const file of files) {
                     try {
+                        const convertedFile = file.type.startsWith('image/') ? await convertImagetoWebp(file) : file;
+
                         const res = await dispatch(
                             wotgsocial.media.getPresignedUrlAction({
-                                fileName: file.name,
-                                fileType: file.type
+                                fileName: convertedFile.name,
+                                fileType: convertedFile.type
                             })
                         );
 
                         const { url, fileName } = res.data;
 
-                        await uploadFileToSpaces(file, url, (percent) => {
-                            setUploadProgress(prev => ({ ...prev, [file.name]: percent }));
-                        });
+                        await uploadFileToSpaces(convertedFile, url);
 
                         const fileCategory = file.type.split('/')[0]; // "image", "video", "audio"
 
@@ -72,8 +71,6 @@ const NewPostModal = ({ user, onClose, onRefresh }) => {
                     }
                 }
             }
-
-            console.log('🟢 Uploaded Files:', uploadedFiles);
 
             const payload = {
                 content,

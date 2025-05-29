@@ -35,7 +35,7 @@ const SharedPostPreview = ({ post }) => {
 
       {/* Shared Media */}
       {post.media?.length > 0 && (
-        <PostMediaGrid media={post.media} className={styles.sharedMediaGrid} />
+        <PostMediaGrid media={post.media} post={post} className={styles.sharedMediaGrid} />
       )}
     </div>
   );

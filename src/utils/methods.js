@@ -1,9 +1,7 @@
 import moment from 'moment';
 import axios from 'axios';
 import { useEffect } from 'react';
-
-
-const plainAxios = axios.create();
+import imageCompression from 'browser-image-compression';
 
 /**
  * convert object to query string
@@ -88,7 +86,7 @@ export const saveScrollPosition = (key = "bibleScrollY") => {
   sessionStorage.setItem(key, window.scrollY.toString());
 };
 
-export const uploadFileToSpaces = async (file, presignedUrl, onProgress) => {
+export const uploadFileToSpaces = async (file, presignedUrl) => {
   const isolatedAxios = axios.create(); // fresh instance
 
   return isolatedAxios.put(presignedUrl, file, {
@@ -98,12 +96,6 @@ export const uploadFileToSpaces = async (file, presignedUrl, onProgress) => {
     },
     maxContentLength: Infinity,
     maxBodyLength: Infinity,
-    onUploadProgress: (e) => {
-      if (onProgress && e.total) {
-        const percent = Math.round((e.loaded * 100) / e.total);
-        onProgress(percent);
-      }
-    },
     transformRequest: [(data, headers) => {
       // REMOVE all inherited headers — especially from axios.defaults or interceptors
       Object.keys(headers).forEach(key => delete headers[key]);
@@ -114,3 +106,32 @@ export const uploadFileToSpaces = async (file, presignedUrl, onProgress) => {
   });
 };
 
+export const convertImagetoWebp = async (file) => {
+  if (!file || !file.type.startsWith('image/')) {
+    throw new Error('File is not a valid image');
+  }
+
+  const options = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    fileType: 'image/webp',
+    initialQuality: 0.8,
+  };
+
+  try {
+    const compressedBlob = await imageCompression(file, options);
+
+    // Rename file to have .webp extension
+    const webpFileName = file.name.replace(/\.\w+$/, '.webp');
+    const webpFile = new File([compressedBlob], webpFileName, {
+      type: 'image/webp',
+      lastModified: Date.now(),
+    });
+
+    return webpFile;
+  } catch (error) {
+    console.error('Error compressing image:', error);
+    throw error;
+  }
+};

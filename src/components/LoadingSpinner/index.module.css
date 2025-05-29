@@ -10,7 +10,7 @@
     align-items: center;
     justify-content: center;
     background: linear-gradient(to right, #c0392b, #d46a5e, #f88658);
-    z-index: 5000;
+    z-index: 999999;
 }
 
 /* Spinner animation */

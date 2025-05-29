@@ -1,0 +1,82 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  /*381414*/
+  z-index: 9999;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overscroll-behavior: contain;
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  padding: 0;
+  gap: 0;
+}
+
+.modalHeader {
+  padding: 1rem .5rem 0 .5rem; 
+  font-size: .85rem;
+}
+
+.closeButton {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  border: none;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  color: rgb(134, 134, 134);
+  font-size: 26px;
+  font-weight: bold;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.closeIcon {
+  font-weight: bold;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.mediaContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mediaItem {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  background-color: #000;
+}
+
+.mediaImage,
+.mediaVideo {
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 60px); /* prevent overflow */
+  object-fit: contain;
+  border-radius: 0;
+  display: block;
+  background-color: #000;
+}

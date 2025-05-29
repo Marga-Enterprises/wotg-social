@@ -9,23 +9,25 @@ const PostMediaGrid = ({ media = [], post }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(null)
 
   const handleTouchStart = (e) => {
     touchStartY = e.touches[0].clientY;
   };
 
-  const handleTouchEnd = (e) => {
+  const handleTouchEnd = (e, index) => {
     const touchEndY = e.changedTouches[0].clientY;
     const deltaY = Math.abs(touchEndY - touchStartY);
 
     if (deltaY < 10) {
-      handleMediaClick(); // open modal
+      handleMediaClick(index); // pass clicked index
     }
   };
 
-  const handleMediaClick = () => {
+  const handleMediaClick = (index) => {
+    setActiveIndex(index);
     setIsOpen(true);
-  }
+  };
 
   useEffect(() => {
       // flutter check
@@ -64,15 +66,18 @@ const PostMediaGrid = ({ media = [], post }) => {
     <>
         <div 
           className={`${styles.mediaGrid} ${gridClass}`} 
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onClick={handleMediaClick}
         >
           {displayedMedia.map((item, index) => {
             const isLast = index === 3;
 
             return (
-              <div key={item.id || index} className={styles.mediaItem}>
+              <div 
+                key={index} 
+                className={styles.mediaItem}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={(e) => handleTouchEnd(e, index)}
+                onClick={() => handleMediaClick(index)}
+              >
                 {item.type === 'image' && (
                   <>
                     <img
@@ -101,6 +106,7 @@ const PostMediaGrid = ({ media = [], post }) => {
           <MediaModalSmallScreen
             media={media}
             post={post}
+            activeIndex={activeIndex}
             onClose={() => setIsOpen(false)}
           />
         )}

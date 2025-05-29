@@ -12,18 +12,29 @@ const MediaModalSmallScreen = ({ media, onClose, post, activeIndex }) => {
     const containerRef = useRef(null);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-        const target = mediaRefs.current[activeIndex];
+    const timeout = setTimeout(() => {
+        // Pause all background videos
+        const allVideos = document.querySelectorAll('video');
+            allVideos.forEach((video) => {
+            // Only pause videos not inside the modal
+            if (!containerRef.current?.contains(video)) {
+                video.pause();
+            }
+        });
 
-        if (target && containerRef.current) {
+        // Scroll to selected media
+        const target = mediaRefs.current[activeIndex];
+            if (target && containerRef.current) {
             target.scrollIntoView({
                 behavior: 'auto',
+                block: 'center',
             });
         }
-        }, 200); // slight delay ensures refs are mounted
+    }, 200); // slight delay ensures refs and DOM are ready
 
-        return () => clearTimeout(timeout);
+    return () => clearTimeout(timeout); // ✅ properly clear timeout
     }, [activeIndex]);
+
 
     return (
         <div className={styles.modalOverlay}>

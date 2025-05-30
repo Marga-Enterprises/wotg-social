@@ -29,8 +29,14 @@ export const SocketProvider = ({ children }) => {
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
-      console.log(`✅ Connected: ${newSocket.id}`);
-      newSocket.emit('join_room', account.id);
+      newSocket.emit('join_room', account.id, account.id);
+
+      newSocket.emit('add_user_id_to_online_users', {
+        userId: account.id,
+        fullName: `${account.user_fname} ${account.user_lname}`.trim(),
+        email: account.email,
+        socketId: newSocket.id,
+      });
     });
 
     newSocket.on('disconnect', () => {

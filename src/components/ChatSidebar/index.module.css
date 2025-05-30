@@ -93,6 +93,24 @@
   color: #c7080b;
 }
 
+.avatarWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.avatarOnlineDot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px; /* changed from left to right */
+  width: 15px;
+  height: 15px;
+  background-color: #00c853; /* Green */
+  border: 2px solid #fff; /* Match your app background */
+  border-radius: 50%;
+  z-index: 2;
+}
+
 .searchInput {
   width: 100%;
   padding: 5px;

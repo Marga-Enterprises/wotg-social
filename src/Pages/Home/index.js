@@ -424,6 +424,7 @@ const Page = ({ onToggleMenu  }) => {
                             currentUserId={user?.id}
                             onSearchChange={(query) => setSearchQuery(query)}
                             selectedChatroom={selectedChatroom}
+                            socket={socket}
                         />
                     </>
                 )}

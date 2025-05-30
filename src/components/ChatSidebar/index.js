@@ -3,6 +3,7 @@ import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { set } from 'lodash';
 
 const ChatSidebar = ({ 
   chatrooms, 
@@ -11,9 +12,11 @@ const ChatSidebar = ({
   currentUserId, 
   onSearchChange,
   selectedChatroom,
-  toggleMenu
+  toggleMenu,
+  socket
 }) => {
   const [maxLength, setMaxLength] = useState(100);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   const backendUrl = useMemo(() =>
     'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
@@ -40,6 +43,14 @@ const ChatSidebar = ({
     onSelectChatroom(chatId);
   };
   
+  // Check if the user is online (this could be replaced with actual online status logic)
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('online_users', (users) => {
+      setOnlineUsers(users);
+    });
+  }, [socket]); 
 
   return (
     <>
@@ -103,33 +114,26 @@ const ChatSidebar = ({
                       }}
                     >
                       {chat.Participants?.length === 2 ? (
-                        // Find the receiver (the participant who is NOT the current user)
                         chat.Participants.filter(participant => participant.user.id !== currentUserId)
                           .map((participant, index) => {
-                            if (participant.user.user_profile_picture) {
-                              return (
+                            const isOnline = onlineUsers.some(u => u.id === participant.user.id);
+                            return (
+                              <div key={index} className={styles.avatarWrapper}>
                                 <img
                                   loading="lazy"
-                                  key={index}
-                                  src={`${backendUrl}/${participant.user.user_profile_picture}`}
+                                  src={
+                                    participant.user.user_profile_picture
+                                      ? `${backendUrl}/${participant.user.user_profile_picture}`
+                                      : `https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon`
+                                  }
                                   alt={participant.user.user_fname}
                                   className={styles.avatarImage}
                                 />
-                              );
-                            } else {
-                              return (
-                                <img
-                                  loading="lazy"
-                                  key={index}
-                                  src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
-                                  alt={participant.user.user_fname}
-                                  className={styles.avatarImage}
-                                />
-                              );
-                            }
+                                {isOnline && <span className={styles.avatarOnlineDot} />}
+                              </div>
+                            );
                           })
                       ) : (
-                        // If it's a group chat (more than 2 participants), show the chat name's first letter
                         <span className={styles.avatarText}>
                           {chat.name ? chat.name.charAt(0).toUpperCase() : 'A'}
                         </span>
@@ -146,8 +150,11 @@ const ChatSidebar = ({
                         ? chat.Participants.filter(
                             (participant) => participant.user.id !== currentUserId
                           ).map((participant, index) => (
-                            <span key={index}>
+                            <span key={index} className={styles.chatUserName}>
                               {`${participant.user.user_fname} ${participant.user.user_lname}`}
+                              {onlineUsers.some((u) => u.id === participant.user.id) && (
+                                <span className={styles.onlineDot} title="Online"></span>
+                              )}
                             </span>
                           ))
                         : chat.name || "Unnamed Chat"}

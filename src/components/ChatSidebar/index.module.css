@@ -48,15 +48,6 @@
   font-weight: bolder;
 }
 
-.newChatButton {
-  background-color: transparent;
-  color: #ff4d4f;
-  border: none;
-  border-radius: 100%;
-  cursor: pointer;
-  font-size: 1.5rem;
-}
-
 .menuButton {
   display: none;
   background-color: transparent;
@@ -68,15 +59,15 @@
 }
 
 .worshipLink {
-  color: #ff4d4f;
-  font-weight: 500;
+  color: #b43436;
+  font-weight: 600;
   margin-right: 10px;
   transition: color .5s ease;
 }
 
 .worshipLink:hover {
-  color: #e21316;
-  font-weight: 600;
+  color: #c7080b;
+  font-weight: 700;
 }
 
 .headerIcon {
@@ -89,8 +80,17 @@
   width : 1.8rem;
 }
 
+.newChatButton {
+  background-color: transparent;
+  color: #b43436;
+  border: none;
+  border-radius: 100%;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
 .newChatButton:hover {
-  color: #e21316;
+  color: #c7080b;
 }
 
 .searchInput {

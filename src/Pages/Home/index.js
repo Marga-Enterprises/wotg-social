@@ -176,6 +176,44 @@ const Page = ({ onToggleMenu  }) => {
         [dispatch, isAuthenticated, searchQuery] // Add searchQuery as a dependency
     );    
 
+    const handleNewMessage = useCallback((message) => {
+        if (message.chatroomId !== selectedChatroom) return;
+
+        setMessages((prevMessages) => {
+            const updatedMessages = [message, ...prevMessages].sort((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            return updatedMessages;
+        });
+
+        setChatrooms((prevChatrooms) => {
+            const updated = prevChatrooms.map((chat) => {
+                if (chat.id !== message.chatroomId) return chat;
+
+                const isUnread = message.senderId !== user?.id;
+                return {
+                    ...chat,
+                    RecentMessage: message,
+                    unreadCount: isUnread ? (chat.unreadCount || 0) + 1 : chat.unreadCount || 0,
+                    hasUnread: chat.hasUnread || isUnread,
+                };
+            });
+
+            return updated.sort((a, b) =>
+                new Date(b.RecentMessage?.createdAt || 0) - new Date(a.RecentMessage?.createdAt || 0)
+            );
+        });
+
+        if (message.senderId !== user?.id) {
+            const now = Date.now();
+            if (now - lastPlayedRef.current > 1000) {
+                messageSound.play();
+                lastPlayedRef.current = now;
+            }
+        }
+    }, [selectedChatroom, user?.id]);
+
+
     // Fetch chatrooms on component mount
     useEffect(() => {
         if (isAuthenticated) {
@@ -221,52 +259,13 @@ const Page = ({ onToggleMenu  }) => {
     // Listen for new messages in real-time
     useEffect(() => {
         if (!socket) return;
-      
-        const handleNewMessage = (message) => {
-          console.log('New message received:', message);
-          setMessages((prevMessages) => {
-            const updatedMessages = [message, ...prevMessages].sort((a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-            return updatedMessages;
-          });
-      
-          setChatrooms((prevChatrooms) => {
-            const updated = prevChatrooms.map((chat) => {
-              if (chat.id !== message.chatroomId) return chat;
-      
-              const isUnread = message.senderId !== user?.id;
-              return {
-                ...chat,
-                RecentMessage: message,
-                unreadCount: isUnread ? (chat.unreadCount || 0) + 1 : chat.unreadCount || 0,
-                hasUnread: chat.hasUnread || isUnread,
-              };
-            });
-      
-            return updated.sort((a, b) =>
-              new Date(b.RecentMessage?.createdAt || 0) - new Date(a.RecentMessage?.createdAt || 0)
-            );
-          });
-      
-
-          if (
-            message.senderId !== user?.id
-          ) {
-            const now = Date.now();
-            if (now - lastPlayedRef.current > 1000) {
-                messageSound.play();
-                lastPlayedRef.current = now;
-            }
-          }
-        };
-      
         socket.on('new_message', handleNewMessage);
-      
+
         return () => {
-          socket.off('new_message', handleNewMessage);
+            socket.off('new_message', handleNewMessage);
         };
-    }, [socket]);      
+    }, [socket, handleNewMessage]);
+     
     
     useEffect(() => {
         if (!socket) return;
@@ -360,7 +359,6 @@ const Page = ({ onToggleMenu  }) => {
     
     // Handle sending a message
     const handleSendMessage = async (messageContent, selectedFile) => {
-        console.log('Sending message:', messageContent, selectedFile);
         if (!selectedChatroom || !user) return;
       
         // 1. If file exists, send file first

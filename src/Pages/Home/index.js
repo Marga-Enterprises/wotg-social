@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 // Components
 import ChatSidebar from '../../components/ChatSidebar';
 import ChatWindow from '../../components/ChatWindow';
-import ProfileSidebar from '../../components/ProfileSidebar';
+// import ProfileSidebar from '../../components/ProfileSidebar';
 import ProfileModal from '../../components/ProfileModal';
 import ChatRoomCreateForm from '../../components/ChatRoomCreateForm';
 import styles from './index.module.css';
@@ -121,9 +121,9 @@ const Page = ({ onToggleMenu  }) => {
         setIsModalOpenForAddParticipant(true);
     };
 
-    const handleOpenProfileModal = () => {
+    /*const handleOpenProfileModal = () => {
         setIsProfileModalOpen(true);
-    };
+    };*/
     
     // Function to close the modal
     const handleCloseCreateChatroomModal = () => {
@@ -223,6 +223,7 @@ const Page = ({ onToggleMenu  }) => {
         if (!socket) return;
       
         const handleNewMessage = (message) => {
+          console.log('New message received:', message);
           setMessages((prevMessages) => {
             const updatedMessages = [message, ...prevMessages].sort((a, b) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -272,7 +273,7 @@ const Page = ({ onToggleMenu  }) => {
     
         // Listen for new chatroom event
         socket.on('new_chatroom', (newChatroom) => {
-            // Check if the current user is a participant in the new chatroom
+            socket.emit('join_room', newChatroom.id); // Join the new chatroom
             const isCurrentUserParticipant = newChatroom.Participants?.some(
                 (participant) => participant.userId.toString() === user?.id.toString()
             );
@@ -378,7 +379,6 @@ const Page = ({ onToggleMenu  }) => {
             if (fileRes) {
               const { content, senderId, chatroomId } = fileRes.data;
               if (socket) {
-                console.log('TESTTTTTTTTT');
                 socket.emit('new_message', {
                   content,
                   senderId,
@@ -417,7 +417,7 @@ const Page = ({ onToggleMenu  }) => {
             <div className={styles.customLayoutContainer}>
                 {isAuthenticated && (isMobile ? !isChatVisible : true) && (
                     <>
-                        <ProfileSidebar onOpenProfileModal={handleOpenProfileModal}/>
+                        {/*<ProfileSidebar onOpenProfileModal={handleOpenProfileModal}/>*/}
                         <ChatSidebar 
                             chatrooms={chatrooms}
                             toggleMenu={onToggleMenu} 

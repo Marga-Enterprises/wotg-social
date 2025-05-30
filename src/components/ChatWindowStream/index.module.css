@@ -43,13 +43,13 @@
 .messageBubble {
   max-width: 70%; /* Limit the width of messages */
   padding: 8px 16px;
-  border-radius: 1rem;
+  border-radius: 2rem;
   font-size: 16px;
   line-height: 1.5;
 }
 
 .senderBubble {
-  background: #17bfdd;
+  background: #ff4d4f;
   color: #fff;
   text-align: end;
 }
@@ -105,8 +105,8 @@
 }
 
 .messageTextarea:focus {
-  border-color: #007bff; /* Highlighted border color */
-  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5); /* Optional glow effect */
+  border-color: #a02626; /* Highlighted border color */
+  box-shadow: 0 0 3px rgba(190, 19, 19, 0.5); /* Optional glow effect */
 }
 
 .emojiButton {
@@ -121,7 +121,7 @@
 }
 
 .emojiButton:hover {
-  color: #007bff; /* Highlighted color */
+  color: #8f2c2e; /* Highlighted color */
 }
 
 .emojiPickerContainer {
@@ -266,7 +266,7 @@
 .sendIcon {
   width: 24px;
   height: 24px;
-  color: #17bfdd;
+  color: #ff4d4f;
 }
 
 .messageReactIcon {
@@ -282,7 +282,7 @@
   width: 24px;
   height: 24px;
   margin-left: .5rem;
-  color: #17bfdd;
+  color: #ff4d4f;
 }
 
 .chatHeader {
@@ -318,7 +318,7 @@
 .backIcon {
   width: 24px;
   height: 24px;
-  color: #17bfdd;
+  color: #ff4d4f;
 }
 
 .chatNameHeader {

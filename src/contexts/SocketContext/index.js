@@ -42,6 +42,8 @@ export const SocketProvider = ({ children }) => {
       try {
         const res = await dispatch(wotgsocial.chatroom.getAllChatroomsAction());
         if (res.success && Array.isArray(res.data)) {
+          console.log('[[[[[[[[[Joining chatrooms]]]]]]]]]:', res.data);
+
           res.data.forEach(chatroom => {
             newSocket.emit('join_room', chatroom.id);
           });

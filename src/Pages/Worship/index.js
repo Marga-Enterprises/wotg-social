@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { io } from 'socket.io-client';
+import { useState, useEffect, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 import styles from './index.module.css';

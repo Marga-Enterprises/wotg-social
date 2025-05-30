@@ -198,8 +198,8 @@
             {!isSender && (
               <img
                 loading="lazy"
-                src={receiver?.user?.user_profile_picture
-                  ? `${backendUrl}/${receiver.user.user_profile_picture}`
+                src={receiver?.user_profile_picture
+                  ? `${backendUrl}/${receiver.user_profile_picture}`
                   : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
                 alt={receiver?.user?.user_fname || "User Avatar"}
                 className={styles.receiverAvatar}

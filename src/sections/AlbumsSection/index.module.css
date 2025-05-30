@@ -71,12 +71,19 @@
   font-optical-sizing: auto;
   font-style: normal;
   color: #111;
-  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .albumMeta {
   font-size: 0.8rem;
   color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .scrollButton {

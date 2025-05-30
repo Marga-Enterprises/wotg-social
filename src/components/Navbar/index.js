@@ -108,7 +108,7 @@ function Navbar({ onToggleMenu }) {
       <div className={styles.logo}>
         <img
           key={Date.now()}
-          src="https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotg-logo.webp"
+          src="https://wotg.sgp1.cdn.digitaloceanspaces.com/images/WOTG_logo2.webp"
           alt="WOTG Logo"
         />
       </div>

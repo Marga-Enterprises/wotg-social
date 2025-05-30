@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: space-between;
     background-color: rgb(197, 31, 31); /* Navbar color */
-    padding: 10px 20px;
+    padding: 0 20px;
     position: fixed;
     top: 0;
     left: 0;
@@ -17,7 +17,7 @@
 }
 
 .logo img {
-    height: 40px;
+    height: 3.5rem;
     width: auto;
 }
 

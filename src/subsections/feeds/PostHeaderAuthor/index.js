@@ -7,7 +7,7 @@ import { convertMomentWithFormatWhole } from '../../../utils/methods';
 
 import PostMenu from '../../../components/PostMenu';
 
-const PostAuthorHeader = ({ author, createdAt, postId, userId, onRefresh }) => {
+const PostAuthorHeader = ({ author, createdAt, postId, userId, onRefresh, color }) => {
   const avatar = author?.user_profile_picture || 'profile_place_holder.webp';
   const fullName = `${author?.user_fname || ''} ${author?.user_lname || ''}`;
   const formattedDate = convertMomentWithFormatWhole(createdAt);
@@ -22,8 +22,18 @@ const PostAuthorHeader = ({ author, createdAt, postId, userId, onRefresh }) => {
         className={styles.avatar}
       />
       <div className={styles.authorInfo}>
-        <div className={styles.authorName}>{fullName}</div>
-        <div className={styles.timestamp}>{formattedDate}</div>
+        <div 
+          className={styles.authorName}
+          style={{ color: color || '#1c1e21' }}
+        >
+          {fullName}
+        </div>
+        <div 
+          className={styles.timestamp}
+          style={{ color: color || '#606770' }}  
+        >
+          {formattedDate}
+        </div>
       </div>
 
       { userId === author?.id && (

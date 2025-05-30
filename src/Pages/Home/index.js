@@ -177,15 +177,6 @@ const Page = ({ onToggleMenu  }) => {
     );    
 
     const handleNewMessage = useCallback((message) => {
-        if (message.chatroomId !== selectedChatroom) return;
-
-        setMessages((prevMessages) => {
-            const updatedMessages = [message, ...prevMessages].sort((a, b) =>
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
-            return updatedMessages;
-        });
-
         setChatrooms((prevChatrooms) => {
             const updated = prevChatrooms.map((chat) => {
                 if (chat.id !== message.chatroomId) return chat;
@@ -211,6 +202,15 @@ const Page = ({ onToggleMenu  }) => {
                 lastPlayedRef.current = now;
             }
         }
+
+        if (message.chatroomId !== selectedChatroom) return;
+
+        setMessages((prevMessages) => {
+            const updatedMessages = [message, ...prevMessages].sort((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            return updatedMessages;
+        });
     }, [selectedChatroom, user?.id]);
 
 

@@ -48,6 +48,7 @@ const Page = ({ onToggleMenu  }) => {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
     const [uploading, setUploading] = useState(false);
+    const [onlineUsers, setOnlineUsers] = useState([]);
 
     const setHideNavbar = useSetHideNavbar();
 
@@ -112,6 +113,14 @@ const Page = ({ onToggleMenu  }) => {
       
         return () => socket.off("new_message_reaction", handleNewReaction);
     }, [socket, user?.id]);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.on('online_users', (users) => {
+            setOnlineUsers(users);
+        });
+    }, [socket]); 
       
     const handleOpenCreateChatroomModal = () => {
         setIsModalOpen(true);
@@ -424,7 +433,7 @@ const Page = ({ onToggleMenu  }) => {
                             currentUserId={user?.id}
                             onSearchChange={(query) => setSearchQuery(query)}
                             selectedChatroom={selectedChatroom}
-                            socket={socket}
+                            onlineUsers={onlineUsers}
                         />
                     </>
                 )}
@@ -442,6 +451,7 @@ const Page = ({ onToggleMenu  }) => {
                         onMessageReaction={handleReactMessage}
                         onOpenAddParticipantModal={handleOpenAddParticipantModal}
                         userDetails={user}
+                        onlineUsers={onlineUsers}
                     />
                 )}
 

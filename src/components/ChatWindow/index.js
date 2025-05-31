@@ -23,7 +23,8 @@
     onOpenAddParticipantModal, 
     onMessageReaction, 
     userDetails,
-    uploading
+    uploading,
+    onlineUsers
   }) => {
 
     const backendUrl = useMemo(() =>
@@ -381,30 +382,41 @@
                         {selectedChatroomDetails?.Participants?.length === 2 ? (
                           // Find the receiver (the participant who is NOT the current user)
                           selectedChatroomDetails.Participants.filter(participant => participant?.user.id !== userId)
-                            .map((participant, index) => {
-                              return participant.user.user_profile_picture ? (
+                          .map((participant, index) => {
+                            const isOnline = onlineUsers.some(u => u.id === participant.user.id);
+                            const handleClick = () => {
+                              if (selectedChatroomDetails?.Participants?.length !== 2) {
+                                onOpenAddParticipantModal();
+                              }
+                            };
+
+                            return (
+                              <div key={index} className={styles.avatarWrapperWithDot}>
                                 <img
                                   loading="lazy"
-                                  key={index}
-                                  onClick={onOpenAddParticipantModal}
-                                  src={`${backendUrl}/${participant.user.user_profile_picture}`}
+                                  onClick={handleClick}
+                                  src={
+                                    participant.user.user_profile_picture
+                                      ? `${backendUrl}/${participant.user.user_profile_picture}`
+                                      : `https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon`
+                                  }
                                   alt={participant.user.user_fname}
                                   className={styles.avatarImage}
                                 />
-                              ) : (
-                                <img
-                                  key={index}
-                                  loading="lazy"
-                                  onClick={onOpenAddParticipantModal}
-                                  src={`https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon&quot`}
-                                  alt={participant.user.user_fname}
-                                  className={styles.avatarImage}
-                                />
-                              );
-                            })
+                                {isOnline && <div className={styles.avatarOnlineDot} />}
+                              </div>
+                            );
+                          })
                         ) : (
                           // If it's a group chat (more than 2 participants), show the chat name's first letter
-                          <span onClick={onOpenAddParticipantModal} className={styles.avatarText}>
+                          <span 
+                            onClick={() => {
+                              if (selectedChatroomDetails?.Participants?.length !== 2) {
+                                onOpenAddParticipantModal();
+                              }
+                            }} 
+                            className={styles.avatarText}
+                          >
                             {selectedChatroomDetails?.name ? selectedChatroomDetails.name.charAt(0).toUpperCase() : 'A'}
                           </span>
                         )}
@@ -415,11 +427,21 @@
                         {selectedChatroomDetails?.Participants?.length === 2
                           ? selectedChatroomDetails.Participants.filter(
                               (participant) => participant?.user.id !== userId
-                            ).map((participant, index) => (
-                              <span key={index}>
-                                {`${participant.user.user_fname} ${participant.user.user_lname}`}
-                              </span>
-                            ))
+                            ).map((participant, index) => {
+                              const isOnline = onlineUsers.some(u => u.id === participant.user.id);
+
+                              return (
+                                <div key={index}>
+                                  <span>
+                                    {`${participant.user.user_fname} ${participant.user.user_lname}`}
+                                  </span>
+
+                                  <span className={styles.status}>
+                                    {` - ${isOnline ? 'Active Now' : 'Offline'}`}
+                                  </span>
+                                </div>
+                              )
+                            })
                           : selectedChatroomDetails?.name || ''}
                       </p>
                     </div>

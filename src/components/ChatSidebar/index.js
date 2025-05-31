@@ -3,7 +3,6 @@ import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
-import { set } from 'lodash';
 
 const ChatSidebar = ({ 
   chatrooms, 
@@ -13,10 +12,9 @@ const ChatSidebar = ({
   onSearchChange,
   selectedChatroom,
   toggleMenu,
-  socket
+  onlineUsers,
 }) => {
   const [maxLength, setMaxLength] = useState(100);
-  const [onlineUsers, setOnlineUsers] = useState([]);
 
   const backendUrl = useMemo(() =>
     'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
@@ -41,16 +39,7 @@ const ChatSidebar = ({
 
   const handleChatSelection = (chatId) => {
     onSelectChatroom(chatId);
-  };
-  
-  // Check if the user is online (this could be replaced with actual online status logic)
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on('online_users', (users) => {
-      setOnlineUsers(users);
-    });
-  }, [socket]); 
+  }; 
 
   return (
     <>

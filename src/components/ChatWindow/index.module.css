@@ -29,7 +29,39 @@
   justify-content: flex-start; /* Ensure messages stay at the bottom */
 }
 
+.avatarWrapper {
+  position: relative;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
 
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+}
+
+.avatarOnlineDot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  background-color: #00c853;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  z-index: 2;
+}
 
 .messageSender {
   display: flex;
@@ -367,23 +399,41 @@
 }
 
 .chatAvatar {
-  width: 2rem;
-  height: 2rem;
+  min-width: 2.5rem;
+  max-width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 100%;
+  border-radius: 50%;
   margin-right: 10px;
   cursor: pointer;
 }
 
-.avatarImage {
-  width: 100%;
-  height: 100%;
-  border-radius: 100%;
-  object-fit: cover;
-  border: 1px solid #dddada;
+.status {
+  font-weight: 400;
+  color: #8b8b8b;
 }
+
+.avatarWrapperWithDot {
+  position: relative;
+  min-width: 2.5rem;
+  max-width: 2.5rem;
+  height: 2.5rem;
+}
+
+.avatarOnlineDot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background-color: #00c853;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  z-index: 2;
+}
+
 
 .avatarText {
   color: #fff;

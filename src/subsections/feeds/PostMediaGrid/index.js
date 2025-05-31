@@ -3,8 +3,9 @@ import styles from './index.module.css';
 
 // components
 import MediaModalSmallScreen from '../../../components/MediaModalSmallScreen';
+import MediaModalBigScreen from '../../../components/MediaModalBigScreen';
 
-const PostMediaGrid = ({ media = [], post }) => {
+const PostMediaGrid = ({ media = [], post, user, socket }) => {
   let touchStartY = 0;
 
   const [isOpen, setIsOpen] = useState(false);
@@ -108,6 +109,17 @@ const PostMediaGrid = ({ media = [], post }) => {
             post={post}
             activeIndex={activeIndex}
             onClose={() => setIsOpen(false)}
+          />
+        )}
+
+        {isOpen && !isMobile && (
+          <MediaModalBigScreen
+            media={media}
+            post={post}
+            activeIndex={activeIndex}
+            onClose={() => setIsOpen(false)}
+            user={user}
+            socket={socket}
           />
         )}
     </>

@@ -21,7 +21,7 @@ const PostCard = ({ post, userId, triggerRefresh, socket, user, showSummaryAndAc
 
       {post.original_post && <SharedPostPreview post={post.original_post} />}
       {post.content && <ExpandableText text={post.content} className={styles.sharedText} />}
-      {post.media?.length > 0 && <PostMediaGrid media={post.media} post={post} />}
+      {post.media?.length > 0 && <PostMediaGrid media={post.media} post={post} user={user} socket={socket} />}
 
       {showSummaryAndActions && (
         <>

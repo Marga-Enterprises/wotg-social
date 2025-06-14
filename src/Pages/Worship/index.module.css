@@ -2,7 +2,7 @@
 .container {
   display: flex;
   width: 100%;
-  height: 93.7svh;
+  height: 93.9svh;
   margin-top: 3.5rem;
   background-color: #121212; /* Dark mode background */
 }
@@ -11,7 +11,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 93.5svh;
   background-color: #121212; /* Dark mode background */
 }
 

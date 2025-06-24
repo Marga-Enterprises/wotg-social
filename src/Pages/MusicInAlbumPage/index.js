@@ -34,6 +34,7 @@ const AlbumDetailsPage = () => {
   const [album, setAlbum] = useState(null);
   const [musics, setMusics] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
   const [pageDetails, setPageDetails] = useState({
     totalRecords: 0,
     pageIndex: currentPage,
@@ -47,11 +48,12 @@ const AlbumDetailsPage = () => {
     if (res.success) setAlbum(res.data);
   }, [dispatch, id]);
 
-  const fetchMusics = useCallback(async () => {
+  const fetchMusics = useCallback(async (search) => {
     const res = await dispatch(
       wotgsocial.music.getMusicByParamsAction({
         albumId: id,
         pageSize: 50,
+        search: search || "",
         pageIndex: currentPage,
         order: "createdAt",
       })
@@ -65,6 +67,15 @@ const AlbumDetailsPage = () => {
       });
     }
   }, [dispatch, id, currentPage]);
+
+  const handleSearch = useCallback((searchTerm) => {
+    fetchMusics(searchTerm);
+  }, [fetchMusics]);
+
+  const handleResetSearch = useCallback(() => {
+    setSearch("");
+    fetchMusics("");
+  }, [fetchMusics]);
 
   const handleFetchDetails = useCallback(async () => {
     if (loadingRef.current) return;
@@ -105,9 +116,6 @@ const AlbumDetailsPage = () => {
     dispatch(wotgsocial.musicPlayer.setTrackList(musics));
     const meta = { source: "album", albumCover: album?.cover_image };
     const selected = musics.find((t) => t.id === trackId);
-
-    console.log("[[[[[[[[Selected track:]]]]]]]]", selected);
-    console.log('[[[[[[[[[[[[[[[META]]]]]]]]]]]]]]]', meta);
     dispatch(wotgsocial.musicPlayer.setCurrentTrack({ ...selected, ...meta }));
     dispatch(wotgsocial.musicPlayer.setIsPlaying(true));
   };
@@ -154,6 +162,35 @@ const AlbumDetailsPage = () => {
               </button>
             )}
           </div>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();        // Prevent default form submission
+              handleSearch(search);      // Call your search function
+            }}
+            className={styles.searchContainer}
+          >
+            <input
+              type="text"
+              placeholder="Search tracks..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className={styles.searchInput}
+            />
+            <button
+              type="submit"
+              className={styles.searchButton}
+            >
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={handleResetSearch}
+              className={styles.resetButton}
+            >
+              Reset
+            </button>
+          </form>
 
           <div className={styles.trackList}>
             <div className={styles.trackListHeader}>

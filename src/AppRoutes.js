@@ -55,7 +55,7 @@ function AppRoutes() {
 
   return (
     <div className="grid-container">
-      {!hideNavbar && token && <Navbar onToggleMenu={() => setMenuOpen(true)} />}
+      {!hideNavbar && <Navbar onToggleMenu={() => setMenuOpen(true)} />}
 
       <AnimatePresence>
         {menuOpen && <BurgerMenu onClose={() => setMenuOpen(false)} />}
@@ -64,7 +64,7 @@ function AppRoutes() {
       <main>
         <Routes>
           <Route path="/" element={<AuthRouter><Home onToggleMenu={() => setMenuOpen(true)} /></AuthRouter>} />
-          <Route path="/worship" element={<AuthRouter><Worship /></AuthRouter>} />
+          <Route path="/worship" element={<Worship />} />
           <Route path="/menu" element={<AuthRouter><Menu /></AuthRouter>} />
           <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
           <Route path="/bible" element={<AuthRouter><Bible /></AuthRouter>} />

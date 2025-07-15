@@ -75,14 +75,12 @@ const Page = () => {
   }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(wotgsocial.worship.getWorshipServiceAction()).then((res) => {
-        if (res.success) {
-          setVideoId(res.data.videoId); // Store video ID dynamically
-        }
-      });
-    }
-  }, [dispatch, isAuthenticated]);
+    dispatch(wotgsocial.worship.getWorshipServiceAction()).then((res) => {
+      if (res.success) {
+        setVideoId(res.data.videoId); // Store video ID dynamically
+      }
+    });
+  }, [dispatch]);
   
 
   // Fetch messages when chatroom changes
@@ -266,7 +264,7 @@ const Page = () => {
         {/*<div className={styles.overlay}/>*/}
 
         {/* Chat Window at the Bottom */}
-        {isAuthenticated && wotglivechatroom && (
+        {isAuthenticated && wotglivechatroom ? (
           <div className={styles.chatSection}>
             <ChatWindowStream
               messages={messages}
@@ -280,6 +278,12 @@ const Page = () => {
               reactions={reactions}
               uploading={uploading}
             />
+          </div>
+        ) : (
+          <div className={`${styles.chatSection} ${styles.chatFallback}`}>
+            <p className={styles.chatMessagePrompt}>
+              <a href="/login" className={styles.chatMessageLink}>Sign in here</a> to see Stream Messages.
+            </p>
           </div>
         )}
 

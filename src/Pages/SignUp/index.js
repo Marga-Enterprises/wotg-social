@@ -9,9 +9,13 @@ import styles from './index.module.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
+// context
+import { useSetHideNavbar } from "../../contexts/NavbarContext";
+
 const Page = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const setHideNavbar = useSetHideNavbar();
 
     // Form state management
     const [firstName, setFirstName] = useState('');
@@ -64,6 +68,11 @@ const Page = () => {
             navigate('/menu');
         }
     }, [navigate]);
+
+    useEffect(() => {
+        setHideNavbar(true);
+        return () => setHideNavbar(false);
+    }, [setHideNavbar]);
 
     return (
         <div className={styles.container}>

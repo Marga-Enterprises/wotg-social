@@ -9,6 +9,9 @@ import styles from "./index.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
+// context
+import { useSetHideNavbar } from "../../contexts/NavbarContext";
+
 const Page = () => {
   const {
     ui: { loading },
@@ -16,6 +19,7 @@ const Page = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const setHideNavbar = useSetHideNavbar();
 
   // ✅ State Optimized
   const [email, setEmail] = useState("");
@@ -62,6 +66,11 @@ const Page = () => {
     const token = Cookies.get("token");
     if (token) navigate("/menu");
   }, [navigate]);
+
+  useEffect(() => {
+      setHideNavbar(true);
+      return () => setHideNavbar(false);
+  }, [setHideNavbar]);
 
   return (
     <div className={styles.container}>

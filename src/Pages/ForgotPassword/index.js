@@ -6,6 +6,9 @@ import Cookies from 'js-cookie';
 import styles from './index.module.css';
 import LoadingSpinner from "../../components/LoadingSpinner";
 
+// context
+import { useSetHideNavbar } from "../../contexts/NavbarContext";
+
 const Page = () => {
     const {
         ui: { loading },
@@ -13,6 +16,7 @@ const Page = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const setHideNavbar = useSetHideNavbar();
 
     const [email, setEmail] = useState('');
     const [errMsg, setErrMsg] = useState('');
@@ -52,6 +56,11 @@ const Page = () => {
             navigate('/menu');
         }
     }, [navigate]);
+
+    useEffect(() => {
+        setHideNavbar(true);
+        return () => setHideNavbar(false);
+    }, [setHideNavbar]);
 
     return (
         <>

@@ -27,6 +27,7 @@ function Navbar({ onToggleMenu }) {
 
   // parse
   const account = Cookies.get('account');
+  const isAuthenticated = Cookies.get('authenticated') === 'true';
   const parsedAccount = account ? JSON.parse(account) : null;
 
   // Fetch notifications from server
@@ -114,13 +115,26 @@ function Navbar({ onToggleMenu }) {
       </div>
 
       <div className={styles.navLinks}>
-        <Link to="/" className={styles.navLink}>Chat</Link>
-        <Link to="/blogs" className={styles.navLink}>Devotion</Link>
-        <Link to="/bible" className={styles.navLink}>Bible</Link>
-        <Link to="/your-journals" className={styles.navLink}>Journal</Link>
-        <Link to="/music" className={styles.navLink}>Music</Link>
-        <Link to="/worship" className={styles.navLink}>Worship</Link>
-        <Link to="/feeds" className={styles.navLink}>Feeds</Link>
+
+        { isAuthenticated && (
+          <>
+            <Link to="/" className={styles.navLink}>Chat</Link>
+            <Link to="/blogs" className={styles.navLink}>Devotion</Link>
+            <Link to="/bible" className={styles.navLink}>Bible</Link>
+            <Link to="/your-journals" className={styles.navLink}>Journal</Link>
+            <Link to="/music" className={styles.navLink}>Music</Link>
+            <Link to="/worship" className={styles.navLink}>Worship</Link>
+            <Link to="/feeds" className={styles.navLink}>Feeds</Link>
+          </>
+        )}
+        
+        { !isAuthenticated && (
+          <>
+            <Link to="/login" className={styles.navLink}>Sign In</Link>
+            <Link to="/register" className={styles.navLink}>Sign Up</Link>
+          </>
+        )}
+
         <a
           href="https://wotgonline.com/donate/"
           target="_blank"
@@ -130,20 +144,22 @@ function Navbar({ onToggleMenu }) {
           Partner
         </a>
 
-        <div className={styles.notificationWrapper}>
-          <FontAwesomeIcon
-            icon={faBell}
-            size="2x"
-            className={styles.headerIcon}
-            onClick={handleNotificationClick}
-          />
-          {unreadCount > 0 && (
-            <span className={styles.unreadBadge}>
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </div>
-
+        { isAuthenticated && (
+          <div className={styles.notificationWrapper}>
+            <FontAwesomeIcon
+              icon={faBell}
+              size="2x"
+              className={styles.headerIcon}
+              onClick={handleNotificationClick}
+            />
+            {unreadCount > 0 && (
+              <span className={styles.unreadBadge}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </div>
+        )}
+        
         {notificationsMounted && (
           <Notifications
             notifList={notifList}
@@ -155,12 +171,14 @@ function Navbar({ onToggleMenu }) {
           />
         )}
 
-        <FontAwesomeIcon
-          icon={faRightFromBracket}
-          size="2x"
-          className={styles.headerIcon}
-          onClick={handleSignOut}
-        />
+        { isAuthenticated && (
+          <FontAwesomeIcon
+            icon={faRightFromBracket}
+            size="2x"
+            className={styles.headerIcon}
+            onClick={handleSignOut}
+          />
+        )}
       </div>
 
       <div className={styles.navLinks1}>

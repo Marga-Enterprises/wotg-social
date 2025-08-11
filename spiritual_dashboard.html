@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>WOTG - Your Spiritual Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    <style>
+        /* MOBILE-FIRST COLOR SCHEME */
+        :root {
+            --brand: #c81e1e;          /* primary red */
+            --brand-700: #b91c1c;      /* deeper red */
+            --brand-50: #fff4f2;       /* soft tint */
+            --ink: #111827;            /* text */
+            --muted: #6b7280;          /* secondary text */
+            --bg: #faf6f3;             /* parchment background */
+            --card: #ffffff;           /* white cards */
+            --radius: 18px;            /* rounded corners */
+            --shadow: 0 10px 30px rgba(17, 24, 39, .08);
+            --tap: 56px;               /* min tap target for mobile */
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        * { box-sizing: border-box; }
+        
+        html, body { 
+            height: 100%; 
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* MOBILE FRAME */
+        .mobile-frame {
+            max-width: 420px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #fff, var(--bg) 220px);
+            min-height: 100dvh;
+            padding-bottom: 120px;
+            position: relative;
+        }
+
+        /* STICKY HEADER WITH STREAK */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--brand);
+            color: #fff;
+            box-shadow: var(--shadow);
+            padding: 12px 16px calc(12px + env(safe-area-inset-top)) 16px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-mark {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .welcome-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .welcome-text small {
+            opacity: 0.85;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .streak-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .streak-number {
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .streak-fire {
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            padding: 16px;
+        }
+
+        /* DYNAMIC VERSE BANNER */
+        .verse-banner {
+            background: linear-gradient(120deg, rgba(200,30,30,.85), rgba(185,28,28,.85)), 
+                        url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=1200&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply;
+            color: #fff;
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verse-content h2 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .verse-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            opacity: 0.98;
+        }
+
+        .verse-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--brand);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            transform: translateY(-1px);
+        }
+
+        .action-btn.ghost {
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* BLESS SOMEONE NOW SECTION */
+        .bless-section {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .bless-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .bless-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--brand);
+            margin: 0 0 4px 0;
+        }
+
+        .bless-subtitle {
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 400;
+            font-style: italic;
+            margin: 0;
+        }
+
+        .bless-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .bless-btn {
+            background: linear-gradient(135deg, #fafafa, #f5f5f5);
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--ink);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bless-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(200, 30, 30, 0.15);
+            border-color: var(--brand);
+        }
+
+        .bless-btn i {
+            font-size: 20px;
+            margin-bottom: 8px;
+            display: block;
+            color: var(--brand);
+        }
+
+        .bless-action {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--ink);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .bless-desc {
+            font-size: 11px;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* Impact feedback styles */
+        .impact-feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 90%;
+            animation: impactSlide 3s ease-out forwards;
+        }
+
+        @keyframes impactSlide {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+            85% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .impact-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .impact-title {
+            font-weight: 900;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .impact-desc {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* LIVE COMMUNITY FEED */
+        .community-section {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .community-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .live-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            background: rgba(200, 30, 30, 0.05);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--brand);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .live-activity {
+            height: 120px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .live-activity::-webkit-scrollbar {
+            display: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            animation: slideIn 0.5s ease;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .activity-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--brand), var(--brand-700));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .activity-text {
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .activity-time {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* CHALLENGE SECTION */
+        .challenge-section {
+            background: linear-gradient(135deg, #ffe9c9, #fff8ec);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--warning);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .challenge-title {
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: var(--ink);
+        }
+
+        .challenge-desc {
+            color: var(--muted);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .challenge-progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .progress-ring {
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 900;
+            font-size: 14px;
+            color: var(--brand);
+        }
+
+        .challenge-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+        }
+
+        .challenge-cta {
+            background: var(--brand);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        /* ACHIEVEMENT NOTIFICATIONS */
+        .achievement-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, var(--warning), #f59e0b);
+            color: #fff;
+            padding: 24px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .achievement-popup.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .achievement-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: bounce 0.6s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        /* FLOATING SHARE BUTTON */
+        .floating-share {
+            position: fixed;
+            bottom: 140px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--brand), var(--brand-700));
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(200, 30, 30, 0.4);
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .floating-share:hover {
+            transform: scale(1.1);
+        }
+
+        /* BOTTOM NAVIGATION */
+        .bottom-nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid #eee;
+            box-shadow: var(--shadow);
+            padding-bottom: env(safe-area-inset-bottom);
+            z-index: 90;
+        }
+
+        .nav-tabs {
+            max-width: 420px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .nav-tab {
+            padding: 12px 8px;
+            text-align: center;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tab.active {
+            color: var(--brand);
+        }
+
+        .nav-tab i {
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .nav-tab div {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .nav-tab .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 50%;
+            margin-right: -8px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        /* RESPONSIVE UTILITIES */
+        .section-spacing {
+            margin-bottom: 16px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* STATS GRID */
+        .stats-grid {
+            margin-bottom: 16px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-tile {
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #fff;
+            color: var(--brand);
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            font-weight: 800;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .stat-badge i {
+            font-size: 8px;
+            margin-right: 2px;
+        }
+
+        .stat-tile h3 {
+            margin: 0 0 6px 0;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--ink);
+            margin: 8px 0 4px 0;
+            line-height: 1;
+        }
+
+        .stat-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* EVENTS SECTION */
+        .events-section {
+            margin-bottom: 16px;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .event-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .event-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+        }
+
+        .event-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--brand);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .event-info {
+            flex: 1;
+        }
+
+        .event-title {
+            font-weight: 700;
+            color: var(--ink);
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .event-time {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .notify-btn {
+            background: #fff0ee;
+            color: var(--brand);
+            border: 1px solid #ffe1dc;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .notify-btn:hover {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .notify-btn.notifying {
+            background: var(--brand);
+            color: #fff;
+        }
+
+        /* SECTION HEADERS */
+        .section-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--ink);
+            margin: 0 0 12px 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .view-all-link {
+            color: var(--brand);
+            font-weight: 800;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        /* ACTIVITY CARDS */
+        .start-section,
+        .activities-section {
+            margin-bottom: 16px;
+        }
+
+        .activity-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 12px;
+        }
+
+        .activity-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .activity-icon-red {
+            background: var(--brand);
+        }
+
+        .activity-icon-rose {
+            background: #e84a5f;
+        }
+
+        .activity-icon-amber {
+            background: var(--warning);
+        }
+
+        .activity-icon-sand {
+            background: var(--muted);
+        }
+
+        .activity-info {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .activity-subtitle {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #eee;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--brand);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .activity-btn {
+            background: var(--brand);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .activity-btn.secondary {
+            background: #fff0ee;
+            color: var(--brand);
+        }
+
+        .activity-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.3);
+        }
+
+        /* GRADIENT BACKGROUNDS */
+        .shade-red { background: linear-gradient(160deg, #ffd7d4, #fff4f2); }
+        .shade-rose { background: linear-gradient(160deg, #ffe1dc, #fff6f5); }
+        .shade-amber { background: linear-gradient(160deg, #ffe9c9, #fff8ec); }
+        .shade-sand { background: linear-gradient(160deg, #e9e1d6, #f9f5ef); }
+        .shade-purple { background: linear-gradient(160deg, #e0e7ff, #f0f4ff); }
+
+        /* LOADING STATES */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: 200px 0; }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        <!-- Sticky Header with Streak -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-mark">W</div>
+                    <div class="welcome-text">
+                        <small>Welcome back</small>
+                        <strong id="userName">Child of God!</strong>
+                    </div>
+                </div>
+                <div class="streak-display">
+                    <span class="streak-fire">🔥</span>
+                    <div>
+                        <div class="streak-number" id="streakNumber">23</div>
+                        <div style="font-size: 10px; opacity: 0.8;">days</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dynamic Verse Banner -->
+            <section class="verse-banner">
+                <div class="verse-content">
+                    <h2>Today's Verse</h2>
+                    <div class="verse-text" id="dailyVerse">
+                        "In the beginning God created the heavens and the earth." — Genesis 1:1
+                    </div>
+                    <div class="verse-actions">
+                        <button class="action-btn" id="shareVerse">
+                            <i class="fa-solid fa-share"></i> Share
+                        </button>
+                        <button class="action-btn ghost" id="reflectVerse">
+                            <i class="fa-solid fa-heart"></i> Reflect
+                        </button>
+                    </div>
+                    <div class="live-indicator">
+                        <div class="pulse-dot"></div>
+                        <span id="liveWorship">Live Worship • 47 watching</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid section-spacing">
+                <div class="stats-container">
+                    <div class="stat-tile shade-red">
+                        <div class="stat-badge">
+                            <i class="fa-solid fa-fire"></i> Streak
+                        </div>
+                        <h3>Conversation with God</h3>
+                        <div class="stat-number" id="readingStreak">1</div>
+                        <div class="stat-subtitle" id="streakSubtitle">29 days to 30-day badge</div>
+                    </div>
+                    <div class="stat-tile shade-rose">
+                        <div class="stat-badge">
+                            <i class="fa-regular fa-hand"></i> Prayer
+                        </div>
+                        <h3>Prayer Requests</h3>
+                        <div class="stat-number" id="prayerRequests">2</div>
+                        <div class="stat-subtitle">2 new today</div>
+                    </div>
+                    <div class="stat-tile shade-amber">
+                        <div class="stat-badge">
+                            <i class="fa-regular fa-message"></i> Inbox
+                        </div>
+                        <h3>Messages</h3>
+                        <div class="stat-number" id="messageCount">5</div>
+                        <div class="stat-subtitle">Unread</div>
+                    </div>
+                    <div class="stat-tile shade-purple">
+                        <div class="stat-badge">
+                            <i class="fa-solid fa-play"></i> Video
+                        </div>
+                        <h3>Video Messages</h3>
+                        <div class="stat-number" id="videoMessages">3</div>
+                        <div class="stat-subtitle">New weekly videos</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upcoming Events Section -->
+            <section class="events-section section-spacing">
+                <h3 class="section-title">Upcoming Events</h3>
+                <div class="events-grid">
+                    <div class="event-card">
+                        <div class="event-content">
+                            <div class="event-icon">
+                                <i class="fa-regular fa-calendar"></i>
+                            </div>
+                            <div class="event-info">
+                                <div class="event-title">Wednesday Equipping</div>
+                                <div class="event-time">Wednesdays 7:00 PM</div>
+                            </div>
+                            <button class="notify-btn" id="notifyWed">Notify Me</button>
+                        </div>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-content">
+                            <div class="event-icon">
+                                <i class="fa-solid fa-praying-hands"></i>
+                            </div>
+                            <div class="event-info">
+                                <div class="event-title">Prayer Gathering</div>
+                                <div class="event-time">Fridays 8:00 PM</div>
+                            </div>
+                            <button class="notify-btn" id="notifyPrayer">Notify Me</button>
+                        </div>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-content">
+                            <div class="event-icon">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="event-info">
+                                <div class="event-title">D-group Meeting</div>
+                                <div class="event-time">Saturdays 5:00 PM</div>
+                            </div>
+                            <button class="notify-btn" id="notifyDgroup">Notify Me</button>
+                        </div>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-content">
+                            <div class="event-icon">
+                                <i class="fa-solid fa-video"></i>
+                            </div>
+                            <div class="event-info">
+                                <div class="event-title">Sunday Live Stream</div>
+                                <div class="event-time">Sundays 10:30 AM</div>
+                            </div>
+                            <button class="notify-btn" id="notifySunday">Notify Me</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Start Section -->
+            <section class="start-section section-spacing">
+                <h3 class="section-title">Start</h3>
+                <div class="activity-card">
+                    <div class="activity-content">
+                        <div class="activity-icon activity-icon-red">
+                            <i class="fa-solid fa-book-bible"></i>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-title">Start my Conversation Time with God</div>
+                            <div class="activity-subtitle">Go to Bible • Today's reading</div>
+                        </div>
+                        <button class="activity-btn primary" id="startConversation">Begin</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Your Activities Section -->
+            <section class="activities-section section-spacing">
+                <div class="section-header">
+                    <h3 class="section-title">Your Activities</h3>
+                    <a href="#" class="view-all-link">View All</a>
+                </div>
+                
+                <div class="activity-card">
+                    <div class="activity-content">
+                        <div class="activity-icon activity-icon-rose">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-title">Weekly Challenge – Psalms</div>
+                            <div class="activity-subtitle"><span id="psalmsCompleted">0</span>/3 completed</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="psalmsProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <button class="activity-btn secondary" id="markPsalm">Mark 1</button>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <div class="activity-content">
+                        <div class="activity-icon activity-icon-amber">
+                            <i class="fa-solid fa-music"></i>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-title">Worship Playlist</div>
+                            <div class="activity-subtitle">Today's curation</div>
+                        </div>
+                        <button class="activity-btn secondary" id="listenWorship">Listen</button>
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <div class="activity-content">
+                        <div class="activity-icon activity-icon-sand">
+                            <i class="fa-regular fa-note-sticky"></i>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-title">Today's Devotion</div>
+                            <div class="activity-subtitle">Unread</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                        </div>
+                        <button class="activity-btn secondary" id="readDevotion">Read</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bless Someone Now Section -->
+            <section class="bless-section">
+                <div class="bless-header">
+                    <h3 class="bless-title">Bless Someone Now</h3>
+                    <p class="bless-subtitle">Love in Action</p>
+                </div>
+                <div class="bless-grid">
+                    <button class="bless-btn" id="prayForSomeone">
+                        <i class="fa-solid fa-praying-hands"></i>
+                        <div class="bless-action">Pray for Someone</div>
+                        <div class="bless-desc">Lift them up</div>
+                    </button>
+                    <button class="bless-btn" id="encourageSomeone">
+                        <i class="fa-solid fa-heart"></i>
+                        <div class="bless-action">Encourage Someone</div>
+                        <div class="bless-desc">Speak life</div>
+                    </button>
+                    <button class="bless-btn" id="thankSomeone">
+                        <i class="fa-solid fa-handshake"></i>
+                        <div class="bless-action">Thank Someone</div>
+                        <div class="bless-desc">Give thanks</div>
+                    </button>
+                    <button class="bless-btn" id="shareConversation">
+                        <i class="fa-solid fa-comment-dots"></i>
+                        <div class="bless-action">Share Your Conversation Time</div>
+                        <div class="bless-desc">What God showed you</div>
+                    </button>
+                    <button class="bless-btn" id="inviteSomeone">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <div class="bless-action">Invite Someone</div>
+                        <div class="bless-desc">Bring them in</div>
+                    </button>
+                    <button class="bless-btn" id="checkInSomeone">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <div class="bless-action">Check In on Someone</div>
+                        <div class="bless-desc">How can I pray?</div>
+                    </button>
+                    <button class="bless-btn" id="shareWorship">
+                        <i class="fa-solid fa-music"></i>
+                        <div class="bless-action">Share a Worship Song</div>
+                        <div class="bless-desc">Send a link of a song</div>
+                    </button>
+                    <button class="bless-btn" id="shareGospel">
+                        <i class="fa-solid fa-cross"></i>
+                        <div class="bless-action">Share the Gospel</div>
+                        <div class="bless-desc">Good News today</div>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Live Community Feed -->
+            <section class="community-section">
+                <div class="community-header">
+                    <span class="boost-title">🌍 Live Community</span>
+                    <span style="font-size: 12px; color: var(--success);">● Live</span>
+                </div>
+                
+                <div class="live-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="activeNow">24</span>
+                        <span class="stat-label">Active Now</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="newPosts">15</span>
+                        <span class="stat-label">New Posts</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="invites">8</span>
+                        <span class="stat-label">Invites</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="prayerResponses">12</span>
+                        <span class="stat-label">Prayer Responses</span>
+                    </div>
+                </div>
+
+                <div class="live-activity" id="liveActivity">
+                    <!-- Dynamic content populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Daily Challenge -->
+            <section class="challenge-section">
+                <div class="challenge-badge" id="challengeTimer">9h 34m left</div>
+                <div class="challenge-title">Today's Growth Challenge</div>
+                <div class="challenge-desc" id="challengeDesc">
+                    Share 3 things you're grateful for and inspire others
+                </div>
+                <div class="challenge-progress">
+                    <div class="progress-ring">
+                        <svg class="progress-circle" width="60" height="60">
+                            <circle cx="30" cy="30" r="25" stroke="#e5e5e5" stroke-width="6" fill="transparent"/>
+                            <circle cx="30" cy="30" r="25" stroke="var(--warning)" stroke-width="6" fill="transparent"
+                                    stroke-dasharray="157" stroke-dashoffset="94" stroke-linecap="round" id="challengeCircle"/>
+                        </svg>
+                        <div class="progress-text" id="challengeProgress">40%</div>
+                    </div>
+                    <div class="challenge-stats">
+                        <div>
+                            <strong id="participantCount">47</strong> participating<br>
+                            <span style="color: var(--muted);">Building grateful hearts together</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="challenge-cta" id="joinChallenge">
+                    🎯 Share Your Gratitude
+                </button>
+            </section>
+
+        </main>
+
+        <!-- Floating Share Button -->
+        <button class="floating-share" id="floatingShare">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-tabs">
+                <div class="nav-tab active">
+                    <i class="fa-solid fa-home"></i>
+                    <div>Home</div>
+                </div>
+                <div class="nav-tab">
+                    <i class="fa-solid fa-book-bible"></i>
+                    <div>Bible</div>
+                </div>
+                <div class="nav-tab">
+                    <i class="fa-solid fa-users"></i>
+                    <div>Community</div>
+                    <div class="notification-dot"></div>
+                </div>
+                <div class="nav-tab">
+                    <i class="fa-solid fa-praying-hands"></i>
+                    <div>Pray</div>
+                </div>
+                <div class="nav-tab">
+                    <i class="fa-solid fa-user"></i>
+                    <div>Profile</div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Achievement Popup -->
+        <div class="achievement-popup" id="achievementPopup">
+            <div class="achievement-icon">🏆</div>
+            <div style="font-size: 18px; font-weight: 900; margin-bottom: 8px;">New Achievement!</div>
+            <div id="achievementText">Prayer Warrior Badge Unlocked!</div>
+        </div>
+    </div>
+
+    <script>
+        // ===== HABIT-FORMING VARIABLES =====
+        let streak = parseInt(localStorage.getItem('streak') || '23');
+        let lastCheckIn = localStorage.getItem('lastCheckIn');
+        let challengeProgress = parseInt(localStorage.getItem('challengeProgress') || '40');
+        let psalmsCompleted = parseInt(localStorage.getItem('psalmsCompleted') || '0');
+
+        // Impact tracking instead of points
+        let weeklyBlessings = parseInt(localStorage.getItem('weeklyBlessings') || '0');
+        let prayerCount = parseInt(localStorage.getItem('prayerCount') || '0');
+        let encouragementCount = parseInt(localStorage.getItem('encouragementCount') || '0');
+
+        // Live activity feed data
+        const activities = [
+            { user: 'Kia B.', action: 'shared Sunday worship invite 🔗', time: '2m', avatar: 'KB' },
+            { user: 'Grace M.', action: 'posted prayer for healing 🙏', time: '5m', avatar: 'GM' },
+            { user: 'John P.', action: 'shared D-group testimony 💝', time: '8m', avatar: 'JP' },
+            { user: 'Maria S.', action: 'encouraged someone in prayer ❤️', time: '12m', avatar: 'MS' },
+            { user: 'David L.', action: 'invited 3 friends to service 📲', time: '15m', avatar: 'DL' },
+            { user: 'Ana R.', action: 'responded with scripture verse 📖', time: '18m', avatar: 'AR' }
+        ];
+
+        // Achievement types for variable rewards
+        const achievements = [
+            { icon: '🔥', title: 'Streak Master', desc: 'Maintained 7-day streak!' },
+            { icon: '🙏', title: 'Prayer Warrior', desc: 'Prayed for 10 people today!' },
+            { icon: '💝', title: 'Heart of Gold', desc: 'Encouraged 5 community members!' },
+            { icon: '📖', title: 'Word Lover', desc: 'Read 3 chapters today!' },
+            { icon: '🌟', title: 'Shining Light', desc: 'Shared testimony that touched hearts!' },
+            { icon: '🎵', title: 'Worship Leader', desc: 'Led 10 people in worship!' }
+        ];
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDisplay();
+            updateStatsDisplay();
+            startLiveActivity();
+            startLiveCounters();
+            updateChallengeTimer();
+            checkForMilestones();
+        });
+
+        // ===== DISPLAY UPDATES =====
+        function updateDisplay() {
+            document.getElementById('streakNumber').textContent = streak;
+            document.getElementById('challengeProgress').textContent = challengeProgress + '%';
+            
+            // Update challenge circle
+            const circle = document.getElementById('challengeCircle');
+            const circumference = 157;
+            const offset = circumference - (challengeProgress / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+        }
+
+        function updateStatsDisplay() {
+            // Update psalms progress
+            document.getElementById('psalmsCompleted').textContent = psalmsCompleted;
+            const psalmsProgress = document.getElementById('psalmsProgress');
+            const progressPercent = (psalmsCompleted / 3) * 100;
+            psalmsProgress.style.width = progressPercent + '%';
+        }
+
+        // ===== LIVE ACTIVITY FEED =====
+        function startLiveActivity() {
+            const activityContainer = document.getElementById('liveActivity');
+            let currentIndex = 0;
+
+            function addActivity() {
+                const activity = activities[currentIndex % activities.length];
+                
+                const activityElement = document.createElement('div');
+                activityElement.className = 'activity-item';
+                activityElement.innerHTML = `
+                    <div class="activity-avatar">${activity.avatar}</div>
+                    <div class="activity-text">
+                        <strong>${activity.user}</strong> ${activity.action}
+                    </div>
+                    <div class="activity-time">${activity.time}</div>
+                `;
+
+                activityContainer.insertBefore(activityElement, activityContainer.firstChild);
+                
+                // Remove old items to keep feed fresh
+                if (activityContainer.children.length > 5) {
+                    activityContainer.removeChild(activityContainer.lastChild);
+                }
+
+                currentIndex++;
+            }
+
+            // Initial population
+            for (let i = 0; i < 4; i++) {
+                addActivity();
+            }
+
+            // Add new activity every 15-30 seconds
+            setInterval(addActivity, Math.random() * 15000 + 15000);
+        }
+
+        // ===== LIVE COUNTERS =====
+        function startLiveCounters() {
+            function updateCounters() {
+                const activeNow = document.getElementById('activeNow');
+                const newPosts = document.getElementById('newPosts');
+                const invites = document.getElementById('invites');
+                const prayerResponses = document.getElementById('prayerResponses');
+
+                // Simulate realistic fluctuations for small community
+                const activeBase = 24;
+                const postsBase = 15;
+                const invitesBase = 8;
+                const responsesBase = 12;
+
+                activeNow.textContent = Math.max(12, activeBase + Math.floor(Math.random() * 10 - 5));
+                newPosts.textContent = Math.max(10, postsBase + Math.floor(Math.random() * 6 - 3));
+                invites.textContent = Math.max(5, invitesBase + Math.floor(Math.random() * 4 - 2));
+                prayerResponses.textContent = Math.max(8, responsesBase + Math.floor(Math.random() * 6 - 3));
+            }
+
+            setInterval(updateCounters, 45000); // Update every 45 seconds for realistic feel
+        }
+
+        // ===== CHALLENGE TIMER =====
+        function updateChallengeTimer() {
+            const timer = document.getElementById('challengeTimer');
+            const now = new Date();
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+            
+            const timeLeft = endOfDay - now;
+            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            
+            timer.textContent = `${hours}h ${minutes}m left`;
+            
+            setTimeout(updateChallengeTimer, 60000); // Update every minute
+        }
+
+        // ===== BLESS SOMEONE NOW ACTIONS =====
+        document.getElementById('prayForSomeone').addEventListener('click', () => {
+            // Update prayer responses metric
+            updateCommunityMetrics('prayerResponse');
+            showImpactFeedback('🙏', 'Prayer Sent', 'Sarah, John, and Maria will feel your prayers in their hearts');
+        });
+
+        document.getElementById('encourageSomeone').addEventListener('click', () => {
+            // Update prayer responses metric (encouragement counts as response)
+            updateCommunityMetrics('prayerResponse');
+            showImpactFeedback('💝', 'Encouragement Delivered', 'Ana was blessed by your words of life and hope');
+        });
+
+        document.getElementById('thankSomeone').addEventListener('click', () => {
+            updateCommunityMetrics('prayerResponse');
+            showImpactFeedback('🙌', 'Thank You Sent', 'Pastor Mike was deeply touched by your gratitude');
+        });
+
+        document.getElementById('shareConversation').addEventListener('click', () => {
+            updateCommunityMetrics('newPost');
+            showImpactFeedback('💬', 'Conversation Shared', 'Your D-group was inspired by what God showed you today');
+        });
+
+        document.getElementById('inviteSomeone').addEventListener('click', () => {
+            // Update invites metric
+            const invites = document.getElementById('invites');
+            const currentInvites = parseInt(invites.textContent);
+            invites.textContent = currentInvites + 1;
+            
+            showImpactFeedback('🎉', 'Invitation Sent', 'Your friend received the loving invite to Sunday service');
+        });
+
+        document.getElementById('checkInSomeone').addEventListener('click', () => {
+            updateCommunityMetrics('prayerResponse');
+            showImpactFeedback('❤️', 'Check-in Sent', 'David appreciated you caring about his heart and wellbeing');
+        });
+
+        document.getElementById('shareWorship').addEventListener('click', () => {
+            updateCommunityMetrics('newPost');
+            showImpactFeedback('🎵', 'Worship Shared', 'Amazing Grace touched 3 hearts through your sharing');
+        });
+
+        document.getElementById('shareGospel').addEventListener('click', () => {
+            updateCommunityMetrics('newPost');
+            showImpactFeedback('✨', 'Good News Shared', 'The Gospel seed was planted in loving, receptive soil');
+        });
+
+        // ===== CHALLENGE PARTICIPATION =====
+        document.getElementById('joinChallenge').addEventListener('click', () => {
+            challengeProgress = Math.min(100, challengeProgress + 25);
+            localStorage.setItem('challengeProgress', challengeProgress);
+            updateDisplay();
+            
+            addFaithPoints(50);
+            showToast('🎯 Challenge progress updated! You\'re inspiring others!');
+            
+            if (challengeProgress >= 100) {
+                setTimeout(() => {
+                    showAchievement('🏆', 'Challenge Complete!', 'You completed today\'s growth challenge!');
+                }, 1000);
+            }
+        });
+
+        // ===== VERSE INTERACTIONS =====
+        document.getElementById('shareVerse').addEventListener('click', () => {
+            addFaithPoints(3);
+            showToast('📱 Verse shared! Your faith is spreading light.');
+            triggerRandomAchievement();
+        });
+
+        document.getElementById('reflectVerse').addEventListener('click', () => {
+            addFaithPoints(5);
+            showToast('💭 Reflection time started. Let God speak to your heart.');
+        });
+
+        // ===== FLOATING SHARE BUTTON =====
+        document.getElementById('floatingShare').addEventListener('click', () => {
+            const options = ['Prayer Request', 'Testimony', 'Gratitude', 'Encouragement'];
+            const choice = options[Math.floor(Math.random() * options.length)];
+            showToast(`✨ Quick ${choice} sharing opened!`);
+            addFaithPoints(7);
+        });
+
+        // ===== ACTIVITY SECTION BUTTONS =====
+        document.getElementById('startConversation').addEventListener('click', () => {
+            showImpactFeedback('📖', 'Conversation Time Started', 'Your heart is open to hear from God today');
+            
+            // Update reading streak
+            streak++;
+            localStorage.setItem('streak', streak);
+            updateDisplay();
+        });
+
+        document.getElementById('markPsalm').addEventListener('click', () => {
+            if (psalmsCompleted < 3) {
+                psalmsCompleted++;
+                localStorage.setItem('psalmsCompleted', psalmsCompleted);
+                updateStatsDisplay();
+                
+                if (psalmsCompleted === 3) {
+                    showImpactFeedback('🎯', 'Challenge Complete!', 'Your faithfulness inspires the whole community');
+                } else {
+                    showToast(`🎵 Psalm completed! ${3 - psalmsCompleted} more to finish this week.`);
+                }
+            } else {
+                showToast('🎉 Challenge already completed! Your dedication is beautiful.');
+            }
+        });
+
+        document.getElementById('listenWorship').addEventListener('click', () => {
+            showImpactFeedback('🎵', 'Worship Time', 'Your praise joins the heavenly chorus');
+        });
+
+        document.getElementById('readDevotion').addEventListener('click', () => {
+            showImpactFeedback('📝', 'Devotion Opened', 'God is ready to speak to your heart');
+        });
+
+        // ===== VIDEO MESSAGES SECTION =====
+        document.querySelector('.stat-tile.shade-purple').addEventListener('click', () => {
+            showToast('📺 Opening weekly video messages... Fresh spiritual content!');
+            addFaithPoints(8);
+            triggerRandomAchievement();
+        });
+
+        // ===== EVENT NOTIFICATIONS =====
+        const eventButtons = ['notifyWed', 'notifyPrayer', 'notifyDgroup', 'notifySunday'];
+        eventButtons.forEach(btnId => {
+            document.getElementById(btnId).addEventListener('click', function() {
+                const isNotifying = this.classList.contains('notifying');
+                
+                if (isNotifying) {
+                    this.classList.remove('notifying');
+                    this.textContent = 'Notify Me';
+                    showToast('🔕 Notification turned off');
+                } else {
+                    this.classList.add('notifying');
+                    this.textContent = 'Notifying';
+                    showToast('🔔 You\'ll be notified before this event!');
+                    addFaithPoints(2);
+                }
+            });
+        });
+
+        // ===== IMPACT FEEDBACK SYSTEM =====
+        function showImpactFeedback(icon, title, description) {
+            const feedback = document.createElement('div');
+            feedback.className = 'impact-feedback';
+            feedback.innerHTML = `
+                <div class="impact-icon">${icon}</div>
+                <div class="impact-title">${title}</div>
+                <div class="impact-desc">${description}</div>
+            `;
+            
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                document.body.removeChild(feedback);
+            }, 3000);
+        }
+
+        // ===== FAITH POINTS SYSTEM =====
+        function addFaithPoints(points) {
+            faithPoints += points;
+            localStorage.setItem('faithPoints', faithPoints);
+            
+            // Show points earned animation
+            showPointsEarned(points);
+        }
+
+        function showPointsEarned(points) {
+            const pointsEl = document.createElement('div');
+            pointsEl.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--success);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-weight: 900;
+                z-index: 1000;
+                animation: pointsAnimation 2s ease-out forwards;
+            `;
+            pointsEl.textContent = `+${points} Faith Points`;
+            document.body.appendChild(pointsEl);
+
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pointsAnimation {
+                    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+                    100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            setTimeout(() => {
+                document.body.removeChild(pointsEl);
+                document.head.removeChild(style);
+            }, 2000);
+        }
+
+        // ===== MILESTONE CHECKING =====
+        function checkForMilestones() {
+            // Check for streak milestones
+            if (streak === 7) {
+                showImpactFeedback('🔥', 'Week of Faithfulness!', 'Seven days of walking with God - beautiful consistency!');
+            } else if (streak === 30) {
+                showImpactFeedback('👑', 'Month of Devotion!', 'Thirty days of seeking God - your dedication inspires others!');
+            } else if (streak === 100) {
+                showImpactFeedback('🏆', 'Century of Faith!', 'One hundred days with God - you are a living testimony!');
+            }
+        }
+
+        // ===== ACHIEVEMENT SYSTEM =====
+        function showAchievement(icon, title, description) {
+            const popup = document.getElementById('achievementPopup');
+            popup.querySelector('.achievement-icon').textContent = icon;
+            popup.querySelector('#achievementText').innerHTML = `<strong>${title}</strong><br>${description}`;
+            
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        // ===== TOAST NOTIFICATIONS =====
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 140px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--ink);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-weight: 600;
+                z-index: 1000;
+                max-width: 90%;
+                text-align: center;
+                box-shadow: var(--shadow);
+                animation: toastSlide 3s ease-out forwards;
+            `;
+            toast.textContent = message;
+
+            // Add toast animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes toastSlide {
+                    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+                    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                    90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                document.body.removeChild(toast);
+                document.head.removeChild(style);
+            }, 3000);
+        }
+
+        // ===== TAB NAVIGATION =====
+        document.querySelectorAll('.nav-tab').forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabNames = ['Home', 'Bible', 'Community', 'Prayer', 'Profile'];
+                showToast(`📱 Navigating to ${tabNames[index]}...`);
+            });
+        });
+
+        // ===== LIVE WORSHIP COUNTER =====
+        function updateLiveWorship() {
+            const element = document.getElementById('liveWorship');
+            const baseCount = 47; // More realistic for their community size
+            const variation = Math.floor(Math.random() * 10 - 5);
+            const newCount = Math.max(25, baseCount + variation);
+            element.textContent = `Live Worship • ${newCount} watching`;
+        }
+
+        setInterval(updateLiveWorship, 60000); // Update every minute
+
+        // ===== AUTO-SAVE PROGRESS =====
+        setInterval(() => {
+            localStorage.setItem('lastActive', new Date().toISOString());
+        }, 30000);
+
+        // ===== PARTICIPANT COUNT ANIMATION =====
+        function animateParticipantCount() {
+            const element = document.getElementById('participantCount');
+            const baseCount = 47; // Realistic community size
+            const newCount = baseCount + Math.floor(Math.random() * 12 - 6); // ±6 variation
+            element.textContent = Math.max(35, newCount); // Minimum 35 participants
+        }
+
+        setInterval(animateParticipantCount, 120000); // Update every 2 minutes
+
+        // ===== DAILY CHALLENGE ROTATION =====
+        function getDailyChallenge() {
+            const challenges = [
+                {
+                    title: "Today's Growth Challenge",
+                    desc: "Share 3 things you're grateful for and inspire others",
+                    button: "🎯 Share Your Gratitude",
+                    subtitle: "Building grateful hearts together"
+                },
+                {
+                    title: "Today's Prayer Challenge", 
+                    desc: "Pray for 3 community members and let them know",
+                    button: "🙏 Lift Others Up",
+                    subtitle: "Covering each other in prayer"
+                },
+                {
+                    title: "Today's Sharing Challenge",
+                    desc: "Share what God taught you in today's conversation time",
+                    button: "💬 Share God's Voice",
+                    subtitle: "Learning from each other's journey"
+                },
+                {
+                    title: "Today's Encouragement Challenge",
+                    desc: "Encourage 3 people in the community with God's love",
+                    button: "💝 Speak Life",
+                    subtitle: "Being Jesus' hands and feet"
+                },
+                {
+                    title: "Today's Worship Challenge",
+                    desc: "Share a worship song that touches your heart",
+                    button: "🎵 Share Praise", 
+                    subtitle: "Lifting voices together"
+                },
+                {
+                    title: "Today's Reflection Challenge",
+                    desc: "Share how God has been faithful to you this week",
+                    button: "🌟 Share Faithfulness",
+                    subtitle: "Testifying to God's goodness"
+                },
+                {
+                    title: "Today's Invitation Challenge",
+                    desc: "Invite someone to join Sunday worship service",
+                    button: "🎉 Extend Invitation",
+                    subtitle: "Growing God's family together"
+                }
+            ];
+            
+            const dayOfWeek = new Date().getDay();
+            return challenges[dayOfWeek];
+        }
+
+        function updateDailyChallenge() {
+            const challenge = getDailyChallenge();
+            document.querySelector('.challenge-title').textContent = challenge.title;
+            document.getElementById('challengeDesc').textContent = challenge.desc;
+            document.getElementById('joinChallenge').innerHTML = challenge.button;
+            document.querySelector('.challenge-stats span[style*="muted"]').textContent = challenge.subtitle;
+        }
+
+        // Update challenge at midnight and on page load
+        updateDailyChallenge();
+        
+        // Check for midnight challenge refresh
+        setInterval(() => {
+            const now = new Date();
+            if (now.getHours() === 0 && now.getMinutes() === 0) {
+                updateDailyChallenge();
+                // Reset challenge progress for new day
+                challengeProgress = 0;
+                localStorage.setItem('challengeProgress', challengeProgress);
+                updateDisplay();
+            }
+        }, 60000); // Check every minute
+    </script>
+</body>
+</html>

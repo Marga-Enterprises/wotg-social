@@ -46,7 +46,7 @@ const Page = () => {
         dispatch(wotgsocial.user.addUser(payload))
             .then((res) => {
                 if (res.success) {
-                    window.location.replace('/menu');
+                    window.location.replace('/');
                 } else {
                     setOpenErrorSnackbar(true);
                     setErrMsg(res.payload);
@@ -64,8 +64,10 @@ const Page = () => {
 
     useEffect(() => {
         const token = Cookies.get('token');
-        if (token) {
-            navigate('/menu');
+        const role = Cookies.get('role');
+
+        if (token && role !== 'guest') {
+            navigate('/');
         }
     }, [navigate]);
 

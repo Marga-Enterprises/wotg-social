@@ -7,6 +7,10 @@ export async function loginFunc(payload) {
   return POST('/auth/login', payload);
 }
 
+export async function guestLoginFunc(payload) {
+  return POST('/auth/login-guest', payload);
+}
+
 export async function registerFunc(payload) {
   return POST('/auth/register', payload);
 }

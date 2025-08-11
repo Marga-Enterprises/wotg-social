@@ -11,7 +11,7 @@ import styles from './index.module.css';
 
 const menuItems = [
   { label: "Worship", href: "/worship", icon: faPrayingHands },
-  { label: "Chat", href: "/", icon: faComments },
+  { label: "Chat", href: "/chat", icon: faComments },
   { label: "Devotion", href: "/blogs", icon: faBookOpen },
   { label: "Bible", href: "/bible", icon: faBible },
   { label: "Journal", href: "/your-journals", icon: faPenFancy },

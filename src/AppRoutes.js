@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -44,14 +44,30 @@ import Notifications from "./Pages/Notifications";
 function AppRoutes() {
   const dispatch = useDispatch();
   const hideNavbar = useHideNavbar();
+  const navigate = useNavigate();
   
   const token = Cookies.get('token');
+  const autoLoginDisabled = Cookies.get('autoLoginDisabled');
 
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     dispatch(wotgsocial.user.restoreSessionAction());
-  }, [dispatch]);
+
+    if (!token && !autoLoginDisabled) {
+      dispatch(wotgsocial.user.guestLoginFunction())
+        .then((res) => {
+          if (res.success) {
+            navigate('/');
+          } else {
+            console.error('Guest login failed:', res.payload);
+          }
+        })
+        .catch((error) => {
+          console.error('An error occurred during guest login:', error);
+        });
+    }
+  }, [dispatch, autoLoginDisabled]);
 
   return (
     <div className="grid-container">
@@ -63,9 +79,9 @@ function AppRoutes() {
 
       <main>
         <Routes>
-          <Route path="/" element={<AuthRouter><Home onToggleMenu={() => setMenuOpen(true)} /></AuthRouter>} />
+          <Route path="/chat" element={<AuthRouter><Home onToggleMenu={() => setMenuOpen(true)} /></AuthRouter>} />
           <Route path="/worship" element={<Worship />} />
-          <Route path="/menu" element={<AuthRouter><Menu /></AuthRouter>} />
+          <Route path="/" element={<AuthRouter><Menu /></AuthRouter>} />
           <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
           <Route path="/bible" element={<AuthRouter><Bible /></AuthRouter>} />
           <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />

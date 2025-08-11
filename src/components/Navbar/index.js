@@ -27,6 +27,7 @@ function Navbar({ onToggleMenu }) {
 
   // parse
   const account = Cookies.get('account');
+  const role = Cookies.get('role');
   const isAuthenticated = Cookies.get('authenticated') === 'true';
   const parsedAccount = account ? JSON.parse(account) : null;
 
@@ -115,10 +116,9 @@ function Navbar({ onToggleMenu }) {
       </div>
 
       <div className={styles.navLinks}>
-
-        { isAuthenticated && (
+        {(isAuthenticated && role !== 'guest') && (
           <>
-            <Link to="/" className={styles.navLink}>Chat</Link>
+            <Link to="/chat" className={styles.navLink}>Chat</Link>
             <Link to="/blogs" className={styles.navLink}>Devotion</Link>
             <Link to="/bible" className={styles.navLink}>Bible</Link>
             <Link to="/your-journals" className={styles.navLink}>Journal</Link>
@@ -127,14 +127,13 @@ function Navbar({ onToggleMenu }) {
             <Link to="/feeds" className={styles.navLink}>Feeds</Link>
           </>
         )}
-        
-        { !isAuthenticated && (
+
+        {(!isAuthenticated || role === 'guest') && (
           <>
             <Link to="/login" className={styles.navLink}>Sign In</Link>
             <Link to="/register" className={styles.navLink}>Sign Up</Link>
           </>
         )}
-
         <a
           href="https://wotgonline.com/donate/"
           target="_blank"
@@ -171,7 +170,7 @@ function Navbar({ onToggleMenu }) {
           />
         )}
 
-        { isAuthenticated && (
+        {(isAuthenticated && role !== 'guest') && (
           <FontAwesomeIcon
             icon={faRightFromBracket}
             size="2x"

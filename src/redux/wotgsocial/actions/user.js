@@ -1,6 +1,6 @@
 // API
 import { loginFunc, registerFunc, getAllUsers, updateUser, getUser, refreshTokenFunc, logoutUser,
-    forgotPasswordFunc, resetPasswordFunc
+    forgotPasswordFunc, resetPasswordFunc, guestLoginFunc
 } from '../../../services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -78,6 +78,7 @@ export const setUserDetails = (userDetails) => {
     Cookies.set("account", JSON.stringify(user), { expires: 365, secure: true, sameSite: "Strict" });
     Cookies.set("authenticated", true, { expires: 365, secure: true, sameSite: "Strict" });
     Cookies.set("role", user.user_role, { expires: 365, secure: true, sameSite: "Strict" });
+    Cookies.set("autoLoginDisabled", false, { expires: 365, secure: true, sameSite: "Strict" });
 
     return {
         type: types.SET_USER_DETAILS,
@@ -123,6 +124,39 @@ export const loginFunction = (payload) => async (dispatch) => {
     }
 };
 
+
+// guest login function
+export const guestLoginFunction = (payload) => async (dispatch) => {
+    try {
+        const res = await guestLoginFunc(payload);
+        const { success, data } = res;
+        if (success) {
+            const { accessToken } = data;
+            const account = jwtDecode(accessToken);
+            setAuthorizationHeader(accessToken);
+
+            dispatch(setUserDetails(account));
+
+            // ✅ Send guest login details to Flutter
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler("onGuestLoginSuccess", {
+                    userId: account.user.id,   // Extracted from JWT
+                    email: account.user.email, // Extracted from JWT
+                    token: accessToken    // Send access token
+                });
+            }
+        }
+
+        return res;
+
+    } catch (err) {
+        return dispatch({
+            type: types.LOGIN_FAIL,
+            payload: err.response?.data?.msg || "Guest login failed.",
+        });
+    }
+};
+
 export const addUser = (payload) => async (dispatch) => {
     try {
         const res = await registerFunc(payload);
@@ -153,8 +187,6 @@ export const addUser = (payload) => async (dispatch) => {
         });
     }
 };
-
-
 
 // 🔹 REFRESH TOKEN ACTION (Auto-renew Access Token)
 export const refreshTokenAction = () => async (dispatch) => {
@@ -263,12 +295,12 @@ export const resetPasswordAction = (payload) => async (dispatch) => {
 
 
 // 🔹 LOGOUT ACTION
-export const userLogout = () => async (dispatch) => {
+export const userLogout = () => (dispatch) => {
     try {
         const refreshToken = Cookies.get("refreshToken"); // ✅ Fetch refresh token from cookies
 
         if (refreshToken) {
-            await logoutUser({ refreshToken }); // ✅ Send refreshToken in request body
+            logoutUser({ refreshToken }); // ✅ Send refreshToken in request body
         }
 
         // ✅ Remove cookies
@@ -277,6 +309,9 @@ export const userLogout = () => async (dispatch) => {
         Cookies.remove("account");
         Cookies.remove("role");
         Cookies.remove("authenticated");
+
+        // set auto login to false
+        Cookies.set("autoLoginDisabled", true, { expires: 365, secure: true, sameSite: "Strict" });
 
         window.location.replace("/login");
 

@@ -41,10 +41,6 @@ const Page = () => {
     (event) => {
       event.preventDefault();
       const payload = { email, password };
-      
-      if (token && role === 'guest') {
-        dispatch(wotgsocial.user.userLogout());
-      };
 
       dispatch(common.ui.setLoading());
       dispatch(wotgsocial.user.loginFunction(payload))
@@ -65,7 +61,7 @@ const Page = () => {
           dispatch(common.ui.clearLoading());
         });
     },
-    [dispatch, email, password]
+    [dispatch, email, password, token, role]
   );
 
   const handleGuestLogin = useCallback(() => {

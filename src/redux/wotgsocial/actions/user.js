@@ -139,7 +139,7 @@ export const guestLoginFunction = (payload) => async (dispatch) => {
 
             // ✅ Send guest login details to Flutter
             if (window.flutter_inappwebview) {
-                window.flutter_inappwebview.callHandler("onGuestLoginSuccess", {
+                window.flutter_inappwebview.callHandler("onLoginSuccess", {
                     userId: account.user.id,   // Extracted from JWT
                     email: account.user.email, // Extracted from JWT
                     token: accessToken    // Send access token
@@ -312,8 +312,6 @@ export const userLogout = () => (dispatch) => {
 
         // set auto login to false
         Cookies.set("autoLoginDisabled", true, { expires: 365, secure: true, sameSite: "Strict" });
-
-        window.location.replace("/login");
 
         return dispatch({
             type: "USER_LOGOUT",

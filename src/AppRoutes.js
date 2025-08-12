@@ -67,6 +67,8 @@ function AppRoutes() {
           console.error('An error occurred during guest login:', error);
         });
     }
+
+    return;
   }, [dispatch, autoLoginDisabled]);
 
   return (

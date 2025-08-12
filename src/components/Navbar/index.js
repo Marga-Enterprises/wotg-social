@@ -103,6 +103,7 @@ function Navbar({ onToggleMenu }) {
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());
+    window.location.href = '/login';
   };
 
   return (

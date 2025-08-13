@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
@@ -45,6 +45,7 @@ function AppRoutes() {
   const dispatch = useDispatch();
   const hideNavbar = useHideNavbar();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const token = Cookies.get('token');
   const autoLoginDisabled = Cookies.get('autoLoginDisabled');
@@ -58,18 +59,17 @@ function AppRoutes() {
       dispatch(wotgsocial.user.guestLoginFunction())
         .then((res) => {
           if (res.success) {
-            navigate('/');
+            // ✅ Force full reload to the original page
+            window.location.href = location.pathname + location.search;
           } else {
-            console.error('Guest login failed:', res.payload);
+            console.error("Guest login failed:", res.payload);
           }
         })
         .catch((error) => {
-          console.error('An error occurred during guest login:', error);
+          console.error("An error occurred during guest login:", error);
         });
     }
-
-    return;
-  }, [dispatch, autoLoginDisabled]);
+  }, [dispatch, autoLoginDisabled, token, location]);
 
   return (
     <div className="grid-container">

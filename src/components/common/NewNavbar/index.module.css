@@ -1,0 +1,90 @@
+/* Navbar container */
+.navbar {
+    background-color: #c53131; /* red from screenshot */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+}
+
+/* Left section */
+.navLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* White circle with "W" */
+.userIcon {
+    background-color: white;
+    color: #c53131;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Welcome text block */
+.userText {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.welcome {
+    font-size: 0.7rem;
+    opacity: 0.85;
+}
+
+.username {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Right section */
+.navRight {
+    display: flex;
+    align-items: center;
+}
+
+/* Streak badge */
+.streakBadge {
+    background-color: white;
+    color: #c53131;
+    border-radius: 50px;
+    padding: 0.2rem 0.7rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 42px;
+}
+
+.streakNumber {
+    font-weight: bold;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.streakLabel {
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
+/* Burger icon */
+.burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.8rem;
+    cursor: pointer;
+}
+
+.burgerIcon {
+    font-size: 1.4rem;
+    color: white;
+}

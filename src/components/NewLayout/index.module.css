@@ -1,0 +1,13 @@
+.layout {
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    background-color: #fafafa;
+}
+
+/* Scrollable middle content */
+.mainContent {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #fafafa;
+}

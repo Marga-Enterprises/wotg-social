@@ -1,17 +1,13 @@
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import { useHideNavbar } from "./contexts/NavbarContext";
 import { wotgsocial } from "./redux/combineActions";
 import Cookies from 'js-cookie';
 
 // Components
-import Navbar from "./components/Navbar";
-import BurgerMenu from "./components/BurgerMenu";
+import NewLayout from "./components/NewLayout"; // ✅ Use new layout
 import AuthRouter from "./components/AuthRouter";
 import AdminRouter from "./components/AdminRouter";
-// import ManagementRouter from "./components/ManagementRouter";
 
 // Pages
 import Home from "./Pages/Home";
@@ -43,13 +39,14 @@ import Notifications from "./Pages/Notifications";
 
 function AppRoutes() {
   const dispatch = useDispatch();
-  const hideNavbar = useHideNavbar();
   const location = useLocation();
-  
+
   const token = Cookies.get('token');
   const autoLoginDisabled = Cookies.get('autoLoginDisabled');
 
+  // ✅ State for hamburger menu toggle
   const [menuOpen, setMenuOpen] = useState(false);
+  const onToggleMenu = () => setMenuOpen((prev) => !prev);
 
   useEffect(() => {
     dispatch(wotgsocial.user.restoreSessionAction());
@@ -58,7 +55,6 @@ function AppRoutes() {
       dispatch(wotgsocial.user.guestLoginFunction())
         .then((res) => {
           if (res.success) {
-            // ✅ Force full reload to the original page
             window.location.href = location.pathname + location.search;
           } else {
             console.error("Guest login failed:", res.payload);
@@ -71,44 +67,36 @@ function AppRoutes() {
   }, [dispatch, autoLoginDisabled, token, location]);
 
   return (
-    <div className="grid-container">
-      {!hideNavbar && <Navbar onToggleMenu={() => setMenuOpen(true)} />}
-
-      <AnimatePresence>
-        {menuOpen && <BurgerMenu onClose={() => setMenuOpen(false)} />}
-      </AnimatePresence>
-
-      <main>
-        <Routes>
-          <Route path="/chat" element={<AuthRouter><Home onToggleMenu={() => setMenuOpen(true)} /></AuthRouter>} />
-          <Route path="/worship" element={<Worship />} />
-          <Route path="/" element={<AuthRouter><Menu /></AuthRouter>} />
-          <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
-          <Route path="/bible" element={<AuthRouter><Bible /></AuthRouter>} />
-          <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
-          <Route path="/journal/:book/:chapter/:verse/:language/" element={<AuthRouter><Journal /></AuthRouter>} />
-          <Route path="/your-journals" element={<AuthRouter><YourJournals /></AuthRouter>} />
-          <Route path="/view-journal/:id" element={<AuthRouter><ViewJournalPage /></AuthRouter>} />
-          <Route path="/update-journal/:id" element={<AuthRouter><UpdateJournal /></AuthRouter>} />
-          <Route path="/commentary/:book/:chapter/:verse/:language/" element={<AuthRouter><Commentary /></AuthRouter>} />
-          <Route path="/notifications" element={<AuthRouter><Notifications /></AuthRouter>} />
-          <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
-          <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
-          <Route path="/albums" element={<AuthRouter><AdminMusicDashboard /></AuthRouter>} />
-          <Route path="/album/:id" element={<AuthRouter><MusicInAlbumPage /></AuthRouter>} />
-          <Route path="/playlist/:id" element={<AuthRouter><Playlist /></AuthRouter>} />
-          <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
-          <Route path="/music" element={<AuthRouter><MainMusic/></AuthRouter>} />
-          <Route path="/feeds" element={<AuthRouter><Feeds /></AuthRouter>} />
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/register" element={<SignUp />} />
-          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-          <Route path="*" element={<Default />} />
-        </Routes>
-      </main>
-    </div>
+    <NewLayout onToggleMenu={onToggleMenu} menuOpen={menuOpen}>
+      <Routes>
+        <Route path="/chat" element={<AuthRouter><Home /></AuthRouter>} />
+        <Route path="/worship" element={<Worship />} />
+        <Route path="/" element={<AuthRouter><Menu /></AuthRouter>} />
+        <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
+        <Route path="/bible" element={<AuthRouter><Bible /></AuthRouter>} />
+        <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />
+        <Route path="/journal/:book/:chapter/:verse/:language/" element={<AuthRouter><Journal /></AuthRouter>} />
+        <Route path="/your-journals" element={<AuthRouter><YourJournals /></AuthRouter>} />
+        <Route path="/view-journal/:id" element={<AuthRouter><ViewJournalPage /></AuthRouter>} />
+        <Route path="/update-journal/:id" element={<AuthRouter><UpdateJournal /></AuthRouter>} />
+        <Route path="/commentary/:book/:chapter/:verse/:language/" element={<AuthRouter><Commentary /></AuthRouter>} />
+        <Route path="/notifications" element={<AuthRouter><Notifications /></AuthRouter>} />
+        <Route path="/blog/record-video/:id" element={<AdminRouter><UploadVideo /></AdminRouter>} />
+        <Route path="/blog/upload-video/:id" element={<AdminRouter><UploadVideoFromFiles /></AdminRouter>} />
+        <Route path="/albums" element={<AuthRouter><AdminMusicDashboard /></AuthRouter>} />
+        <Route path="/album/:id" element={<AuthRouter><MusicInAlbumPage /></AuthRouter>} />
+        <Route path="/playlist/:id" element={<AuthRouter><Playlist /></AuthRouter>} />
+        <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
+        <Route path="/music" element={<AuthRouter><MainMusic/></AuthRouter>} />
+        <Route path="/feeds" element={<AuthRouter><Feeds /></AuthRouter>} />
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/register" element={<SignUp />} />
+        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+        <Route path="*" element={<Default />} />
+      </Routes>
+    </NewLayout>
   );
 }
 

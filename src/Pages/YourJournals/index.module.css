@@ -24,6 +24,7 @@
   background-color: #f9f9f9;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   cursor: pointer;
+  word-wrap: break-word; /* prevents text overflow */
 }
 
 .journalItem:hover {
@@ -131,4 +132,23 @@
   font-size: 1.3rem;
   color: #464646;
   margin-top: 0.520rem;
+}
+
+@media (max-width: 480px) {
+  .journalItem {
+    padding: 0.75rem; /* less padding for small devices */
+    border-left-width: 4px; /* slightly thinner border */
+  }
+
+  .journalItem strong {
+    font-size: 1rem; /* prevent oversized title */
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* 📟 Tablet adjustments */
+@media (max-width: 768px) {
+  .journalItem {
+    padding: 0.9rem;
+  }
 }

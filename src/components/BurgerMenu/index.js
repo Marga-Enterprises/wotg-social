@@ -14,7 +14,6 @@ const BurgerMenu = ({ onClose }) => {
 
   const account = Cookie.get('account') ? JSON.parse(Cookie.get('account')) : null;
   const role = account ? account.user_role : null;
-  const isAdmin = role === 'admin' || role === 'owner';
 
   const handleSignOut = () => {
     dispatch(wotgsocial.user.userLogout());
@@ -57,7 +56,12 @@ const BurgerMenu = ({ onClose }) => {
         >
           Partner
         </a>
-        <Link className={styles.menuItem} onClick={handleSignOut}>Logout</Link>
+        {(!account || role === 'guest') && (
+          <Link to="/login" className={styles.menuItem} onClick={onClose}>Sign In</Link>
+        )}
+        {account && role !== 'guest' && (
+          <button className={styles.menuItem} onClick={handleSignOut}>Sign Out</button>
+        )}
       </nav>
     </motion.div>
   );

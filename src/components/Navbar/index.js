@@ -109,15 +109,17 @@ function Navbar({ onToggleMenu }) {
   return (
     <div className={styles.navbar}>
       <div className={styles.logo}>
-        <img
-          key={Date.now()}
-          src="https://wotg.sgp1.cdn.digitaloceanspaces.com/images/WOTG_logo2.webp"
-          alt="WOTG Logo"
-        />
+        <Link to="/">
+          <img
+            key={Date.now()}
+            src="https://wotg.sgp1.cdn.digitaloceanspaces.com/images/WOTG_logo2.webp"
+            alt="WOTG Logo"
+          />
+        </Link>
       </div>
 
       <div className={styles.navLinks}>
-        {(isAuthenticated && role !== 'guest') && (
+        {/*(isAuthenticated && role !== 'guest') && (
           <>
             <Link to="/chat" className={styles.navLink}>Chat</Link>
             <Link to="/blogs" className={styles.navLink}>Devotion</Link>
@@ -127,12 +129,21 @@ function Navbar({ onToggleMenu }) {
             <Link to="/worship" className={styles.navLink}>Worship</Link>
             <Link to="/feeds" className={styles.navLink}>Feeds</Link>
           </>
-        )}
+        )*/}
+
+        <>
+          <Link to="/chat" className={styles.navLink}>Chat</Link>
+          <Link to="/blogs" className={styles.navLink}>Devotion</Link>
+          <Link to="/bible" className={styles.navLink}>Bible</Link>
+          <Link to="/your-journals" className={styles.navLink}>Journal</Link>
+          <Link to="/music" className={styles.navLink}>Music</Link>
+          <Link to="/worship" className={styles.navLink}>Worship</Link>
+          <Link to="/feeds" className={styles.navLink}>Feeds</Link>
+        </>
 
         {(!isAuthenticated || role === 'guest') && (
           <>
             <Link to="/login" className={styles.navLink}>Sign In</Link>
-            <Link to="/register" className={styles.navLink}>Sign Up</Link>
           </>
         )}
         <a

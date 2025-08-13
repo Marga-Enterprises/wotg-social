@@ -44,7 +44,6 @@ import Notifications from "./Pages/Notifications";
 function AppRoutes() {
   const dispatch = useDispatch();
   const hideNavbar = useHideNavbar();
-  const navigate = useNavigate();
   const location = useLocation();
   
   const token = Cookies.get('token');

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 
@@ -23,6 +24,7 @@ import { useSocket } from '../../contexts/SocketContext';
 const Page = ({ onToggleMenu  }) => {
     const dispatch = useDispatch();
     const socket = useSocket();
+    const location = useLocation();
 
     const messageSound = useRef(
         new Howl({
@@ -121,6 +123,12 @@ const Page = ({ onToggleMenu  }) => {
             setOnlineUsers(users);
         });
     }, [socket]); 
+
+    useEffect(() => {
+        if (location.search === '?chat=wotgadmin') {
+            handleSelectChatroom(5);
+        }
+    }, [location.search]);
       
     const handleOpenCreateChatroomModal = () => {
         setIsModalOpen(true);

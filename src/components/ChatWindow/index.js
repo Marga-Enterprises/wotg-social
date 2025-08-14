@@ -99,37 +99,44 @@
       }, 100); // zero delay works best when using rAF
     };
     
-
     const renderMessageContent = useCallback((content, type) => {
       const isImage = type === 'file';
 
       if (isImage) {
         return (
-          <>
-            <img
-              src={`${backendUrl}/${content}`}
-              alt="sent-img"
-              className={styles.chatImage}
-              loading="lazy"
-              decoding="async"
-              referrerPolicy="no-referrer"
-              onClick={() => handleImageClick(`${backendUrl}/${content}`)}
-            />
-          </>
+          <img
+            src={`${backendUrl}/${content}`}
+            alt="sent-img"
+            className={styles.chatImage}
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            onClick={() => handleImageClick(`${backendUrl}/${content}`)}
+          />
         );
       }
-    
+
       const urlRegex = /(https?:\/\/[^\s]+)/g;
-      return content.split(urlRegex).map((part, index) =>
-        urlRegex.test(part) ? (
-          <a key={index} href={part} target="_blank" rel="noopener noreferrer">
-            {part}
-          </a>
-        ) : (
-          part
-        )
-      );
-    }, [backendUrl]);  
+
+      return content.split(urlRegex).map((part, index) => {
+        if (urlRegex.test(part)) {
+          // URL part
+          return (
+            <a key={index} href={part} target="_blank" rel="noopener noreferrer">
+              {part}
+            </a>
+          );
+        } else {
+          // Non-URL part → preserve line breaks
+          return part.split("\n").map((line, lineIndex) => (
+            <React.Fragment key={`${index}-${lineIndex}`}>
+              {line}
+              {lineIndex < part.split("\n").length - 1 && <br />}
+            </React.Fragment>
+          ));
+        }
+      });
+    }, [backendUrl]);
 
     const handleShowMessageReactors = useCallback((messageId) => {
       const message = messages.find((msg) => msg.id === messageId);

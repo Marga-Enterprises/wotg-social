@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 const ChatSidebar = ({ 
@@ -11,7 +11,6 @@ const ChatSidebar = ({
   currentUserId, 
   onSearchChange,
   selectedChatroom,
-  toggleMenu,
   onlineUsers,
 }) => {
   const [maxLength, setMaxLength] = useState(100);
@@ -58,19 +57,12 @@ const ChatSidebar = ({
             />
 
             <div>
-              <FontAwesomeIcon
-                icon={faBars}
-                className={styles.menuButton}
-                onClick={toggleMenu}
-                title="Open Menu"
-              />
-
-            <Link className={styles.worshipLink} to="/bible">Bible</Link>
-            <Link className={styles.worshipLink} to="/worship">Worship</Link>
-            <Link className={styles.worshipLink} to="/blogs">Devotion</Link>
-            <Link className={styles.worshipLink} to="/music">Music</Link>
-            <Link className={styles.worshipLink} to="/your-journals">Journal</Link>
-            <Link className={styles.worshipLink} to="/feeds">Feeds</Link>
+              <Link className={styles.worshipLink} to="/bible">Bible</Link>
+              <Link className={styles.worshipLink} to="/worship">Worship</Link>
+              <Link className={styles.worshipLink} to="/blogs">Devotion</Link>
+              <Link className={styles.worshipLink} to="/music">Music</Link>
+              <Link className={styles.worshipLink} to="/your-journals">Journal</Link>
+              <Link className={styles.worshipLink} to="/feeds">Feeds</Link>
             </div>
           </div>
         </div>

@@ -55,6 +55,7 @@ function AppRoutes() {
       dispatch(wotgsocial.user.guestLoginFunction())
         .then((res) => {
           if (res.success) {
+            console.log("Guest login successful:", location.pathname + location.search);
             window.location.href = location.pathname + location.search;
           } else {
             console.error("Guest login failed:", res.payload);
@@ -64,7 +65,7 @@ function AppRoutes() {
           console.error("An error occurred during guest login:", error);
         });
     }
-  }, [dispatch, autoLoginDisabled, token, location]);
+  }, [dispatch, autoLoginDisabled, token]);
 
   return (
     <NewLayout onToggleMenu={onToggleMenu} menuOpen={menuOpen}>

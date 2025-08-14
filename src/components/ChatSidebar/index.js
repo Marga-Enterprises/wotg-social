@@ -116,7 +116,17 @@ const ChatSidebar = ({
                           })
                       ) : (
                         <span className={styles.avatarText}>
-                          {chat.name ? chat.name.charAt(0).toUpperCase() : 'A'}
+                          {chat?.chatroom_photo ? (
+                            <img
+                              src={`${backendUrl}/${chat.chatroom_photo}`}
+                              alt="Chatroom"
+                              className={styles.avatarImage}
+                            />
+                          ) : (
+                            chat?.name
+                              ? chat.name.charAt(0).toUpperCase()
+                              : 'A'
+                          )}
                         </span>
                       )}
                     </div>

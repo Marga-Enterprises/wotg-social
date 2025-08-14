@@ -417,7 +417,17 @@
                             }} 
                             className={styles.avatarText}
                           >
-                            {selectedChatroomDetails?.name ? selectedChatroomDetails.name.charAt(0).toUpperCase() : 'A'}
+                            {selectedChatroomDetails?.chatroom_photo ? (
+                              <img 
+                                src={`${backendUrl}/${selectedChatroomDetails.chatroom_photo}`} 
+                                alt="Chatroom" 
+                                className={styles.avatarImage} 
+                              />
+                            ) : (
+                              selectedChatroomDetails?.name
+                                ? selectedChatroomDetails.name.charAt(0).toUpperCase()
+                                : 'A'
+                            )}
                           </span>
                         )}
                       </div>

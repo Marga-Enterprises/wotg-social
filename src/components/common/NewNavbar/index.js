@@ -29,7 +29,7 @@ const NewNavbar = ({ onToggleMenu }) => {
 
                 <div className={styles.userText}>
                     <span className={styles.welcome}>WELCOME BACK</span>
-                    <span className={styles.username}>{account?.user_fname || "User"}</span>
+                    <span className={styles.username}>{account?.user_fname || "User"} {account?.user_lname || "User"}</span>
                 </div>
             </div>
 

@@ -2,7 +2,7 @@
   position: fixed;
   top: 0; /* 🔼 Stick to the top instead of bottom */
   left: 0;
-  margin-top: 3.2rem;
+  margin-top: 4rem;
   right: 0;
   z-index: 1000;
   background: #fff;

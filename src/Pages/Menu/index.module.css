@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100svh;
+  height: 100%;
   width: 100%;
   background: linear-gradient(135deg, #da2f1c, #f17050);
   animation: bgShift 10s ease infinite alternate;

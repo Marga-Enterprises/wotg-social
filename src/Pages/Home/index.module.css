@@ -3,7 +3,7 @@
 /* Custom container style for layout */
 .customLayoutContainer {
     display: flex;
-    height: 100svh;
+    height: 100%;
     background: #fff;
 }
 

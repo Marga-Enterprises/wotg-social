@@ -40,6 +40,7 @@ const BurgerMenu = ({ onClose }) => {
       </button>
 
       <nav className={styles.menuNav}>
+        <Link to="/" className={styles.menuItem} onClick={onClose}>Home</Link>
         <Link to="/chat" className={styles.menuItem} onClick={onClose}>Chat</Link>
         <Link to="/blogs" className={styles.menuItem} onClick={onClose}>Devotion</Link>
         <Link to="/bible" className={styles.menuItem} onClick={onClose}>Bible</Link>

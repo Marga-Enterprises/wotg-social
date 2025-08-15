@@ -35,6 +35,7 @@ const Page = ({ onToggleMenu  }) => {
     ).current;
 
     const lastPlayedRef = useRef(0); // to throttle playback
+    const chatroomLoginId = Cookies.get('chatroomLoginId') ? JSON.parse(Cookies.get('chatroomLoginId')) : null;
 
     // Local state
     const [user, setUser] = useState(null);
@@ -126,7 +127,7 @@ const Page = ({ onToggleMenu  }) => {
 
     useEffect(() => {
         if (location.search === '?chat=wotgadmin') {
-            handleSelectChatroom(5);
+            handleSelectChatroom(chatroomLoginId);
         }
     }, [location.search]);
       

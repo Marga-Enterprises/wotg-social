@@ -94,13 +94,14 @@ export const loginFunction = (payload) => async (dispatch) => {
         const { success, data } = res;
 
         if (success) {
-            const { accessToken, refreshToken } = data;
+            const { accessToken, refreshToken, chatroomLoginId } = data;
             const account = jwtDecode(accessToken);
 
             setAuthorizationHeader(accessToken);
 
             // ✅ Store refresh token persistently (1 year)
             Cookies.set("refreshToken", refreshToken, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
+            Cookies.set("chatroomLoginId", chatroomLoginId, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
 
             dispatch(setUserDetails(account));
 
@@ -131,9 +132,11 @@ export const guestLoginFunction = (payload) => async (dispatch) => {
         const res = await guestLoginFunc(payload);
         const { success, data } = res;
         if (success) {
-            const { accessToken } = data;
+            const { accessToken, chatroomLoginId } = data;
             const account = jwtDecode(accessToken);
             setAuthorizationHeader(accessToken);
+
+            Cookies.set("chatroomLoginId", chatroomLoginId, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
 
             dispatch(setUserDetails(account));
 

@@ -166,13 +166,14 @@ export const addUser = (payload) => async (dispatch) => {
         const { success, data } = res;
 
         if (success) {
-            const { accessToken, refreshToken } = data;
+            const { accessToken, refreshToken, chatroomLoginId } = data;
             const account = jwtDecode(accessToken);
 
             setAuthorizationHeader(accessToken);
 
             // ✅ Store refresh token persistently (1 year)
             Cookies.set("refreshToken", refreshToken, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
+            Cookies.set("chatroomLoginId", chatroomLoginId, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
 
             dispatch(setUserDetails(account));
             dispatch({
@@ -312,6 +313,7 @@ export const userLogout = () => (dispatch) => {
         Cookies.remove("account");
         Cookies.remove("role");
         Cookies.remove("authenticated");
+        Cookies.remove("chatroomLoginId");
 
         // set auto login to false
         Cookies.set("autoLoginDisabled", true, { expires: 365, secure: true, sameSite: "Strict" });

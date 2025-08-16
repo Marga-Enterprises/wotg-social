@@ -6,6 +6,7 @@
   import debounce from 'lodash/debounce';
   import styles from './index.module.css';
   import LoadingSpinner from '../LoadingSpinner';
+  import SignUpModal from '../SignUpModal';
 
   // COMPONENT IMPORTS
   const MessageImageModal = lazy(() => import('../MessageImageModal'));
@@ -41,6 +42,7 @@
     const [selectedMessageReactions, setSelectedMessageReactions] = useState([]);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [modalImageUrl, setModalImageUrl] = useState(null);
+    const [showSignUpModal, setShowSignUpModal] = useState(false);
 
     const longPressTimeout = useRef(null);
     const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
@@ -225,6 +227,17 @@
                 <p className={styles.senderName}>{msg?.sender?.user_fname} {msg?.sender?.user_lname}</p>
               )}
               {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
+
+              {msg?.category === 'automated' && (
+                <div className={styles.automatedAction}>
+                  <button
+                    className={styles.automatedButton}
+                    onClick={() => setShowSignUpModal(true)}
+                  >
+                    Sign Up Now
+                  </button>
+                </div>
+              )}
     
               {msg?.reactions?.length > 0 && (
                 <div
@@ -595,6 +608,9 @@
             </div>
           ) }
 
+          {showSignUpModal && (
+            <SignUpModal onClose={() => setShowSignUpModal(false)} />
+          )}
       </>
     );
     

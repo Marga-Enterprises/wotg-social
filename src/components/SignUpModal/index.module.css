@@ -1,0 +1,158 @@
+/* Modal Overlay (Dark Background) */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Box */
+.modalContainer {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  margin: 1rem;
+
+  /* Added fixed height and scrollable content */
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Close Button */
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #555;
+}
+
+/* Modal Content Wrapper */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  /* Scrollable content area */
+  overflow-y: auto;
+  padding-right: 6px;
+  flex-grow: 1;
+}
+
+/* Title */
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Form Section */
+.profileForm {
+  width: 100%;
+}
+
+.profileDetails {
+  width: 100%;
+}
+
+/* Input Fields */
+.inputGroup {
+  margin-bottom: 16px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #c0392b;
+  box-shadow: 0 0 4px rgba(192, 57, 43, 0.25);
+}
+
+/* Gender Select Styling */
+select.input {
+  appearance: none;
+  background-color: #fff;
+}
+
+/* Submit Button */
+.buttonContainer {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.submitButton {
+  width: 100%;
+  background-color: #c0392b;
+  color: #fff;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #962d21;
+}
+
+/* Error Message */
+.errorMessage {
+  color: #c0392b;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Footer Text */
+.footerText {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #444;
+  text-align: center;
+}
+
+.link {
+  color: #c0392b;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

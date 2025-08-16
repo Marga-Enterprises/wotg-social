@@ -11,6 +11,7 @@
   font-style: normal;
   max-width: 100%;
   overflow-y: auto;
+  height: 100%;
 }
 
 @media (max-width: 780px) {
@@ -50,6 +51,7 @@
   padding: 8px 16px;
   border-radius: 2rem;
   font-size: 16px;
+  border: 1px solid #bbbbbb;
   line-height: 1.5;
 }
 

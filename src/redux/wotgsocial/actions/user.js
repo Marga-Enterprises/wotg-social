@@ -94,13 +94,11 @@ export const loginFunction = (payload) => async (dispatch) => {
         const { success, data } = res;
 
         if (success) {
-            const { accessToken, refreshToken, chatroomLoginId } = data;
+            const { accessToken, chatroomLoginId } = data;
             const account = jwtDecode(accessToken);
 
             setAuthorizationHeader(accessToken);
 
-            // ✅ Store refresh token persistently (1 year)
-            Cookies.set("refreshToken", refreshToken, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
             Cookies.set("chatroomLoginId", chatroomLoginId, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
 
             dispatch(setUserDetails(account));
@@ -160,19 +158,18 @@ export const guestLoginFunction = (payload) => async (dispatch) => {
     }
 };
 
+
 export const addUser = (payload) => async (dispatch) => {
     try {
         const res = await registerFunc(payload);
         const { success, data } = res;
 
         if (success) {
-            const { accessToken, refreshToken, chatroomLoginId } = data;
+            const { accessToken, chatroomLoginId } = data;
             const account = jwtDecode(accessToken);
 
             setAuthorizationHeader(accessToken);
 
-            // ✅ Store refresh token persistently (1 year)
-            Cookies.set("refreshToken", refreshToken, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
             Cookies.set("chatroomLoginId", chatroomLoginId, { expires: 365, secure: true, sameSite: "Strict", httpOnly: false });
 
             dispatch(setUserDetails(account));
@@ -192,58 +189,6 @@ export const addUser = (payload) => async (dispatch) => {
     }
 };
 
-// 🔹 REFRESH TOKEN ACTION (Auto-renew Access Token)
-export const refreshTokenAction = () => async (dispatch) => {
-    try {
-        const refreshToken = Cookies.get("refreshToken"); // ✅ Fetch refresh token from cookies
-
-        if (!refreshToken) {
-            dispatch(userLogout());
-            return { success: false, message: "No refresh token found, please log in again." };
-        }
-
-        const res = await refreshTokenFunc({ refreshToken }); // ✅ Send refreshToken in request body
-        const { success, data } = res;
-
-        if (success) {
-            const { accessToken } = data;
-            setAuthorizationHeader(accessToken);
-            return { success: true, accessToken };
-        } else {
-            dispatch(userLogout());
-            return { success: false, message: "Refresh failed." };
-        }
-
-    } catch (err) {
-        dispatch(userLogout());
-        return { success: false, message: "Session expired, please log in again." };
-    }
-};
-
-export const restoreSessionAction = () => async (dispatch) => {
-    try {
-        const refreshToken = Cookies.get("refreshToken");
-
-        if (!refreshToken) {
-            return; // ✅ Prevent calling `userLogout()` if already logged out
-        }
-
-        const res = await refreshTokenFunc({ refreshToken });
-        const { success, data } = res;
-
-        if (success) {
-            const { accessToken } = data;
-            setAuthorizationHeader(accessToken);
-
-            const account = jwtDecode(accessToken);
-            dispatch(setUserDetails(account));
-        } else {
-            dispatch(userLogout()); // ✅ Only call logout if refresh explicitly fails
-        }
-    } catch (err) {
-        console.error("Session restore failed:", err);
-    }
-};
 
 export const forgotPasswordAction = (payload) => async (dispatch) => {
     try {
@@ -301,15 +246,7 @@ export const resetPasswordAction = (payload) => async (dispatch) => {
 // 🔹 LOGOUT ACTION
 export const userLogout = () => (dispatch) => {
     try {
-        const refreshToken = Cookies.get("refreshToken"); // ✅ Fetch refresh token from cookies
-
-        if (refreshToken) {
-            logoutUser({ refreshToken }); // ✅ Send refreshToken in request body
-        }
-
-        // ✅ Remove cookies
         Cookies.remove("token");
-        Cookies.remove("refreshToken"); 
         Cookies.remove("account");
         Cookies.remove("role");
         Cookies.remove("authenticated");

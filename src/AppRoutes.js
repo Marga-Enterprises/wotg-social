@@ -49,8 +49,6 @@ function AppRoutes() {
   const onToggleMenu = () => setMenuOpen((prev) => !prev);
 
   useEffect(() => {
-    dispatch(wotgsocial.user.restoreSessionAction());
-
     if (!token && !autoLoginDisabled) {
       dispatch(wotgsocial.user.guestLoginFunction())
         .then((res) => {

@@ -26,12 +26,23 @@
   cursor: pointer;
 }
 
-/* 📍 Menu container */
+/* Menu nav handles the scrolling */
 .menuNav {
+  max-height: calc(100vh - 6rem); /* leave room for top/bottom spacing */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2rem;
+  width: 100%;
+
+  /* Hide scrollbar */
+  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.menuNav::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* 🔗 Menu items */

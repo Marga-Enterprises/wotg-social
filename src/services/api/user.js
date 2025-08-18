@@ -15,10 +15,6 @@ export async function registerFunc(payload) {
   return POST('/auth/register', payload);
 }
 
-export async function refreshTokenFunc(payload) {
-  return POST('/auth/refresh-token', payload); // ✅ Now requires { refreshToken } in payload
-}
-
 export async function logoutUser(payload) {
   return POST('/auth/logout', payload); // ✅ Now requires { refreshToken } in payload
 }

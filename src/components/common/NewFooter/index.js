@@ -8,9 +8,14 @@ import {
     faUser
 } from '@fortawesome/free-solid-svg-icons';
 
+// cookiejs
+import Cookies from 'js-cookie';
+
 import styles from './index.module.css';
 
 const NewFooter = () => {
+    const parsedAccount = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
+
     return (
         <footer className={styles.footer}>
             <ul className={styles.footerNav}>
@@ -39,7 +44,7 @@ const NewFooter = () => {
                     </Link>
                 </li>
                 <li className={styles.navItem}>
-                    <Link to="/profile" className={styles.navLink}>
+                    <Link to={`/profile/${parsedAccount.id}`} className={styles.navLink}>
                         <FontAwesomeIcon icon={faUser} className={styles.navIcon} />
                         <span className={styles.navLabel}>Profile</span>
                     </Link>

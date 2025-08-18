@@ -46,20 +46,29 @@ export const updateUserAction = (payload) => async (dispatch) => {
 };
 
 export const getUserAction = (payload) => async (dispatch) => {
-    return getUser(payload).then((res) => {
-        if (res.success) {
+    try {
+        const res = await getUser(payload);
+
+        const { success, data } = res;
+        if (success) {
             dispatch({
                 type: types.USER_GET_SUCCESS,
-                payload: res.data,
+                payload: data,
             });
         } else {
             dispatch({
                 type: types.USER_GET_FAIL,
-                payload: res.msg,
+                payload: res.msg || "Failed to fetch user profile.",
             });
         }
-        return res; 
-    });
+
+        return res;
+    } catch (err) {
+        return dispatch({
+            type: types.USER_GET_FAIL,
+            payload: err.response?.data?.msg || "Error in fetching user profile.",
+        });
+    }
 };
 
 export const setAuthorizationHeader = (token) => {

@@ -35,6 +35,7 @@ import MusicInAlbumPage from "./Pages/MusicInAlbumPage";
 import MainMusic from "./Pages/MainMusic";
 import Playlist from "./Pages/Playlist";
 import Feeds from "./Pages/Feeds";
+import Profile from "./Pages/Profile"; 
 import Notifications from "./Pages/Notifications";
 
 function AppRoutes() {
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="/chat" element={<AuthRouter><Home /></AuthRouter>} />
         <Route path="/worship" element={<Worship />} />
         <Route path="/" element={<AuthRouter><Menu /></AuthRouter>} />
+        <Route path="/profile/:id" element={<AuthRouter><Profile /></AuthRouter>} />
         <Route path="/blogs" element={<AuthRouter><Blogs /></AuthRouter>} />
         <Route path="/bible" element={<AuthRouter><Bible /></AuthRouter>} />
         <Route path="/blog/:id" element={<AuthRouter><BlogDetails /></AuthRouter>} />

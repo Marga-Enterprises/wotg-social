@@ -15,6 +15,7 @@ import styles from './index.module.css';
 
 const NewFooter = () => {
     const parsedAccount = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
+    const role = Cookies.get('role');
 
     return (
         <footer className={styles.footer}>
@@ -43,12 +44,14 @@ const NewFooter = () => {
                         <span className={styles.navLabel}>Pray</span>
                     </Link>
                 </li>
-                <li className={styles.navItem}>
-                    <Link to={`/profile/${parsedAccount.id}`} className={styles.navLink}>
-                        <FontAwesomeIcon icon={faUser} className={styles.navIcon} />
-                        <span className={styles.navLabel}>Profile</span>
-                    </Link>
-                </li>
+                {role !== 'guest' && (
+                    <li className={styles.navItem}>
+                        <Link to={`/profile/${parsedAccount.id}`} className={styles.navLink}>
+                            <FontAwesomeIcon icon={faUser} className={styles.navIcon} />
+                            <span className={styles.navLabel}>Profile</span>
+                        </Link>
+                    </li>
+                )}
             </ul>
         </footer>
     );

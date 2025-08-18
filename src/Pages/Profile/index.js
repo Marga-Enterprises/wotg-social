@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import styles from './index.module.css';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
@@ -13,7 +14,9 @@ import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
+  const navigate = useNavigate();
   const { ui: { loading } } = useSelector((state) => state.common);
+  const role = Cookies.get('role');
 
   const backendUrl = useMemo(() =>
     'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
@@ -29,7 +32,7 @@ const ProfilePage = () => {
   });
   const [previewImage, setPreviewImage] = useState(null);
 
-    useEffect(() => {
+  useEffect(() => {
     dispatch(common.ui.setLoading());
     dispatch(wotgsocial.user.getUserAction({ id }))
         .then((res) => {
@@ -52,8 +55,13 @@ const ProfilePage = () => {
             setErrMsg(err.response?.data?.msg || "An error occurred while fetching the profile.");
         })
         .finally(() => dispatch(common.ui.clearLoading()));
-    }, [dispatch, id]);
+  }, [dispatch, id]);
 
+  useEffect(() => {
+    if (role === 'guest') {
+      navigate(`/`);
+    }
+  }, [role, id, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

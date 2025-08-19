@@ -145,8 +145,6 @@ const Page = () => {
   // Handle reacting to a message
   const handleSendAutomatedMessage = async (receiverFname, receiverLname) => {
     if (!user) return;
-    
-    console.log('[[[[[Sending automated message to:]]]]]', receiverFname, receiverLname);
 
     try {
       await dispatch(wotgsocial.message.sendAutomatedMessageAction({

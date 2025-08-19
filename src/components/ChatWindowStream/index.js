@@ -482,7 +482,7 @@ const ChatWindow = ({ messages,
                         {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
                       </p>
 
-                      {msg?.category === 'automated' && (
+                      {(msg?.category === 'automated' && !isSender) && (
                         <div className={styles.automatedAction}>
                           <button
                             className={styles.automatedButton}

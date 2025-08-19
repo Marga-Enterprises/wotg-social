@@ -1,4 +1,4 @@
-import { getMessagesByChatroom, sendMessage, reactToMessage, sendFile  } from '../../../services/api/message';
+import { getMessagesByChatroom, sendMessage, sendAutomatedMessage, reactToMessage, sendFile  } from '../../../services/api/message';
 
 // Types
 import * as types from '../types';
@@ -40,6 +40,25 @@ export const sendMessageAction = (payload) => async (dispatch) => {
     return res;
   });
 };
+
+// Send Automated Message
+export const sendAutomatedMessageAction = (payload) => async (dispatch) => {
+  return sendAutomatedMessage(payload).then((res) => {
+    if (res.success) {
+      dispatch({
+        type: types.MESSAGE_CREATE_SUCCESS,
+        payload: res.data,
+      });
+    } else {
+      dispatch({
+        type: types.MESSAGE_CREATE_FAIL,
+        payload: res.msg,
+      });
+    }
+
+    return res;
+  });
+}
 
 export const sendFileMessageAction = (payload) => async (dispatch) => {
   return sendFile(payload).then((res) => {

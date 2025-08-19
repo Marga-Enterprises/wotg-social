@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy, startTransition, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, Suspense, lazy, startTransition, useRef, useState, useCallback, useMemo } from 'react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react'
 import debounce from 'lodash/debounce';
@@ -11,8 +11,8 @@ import styles from './index.module.css'
 
 // COMPONENT IMPORTS
 import LoadingSpinner from '../LoadingSpinner';
+import SignUpModal from '../SignUpModal';
 const MessageImageModal = lazy(() => import('../MessageImageModal'));
-
 
 const ChatWindow = ({ messages, 
   onSendMessage, 
@@ -20,6 +20,7 @@ const ChatWindow = ({ messages,
   userId, 
   selectedChatroomDetails, 
   onSendReaction, 
+  onSendAutomatedMessage,
   onMessageReaction, 
   reactions, 
   userRole,
@@ -29,13 +30,13 @@ const ChatWindow = ({ messages,
     'https://wotg.sgp1.cdn.digitaloceanspaces.com/images',
     []
   );
-    
   const [message, setMessage] = useState('');
   const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showReactions, setShowReactions] = useState(false);
   const [activeMessageId, setActiveMessageId] = useState(null);
   const [showMessageReactors, setShowMessageReactors] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
   const [selectedMessageReactions, setSelectedMessageReactions] = useState([]);
   const [mentionList, setMentionList] = useState([]); // List of participants
   const [showMentionList, setShowMentionList] = useState(false); // Controls mention dropdown visibility
@@ -43,16 +44,32 @@ const ChatWindow = ({ messages,
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [modalImageUrl, setModalImageUrl] = useState(null);
+  const [activeUserPopover, setActiveUserPopover] = useState(null);
   
   const longPressTimeout = useRef(null);
   const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
   const emojiPickerRef = useRef(null); 
   const fileInputRef = useRef(null);
+  const popoverRef = useRef(null); // Ref for the user avatar popover
 
   // Sync initial messages with realtimeMessages
   useEffect(() => {
     setRealtimeMessages([...messages]);
   }, [messages]);
+
+  /*useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (popoverRef.current && !popoverRef.current.contains(event.target)) {
+        setActiveUserPopover(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);*/
 
   // Scroll to the bottom when component mounts or when new messages are added (initially)
   useEffect(() => {
@@ -104,6 +121,12 @@ const ChatWindow = ({ messages,
       textarea.style.height = 'auto';
     }
   }; 
+
+  const handleSendAutomatedMessage = (receiver) => {
+    // if (!selectedChatroomDetails || !userId) return;
+    onSendAutomatedMessage(receiver);
+    setActiveUserPopover(null); // Close popover after sending message
+  }
   
   const handleSendReaction = (reaction) => {
       // console.log('[[[REACTION CHAT STREAM COMPONENT]]]', reaction);  
@@ -392,14 +415,52 @@ const ChatWindow = ({ messages,
                     className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
                   >
                     {!isSender && (
-                      <img
-                        loading="lazy"
-                        src={receiver?.user?.user_profile_picture
-                          ? `${backendUrl}/${receiver.user.user_profile_picture}`
-                          : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"}
-                        alt={receiver?.user?.user_fname || "User Avatar"}
-                        className={styles.receiverAvatar}
-                      />
+                      <div className={styles.avatarContainer} ref={popoverRef}>
+                        <img
+                          loading="lazy"
+                          src={
+                            receiver?.user_profile_picture
+                              ? `${backendUrl}/${receiver.user_profile_picture}`
+                              : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"
+                          }
+                          alt={
+                            receiver?.user?.user_fname ||
+                            receiver?.user_fname ||
+                            "User Avatar"
+                          }
+                          className={styles.receiverAvatar}
+                          onClick={() => {
+                            setActiveUserPopover((prev) =>
+                              prev?.msgId === msg.id && prev?.receiverId === receiver?.id
+                                ? null
+                                : { msgId: msg.id, receiverId: receiver?.id }
+                            );
+                          }}
+                        />
+
+                        {activeUserPopover?.msgId === msg.id &&
+                          activeUserPopover?.receiverId === receiver?.id && (() => {
+                            // Fallback-safe access to fname/lname
+                            const fname = receiver?.user?.user_fname || receiver?.user_fname || "Unknown";
+                            const lname = receiver?.user?.user_lname || receiver?.user_lname || "Unknown";
+
+                            // Debug log (will only run when condition is true)
+                            console.log("Receiver details in activeUserPopover:", receiver);
+
+                            return (
+                              <div className={styles.userPopover}>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleSendAutomatedMessage(fname, lname);
+                                  }}
+                                >
+                                  Send Invitation
+                                </button>
+                              </div>
+                            );
+                          })()}
+                      </div>
                     )}
 
                     <div
@@ -420,6 +481,17 @@ const ChatWindow = ({ messages,
                       <p className={styles.messageContent}>
                         {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
                       </p>
+
+                      {msg?.category === 'automated' && (
+                        <div className={styles.automatedAction}>
+                          <button
+                            className={styles.automatedButton}
+                            onClick={() => setShowSignUpModal(true)}
+                          >
+                            Sign Up Now
+                          </button>
+                        </div>
+                      )}
 
                       {/* Show Reactions Below Message */}
                       {msg?.reactions?.length > 0 && (
@@ -475,7 +547,8 @@ const ChatWindow = ({ messages,
             <div className={styles.noMessages}>
               <p>Say 'Hi' and start messaging</p>
             </div>
-          )}
+          )
+        }
       </div>
 
       {showMentionList && (
@@ -598,6 +671,10 @@ const ChatWindow = ({ messages,
           />
         )}
       </Suspense>
+
+      {showSignUpModal && (
+        <SignUpModal onClose={() => setShowSignUpModal(false)} />
+      )}
     </div>
   );
    

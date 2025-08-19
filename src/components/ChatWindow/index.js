@@ -5,11 +5,12 @@
   import { faFaceSmile as faFaceSmileRegular } from '@fortawesome/free-regular-svg-icons';
   import debounce from 'lodash/debounce';
   import styles from './index.module.css';
-  import LoadingSpinner from '../LoadingSpinner';
-  import SignUpModal from '../SignUpModal';
 
   // COMPONENT IMPORTS
+  import LoadingSpinner from '../LoadingSpinner';
+  import SignUpModal from '../SignUpModal';
   const MessageImageModal = lazy(() => import('../MessageImageModal'));
+
 
   const Picker = React.lazy(() => import('@emoji-mart/react'));
 

@@ -14,7 +14,7 @@ const Page = () => {
   const dispatch = useDispatch();
   const socket = useSocket();
 
-  let wotglivechatroom = process.env.NODE_ENV === 'development' ? 40 : 7;
+  let wotglivechatroom = 7;
   const userRole = Cookies.get('role');
 
   // Local state
@@ -139,6 +139,23 @@ const Page = () => {
       } catch (err) {
         console.error('Text message dispatch failed:', err);
       }
+    }
+  };
+
+  // Handle reacting to a message
+  const handleSendAutomatedMessage = async (receiverFname, receiverLname) => {
+    if (!user) return;
+    
+    console.log('[[[[[Sending automated message to:]]]]]', receiverFname, receiverLname);
+
+    try {
+      await dispatch(wotgsocial.message.sendAutomatedMessageAction({
+        senderId: user.id,
+        receiverFname,
+        receiverLname,
+      }));
+    } catch (err) {
+      console.error('Automated message dispatch failed:', err);
     }
   };
 
@@ -269,6 +286,7 @@ const Page = () => {
             <ChatWindowStream
               messages={messages}
               userRole={userRole}
+              onSendAutomatedMessage={handleSendAutomatedMessage}
               onSendMessage={handleSendMessage}
               selectedChatroom={wotglivechatroom}
               selectedChatroomDetails={selectedChatroomDetails}

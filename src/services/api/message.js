@@ -11,6 +11,10 @@ export async function sendMessage(payload) {
   return POST('/messages/send-text', payload); // Payload should include content, senderId, and chatroomId
 }
 
+export async function sendAutomatedMessage(payload) {
+  return POST('/messages/send-automated', payload); 
+}
+
 export async function reactToMessage(payload) {
   return POST('/messages/react', payload); // Payload should include messageId, userId, and react
 }

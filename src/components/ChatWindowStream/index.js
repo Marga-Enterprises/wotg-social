@@ -393,96 +393,108 @@ const ChatWindow = ({ messages,
           </div>
         )}
 
-        {realtimeMessages &&
-          realtimeMessages.length > 0 ? (
-            realtimeMessages
-              .filter((msg) => msg.chatroomId === selectedChatroom)
-              .map((msg, index) => {
-                const isSender = msg.senderId === userId;
-                const receiver = selectedChatroomDetails?.Participants?.find(
-                  (participant) => participant.user.id === msg.senderId
-                );
+        {realtimeMessages && realtimeMessages.length > 0 ? (
+          realtimeMessages
+            .filter((msg) => msg.chatroomId === selectedChatroom)
+            .map((msg, index) => {
+              const isSender = msg.senderId === userId;
 
-                // Group reactions by type and count them
-                const groupedReactions = msg?.reactions?.reduce((acc, reaction) => {
-                  acc[reaction.react] = (acc[reaction.react] || 0) + 1;
-                  return acc;
-                }, {});
+              // The sender of this message
+              const sender = selectedChatroomDetails?.Participants?.find(
+                (participant) => participant.user.id === msg.senderId
+              );
 
-                return (
+              // The current user in this chat (receiver)
+              const myParticipant = selectedChatroomDetails?.Participants?.find(
+                (participant) => participant.user.id === userId
+              );
+
+              // Group reactions by type and count them
+              const groupedReactions = msg?.reactions?.reduce((acc, reaction) => {
+                acc[reaction.react] = (acc[reaction.react] || 0) + 1;
+                return acc;
+              }, {});
+
+              return (
+                <div
+                  key={index}
+                  className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
+                >
+                  {!isSender && (
+                    <div className={styles.avatarContainer} ref={popoverRef}>
+                      <img
+                        loading="lazy"
+                        src={
+                          sender?.user_profile_picture
+                            ? `${backendUrl}/${sender.user_profile_picture}`
+                            : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"
+                        }
+                        alt={
+                          sender?.user?.user_fname ||
+                          sender?.user_fname ||
+                          "User Avatar"
+                        }
+                        className={styles.receiverAvatar}
+                        onClick={() => {
+                          setActiveUserPopover((prev) =>
+                            prev?.msgId === msg.id && prev?.receiverId === sender?.id
+                              ? null
+                              : { msgId: msg.id, receiverId: sender?.id }
+                          );
+                        }}
+                      />
+
+                      {activeUserPopover?.msgId === msg.id &&
+                        activeUserPopover?.receiverId === sender?.id && (() => {
+                          const fname =
+                            sender?.user?.user_fname || sender?.user_fname || "Unknown";
+                          const lname =
+                            sender?.user?.user_lname || sender?.user_lname || "Unknown";
+
+                          console.log("Sender details in activeUserPopover:", sender);
+
+                          return (
+                            <div className={styles.userPopover}>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSendAutomatedMessage(fname, lname);
+                                }}
+                              >
+                                Send Invitation
+                              </button>
+                            </div>
+                          );
+                        })()}
+                    </div>
+                  )}
+
                   <div
-                    key={index}
-                    className={`${isSender ? styles.messageSender : styles.messageReceiver}`}
+                    className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
+                    {...(!isSender && {
+                      onMouseDown: (e) => handleLongPress(e, msg.id),
+                      onTouchStart: (e) => handleLongPress(e, msg.id),
+                    })}
                   >
-                    {!isSender && (
-                      <div className={styles.avatarContainer} ref={popoverRef}>
-                        <img
-                          loading="lazy"
-                          src={
-                            receiver?.user_profile_picture
-                              ? `${backendUrl}/${receiver.user_profile_picture}`
-                              : "https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon"
-                          }
-                          alt={
-                            receiver?.user?.user_fname ||
-                            receiver?.user_fname ||
-                            "User Avatar"
-                          }
-                          className={styles.receiverAvatar}
-                          onClick={() => {
-                            setActiveUserPopover((prev) =>
-                              prev?.msgId === msg.id && prev?.receiverId === receiver?.id
-                                ? null
-                                : { msgId: msg.id, receiverId: receiver?.id }
-                            );
-                          }}
-                        />
-
-                        {activeUserPopover?.msgId === msg.id &&
-                          activeUserPopover?.receiverId === receiver?.id && (() => {
-                            // Fallback-safe access to fname/lname
-                            const fname = receiver?.user?.user_fname || receiver?.user_fname || "Unknown";
-                            const lname = receiver?.user?.user_lname || receiver?.user_lname || "Unknown";
-
-                            // Debug log (will only run when condition is true)
-                            console.log("Receiver details in activeUserPopover:", receiver);
-
-                            return (
-                              <div className={styles.userPopover}>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleSendAutomatedMessage(fname, lname);
-                                  }}
-                                >
-                                  Send Invitation
-                                </button>
-                              </div>
-                            );
-                          })()}
-                      </div>
+                    {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
+                      <p className={styles.senderName}>
+                        {msg.type !== 'file' && (
+                          <>
+                            {formatName(`${msg?.sender?.user_fname} ${msg?.sender?.user_lname}`)}
+                          </>
+                        )}
+                      </p>
                     )}
 
-                    <div
-                      className={`${styles.messageBubble} ${isSender ? styles.senderBubble : styles.receiverBubble}`}
-                      {...(!isSender && {
-                        onMouseDown: (e) => handleLongPress(e, msg.id),
-                        onTouchStart: (e) => handleLongPress(e, msg.id),
-                      })}
-                    >
-                      {!isSender && selectedChatroomDetails?.Participants?.length > 2 && (
-                        <p className={styles.senderName}>
-                          { msg.type !== 'file' && (
-                            <>{formatName(`${msg?.sender?.user_fname} ${msg?.sender?.user_lname}`)}</>
-                          )}
-                        </p>
-                      )}
+                    <p className={styles.messageContent}>
+                      {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
+                    </p>
 
-                      <p className={styles.messageContent}>
-                        {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
-                      </p>
-
-                      {(msg?.category === 'automated' && !isSender) && (
+                    {(msg?.category === 'automated' &&
+                      !isSender &&
+                      myParticipant?.user?.user_role === 'guest') && (
+                      <>
+                        {console.log('MY ROLE', myParticipant.user.user_role)}
                         <div className={styles.automatedAction}>
                           <button
                             className={styles.automatedButton}
@@ -491,64 +503,65 @@ const ChatWindow = ({ messages,
                             Sign Up Now
                           </button>
                         </div>
-                      )}
-
-                      {/* Show Reactions Below Message */}
-                      {msg?.reactions?.length > 0 && (
-                        <div
-                          onClick={() => handleShowMessageReactors(msg.id)}
-                          className={styles.reactionDisplay}
-                        >
-                          {Object.entries(groupedReactions).map(([type, count], i) => (
-                            <span key={i} className={styles.reactionItem}>
-                              {type === "heart" && "❤️"}
-                              {type === "clap" && "👏"}
-                              {type === "pray" && "🙏"}
-                              {type === "praise" && "🙌"}
-                            </span>
-                          ))}
-
-                          {/* Display total count of reactions */}
-                          <span className={styles.totalReactionCount}>{msg?.reactions?.length}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-
-                    {/* Smiley Icon for Message Reactions */}
-                    {!isSender && (
-                      <div>
-                        <FontAwesomeIcon
-                          onClick={() => handleShowMessageReacts(msg.id)}
-                          icon={faFaceSmileRegular}
-                          className={styles.messageReactIcon}
-                        />
-                      </div>
+                      </>
                     )}
 
-                    {/* Reaction Drawer (Only Visible for Active Message) */}
-                    {activeMessageId === msg.id && !isSender && (
-                      <div className={styles.messageReactions}>
-                        {["heart", "clap", "pray", "praise"].map((reaction) => (
-                          <button key={reaction} onClick={() => handleMessageReaction(reaction, msg.id)}>
-                            {reaction === "heart" && "❤️"}
-                            {reaction === "clap" && "👏"}
-                            {reaction === "pray" && "🙏"}
-                            {reaction === "praise" && "🙌"}
-                          </button>
+                    {/* Show Reactions Below Message */}
+                    {msg?.reactions?.length > 0 && (
+                      <div
+                        onClick={() => handleShowMessageReactors(msg.id)}
+                        className={styles.reactionDisplay}
+                      >
+                        {Object.entries(groupedReactions).map(([type, count], i) => (
+                          <span key={i} className={styles.reactionItem}>
+                            {type === "heart" && "❤️"}
+                            {type === "clap" && "👏"}
+                            {type === "pray" && "🙏"}
+                            {type === "praise" && "🙌"}
+                          </span>
                         ))}
+                        <span className={styles.totalReactionCount}>
+                          {msg?.reactions?.length}
+                        </span>
                       </div>
                     )}
                   </div>
-                );
-              })
-              
-          ) : (
-            <div className={styles.noMessages}>
-              <p>Say 'Hi' and start messaging</p>
-            </div>
-          )
-        }
+
+                  {/* Smiley Icon for Message Reactions */}
+                  {!isSender && (
+                    <div>
+                      <FontAwesomeIcon
+                        onClick={() => handleShowMessageReacts(msg.id)}
+                        icon={faFaceSmileRegular}
+                        className={styles.messageReactIcon}
+                      />
+                    </div>
+                  )}
+
+                  {/* Reaction Drawer (Only Visible for Active Message) */}
+                  {activeMessageId === msg.id && !isSender && (
+                    <div className={styles.messageReactions}>
+                      {["heart", "clap", "pray", "praise"].map((reaction) => (
+                        <button
+                          key={reaction}
+                          onClick={() => handleMessageReaction(reaction, msg.id)}
+                        >
+                          {reaction === "heart" && "❤️"}
+                          {reaction === "clap" && "👏"}
+                          {reaction === "pray" && "🙏"}
+                          {reaction === "praise" && "🙌"}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+        ) : (
+          <div className={styles.noMessages}>
+            <p>Say 'Hi' and start messaging</p>
+          </div>
+        )}
       </div>
 
       {showMentionList && (

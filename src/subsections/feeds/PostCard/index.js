@@ -25,6 +25,7 @@ const PostCard = ({ post, userId, triggerRefresh, socket, user, showSummaryAndAc
 
       {showSummaryAndActions && (
         <>
+          {console.log('PostCard post:', post)}
           <PostFooterSummary
             reactionCount={post.reaction_count}
             commentsCount={post.comments_count}

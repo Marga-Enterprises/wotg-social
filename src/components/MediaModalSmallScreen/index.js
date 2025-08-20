@@ -1,4 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // css
 import styles from './index.module.css';
@@ -7,92 +9,135 @@ import styles from './index.module.css';
 import PostHeaderAuthor from '../../subsections/feeds/PostHeaderAuthor';
 import ExpandableText from '../../common/ExpandableText';
 
-const MediaModalSmallScreen = ({ media, onClose, post, activeIndex }) => {
-    const mediaRefs = useRef([]);   
-    const containerRef = useRef(null);
+// redux
+import { wotgsocial } from '../../redux/combineActions';
 
-    useEffect(() => {
-        document.body.style.overflow = "hidden";
-        return () => {
-            document.body.style.overflow = "auto";
-        };
-    }, []);
+const MediaModalSmallScreen = ({ post, onClose, activeIndex }) => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            // Pause all background videos
-            const allVideos = document.querySelectorAll('video');
-                allVideos.forEach((video) => {
-                // Only pause videos not inside the modal
-                if (!containerRef.current?.contains(video)) {
-                    video.pause();
-                }
-            });
+  const [fetchedPost, setFetchedPost] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const mediaRefs = useRef([]);
+  const containerRef = useRef(null);
 
-            // Scroll to selected media
-            const target = mediaRefs.current[activeIndex];
-                if (target && containerRef.current) {
-                target.scrollIntoView({
-                    behavior: 'auto',
-                    block: 'center',
-                });
-            }
-        }, 200); // slight delay ensures refs and DOM are ready
+  const urlParams = new URLSearchParams(location.search);
+  const modalPostId = urlParams.get('post');
 
-        return () => clearTimeout(timeout); // ✅ properly clear timeout
-    }, [activeIndex]);
+  useEffect(() => {
+    if (modalPostId === String(post?.id)) {
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  }, [modalPostId, post?.id]);
 
+  useEffect(() => {
+    let isMounted = true;
 
-    return (
-        <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
-                <button className={styles.closeButton} onClick={onClose}>
-                <span className={styles.closeIcon}>×</span>
-                </button>
+    const fetchPost = async () => {
+      try {
+        const response = await dispatch(wotgsocial.post.getPostByIdAction({ id: post.id }));
+        if (isMounted) {
+          setFetchedPost(response?.data || null);
+        }
+      } catch (err) {
+        console.error('Failed to fetch post:', err);
+      }
+    };
 
-                <div className={styles.mediaContainer} ref={containerRef}>
-                    {media?.map((item, index) => (
-                        <div
-                            key={index}
-                            ref={(el) => (mediaRefs.current[index] = el)}
-                            className={styles.mediaItem}
-                        >
-                            {item.type === 'image' && (
-                                <img
-                                    src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${item.url}`}
-                                    alt={`media-${index}`}
-                                    className={styles.mediaImage}
-                                />
-                            )}
-                            {item.type === 'video' && (
-                                <video
-                                    src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/videos/${item.url}`}
-                                    controls
-                                    className={styles.mediaVideo}
-                                />
-                            )}
-                        </div>
-                    ))}
-                </div>
+    if (post?.id) {
+      fetchPost();
+    }
 
-                <div className={styles.modalHeader}>
-                    <PostHeaderAuthor 
-                        author={post?.author} 
-                        createdAt={post?.created_at} 
-                        postId={post?.id}
-                        className={styles.postHeaderAuthor}
-                        color="#fff"
-                    />
-                    {post?.content && (
-                        <ExpandableText
-                            maxLength={100}
-                            text={post?.content}
-                        />
-                    )}
-                </div>
+    if (showModal) {
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      isMounted = false;
+      document.body.style.overflow = 'auto';
+    };
+  }, [dispatch, post?.id, showModal]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const allVideos = document.querySelectorAll('video');
+      allVideos.forEach((video) => {
+        if (!containerRef.current?.contains(video)) {
+          video.pause();
+        }
+      });
+
+      const target = mediaRefs.current[activeIndex];
+      if (target && containerRef.current) {
+        target.scrollIntoView({
+          behavior: 'auto',
+          block: 'center',
+        });
+      }
+    }, 200);
+
+    return () => clearTimeout(timeout);
+  }, [activeIndex]);
+
+  const handleClose = () => {
+    setShowModal(false);
+    navigate('/feeds', { replace: true });
+    if (onClose) onClose();
+  };
+
+  const media = fetchedPost?.media || [];
+  if (!showModal || !fetchedPost || !media.length) return null;
+
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <button className={styles.closeButton} onClick={handleClose}>
+          <span className={styles.closeIcon}>×</span>
+        </button>
+
+        <div className={styles.mediaContainer} ref={containerRef}>
+          {media.map((item, index) => (
+            <div
+              key={index}
+              ref={(el) => (mediaRefs.current[index] = el)}
+              className={styles.mediaItem}
+            >
+              {item.type === 'image' && (
+                <img
+                  src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${item.url}`}
+                  alt={`media-${index}`}
+                  className={styles.mediaImage}
+                />
+              )}
+              {item.type === 'video' && (
+                <video
+                  src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/videos/${item.url}`}
+                  controls
+                  className={styles.mediaVideo}
+                />
+              )}
             </div>
+          ))}
         </div>
-    );
-}
+
+        <div className={styles.modalHeader}>
+          <PostHeaderAuthor
+            author={fetchedPost?.author}
+            createdAt={fetchedPost?.created_at}
+            postId={fetchedPost?.id}
+            className={styles.postHeaderAuthor}
+            color="#fff"
+          />
+          {fetchedPost?.content && (
+            <ExpandableText maxLength={100} text={fetchedPost.content} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default React.memo(MediaModalSmallScreen);

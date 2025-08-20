@@ -34,3 +34,36 @@
   height: 20px;
   object-fit: contain;
 }
+
+.shareDropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 0.5rem 0;
+  top: 100%;
+  right: 0;
+  width: 180px;
+  min-width: max-content;
+}
+
+.shareDropdownItem {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.shareDropdownItem:hover {
+  background-color: #f5f5f5;
+}
+
+.shareDropdownItem svg {
+  font-size: 1rem;
+}

@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faComment, faShare } from '@fortawesome/free-solid-svg-icons';
-
-// redux
+import { faHeart, faComment, faShare, faLink, faCopy } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { wotgsocial } from '../../../redux/combineActions';
 
-// components
 import ReactionPopup from '../../../components/PostReactionsOption';
 import PostCommentsModal from '../../../components/PostCommentsModal';
 import SharePostModal from '../../../components/SharePostModal';
@@ -25,117 +22,104 @@ const PostActions = ({ onRefresh, reactions, postId, post, socket, author, user 
 
   const showTimeout = useRef(null);
   const hideTimeout = useRef(null);
+  const shareDropdownRef = useRef(null);
   const touchStartTimeRef = useRef(null);
   const longPressTimeoutRef = useRef(null);
 
   const [showReactions, setShowReactions] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [localReactions, setLocalReactions] = useState(reactions);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [localReactions, setLocalReactions] = useState(reactions);
+  const [showShareDropdown, setShowShareDropdown] = useState(false);
 
   const handleReactToPost = useCallback((reaction, option) => {
     clearTimeout(showTimeout.current);
-
-    // Optionally clear hide timeout too (for safety)
     clearTimeout(hideTimeout.current);
 
-    const reactionType = typeof reaction === 'string'
-      ? reaction.toLowerCase()
-      : reaction?.label?.toLowerCase();
-
-    const existingReaction = localReactions.find(
-      (r) => r.user_id === user.id && r.post_id === postId
-    );
+    const reactionType = typeof reaction === 'string' ? reaction.toLowerCase() : reaction?.label?.toLowerCase();
+    const existingReaction = localReactions.find(r => r.user_id === user.id && r.post_id === postId);
 
     if (existingReaction && existingReaction.type === reactionType) {
       if (option === 2) {
-        // If the user long-pressed and the reaction is the same, remove it
         setShowReactions(false);
         return;
-      };
-
-      setLocalReactions(prev =>
-        prev.filter(r => !(r.user_id === user.id && r.post_id === postId))
-      );
-
-      dispatch(wotgsocial.post.reactToPostByIdAction({
-        postId,
-        type: reactionType,
-      }));
+      }
+      setLocalReactions(prev => prev.filter(r => !(r.user_id === user.id && r.post_id === postId)));
     } else {
       setLocalReactions(prev => {
         const withoutUser = prev.filter(r => r.user_id !== user.id);
-        return [...withoutUser, {
-          id: Date.now(),
-          user_id: user.id,
-          post_id: postId,
-          type: reactionType,
-        }];
+        return [...withoutUser, { id: Date.now(), user_id: user.id, post_id: postId, type: reactionType }];
       });
-
-      dispatch(wotgsocial.post.reactToPostByIdAction({
-        postId,
-        type: reactionType,
-      }));
     }
 
+    dispatch(wotgsocial.post.reactToPostByIdAction({ postId, type: reactionType }));
     setShowReactions(false);
   }, [dispatch, postId, user.id, localReactions]);
-
-  const handleTouchStart = (e) => {
-    e.preventDefault();
-    touchStartTimeRef.current = Date.now();
-  
-    longPressTimeoutRef.current = setTimeout(() => {
-      setShowReactions(true);
-    }, 800);
-  };
-  
-  const handleTouchEnd = (e) => {
-    e.preventDefault();
-    clearTimeout(longPressTimeoutRef.current);
-  
-    const wasLongPressed = showReactions;
-  
-    if (!wasLongPressed) {
-      userReaction && reactionMeta
-        ? handleReactToPost(reactionMeta, 1)
-        : handleReactToPost('Heart', 1);
-    }
-  
-    touchStartTimeRef.current = null;
-  };
 
   useEffect(() => {
     setLocalReactions(reactions);
   }, [reactions]);
 
-  const userReaction = localReactions.find(
-    (r) => r.user_id === user.id && r.post_id === postId
-  );
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        shareDropdownRef.current &&
+        !shareDropdownRef.current.contains(event.target)
+      ) {
+        setShowShareDropdown(false);
+      }
+    };
 
-  const reactionMeta = userReaction
-    ? REACTIONS.find(r => r.label.toLowerCase() === userReaction.type.toLowerCase())
-    : null;
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
-  // Shared hover handlers
+  const userReaction = localReactions.find(r => r.user_id === user.id && r.post_id === postId);
+  const reactionMeta = userReaction ? REACTIONS.find(r => r.label.toLowerCase() === userReaction.type.toLowerCase()) : null;
+
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    touchStartTimeRef.current = Date.now();
+    longPressTimeoutRef.current = setTimeout(() => setShowReactions(true), 800);
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    clearTimeout(longPressTimeoutRef.current);
+
+    if (!showReactions) {
+      handleReactToPost(userReaction && reactionMeta ? reactionMeta : 'Heart', 1);
+    }
+
+    touchStartTimeRef.current = null;
+  };
+
   const handleMouseEnter = () => {
     clearTimeout(hideTimeout.current);
-    showTimeout.current = setTimeout(() => {
-      setShowReactions(true);
-    }, 800);
+    showTimeout.current = setTimeout(() => setShowReactions(true), 800);
   };
 
   const handleMouseLeave = () => {
     clearTimeout(showTimeout.current);
-    hideTimeout.current = setTimeout(() => {
-      setShowReactions(false);
-    }, 800);
+    hideTimeout.current = setTimeout(() => setShowReactions(false), 800);
+  };
+
+  const copyLink = async (selectedPostId) => {  
+    const url = `${window.location.origin}/feeds?post=${selectedPostId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('Link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+    setShowShareDropdown(false);
   };
 
   return (
     <div className={styles.footerActions}>
-      {/* Reaction Button */}
+      {/* React Button */}
       <div
         className={styles.actionButton}
         onMouseEnter={handleMouseEnter}
@@ -145,20 +129,12 @@ const PostActions = ({ onRefresh, reactions, postId, post, socket, author, user 
         onTouchMove={() => {
           clearTimeout(longPressTimeoutRef.current);
           touchStartTimeRef.current = null;
-        }}               
-        onClick={() =>
-          userReaction && reactionMeta
-            ? handleReactToPost(reactionMeta, 1)
-            : handleReactToPost('Heart', 1)
-        }
+        }}
+        onClick={() => handleReactToPost(userReaction && reactionMeta ? reactionMeta : 'Heart', 1)}
       >
         {userReaction && reactionMeta ? (
           <>
-            <img
-              src={reactionMeta.src}
-              alt={userReaction.type}
-              className={styles.reactionEmoji}
-            />
+            <img src={reactionMeta.src} alt={userReaction.type} className={styles.reactionEmoji} />
             <span>{reactionMeta.label}</span>
           </>
         ) : (
@@ -175,10 +151,25 @@ const PostActions = ({ onRefresh, reactions, postId, post, socket, author, user 
         <span>Comment</span>
       </div>
 
-      {/* Share */}
-      <div className={styles.actionButton} onClick={() => setShowShareModal(true)}>
-        <FontAwesomeIcon icon={faShare} />
-        <span>Share</span>
+      {/* Share Dropdown */}
+      <div className={styles.actionButton} style={{ position: 'relative' }} ref={shareDropdownRef}>
+        <div onClick={() => setShowShareDropdown(post.id)}>
+          <FontAwesomeIcon icon={faShare} />
+          <span>Share</span>
+        </div>
+
+        {showShareDropdown && (
+          <div className={styles.shareDropdown}>
+            <div className={styles.shareDropdownItem} onClick={() => setShowShareModal(true)}>
+              <FontAwesomeIcon icon={faShare} />
+              Share to Feed
+            </div>
+            <div className={styles.shareDropdownItem} onClick={() => copyLink(post.id)}>
+              <FontAwesomeIcon icon={faLink} />
+              Copy Link
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Reaction Options */}
@@ -201,7 +192,7 @@ const PostActions = ({ onRefresh, reactions, postId, post, socket, author, user 
         />
       )}
 
-      {/* Share Post Modal */}
+      {/* Share Modal */}
       {showShareModal && (
         <SharePostModal
           post={post}

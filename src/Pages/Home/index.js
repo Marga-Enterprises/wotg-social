@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate  } from 'react-router-dom';
 import { wotgsocial, common } from '../../redux/combineActions';
 import Cookies from 'js-cookie';
 
@@ -25,6 +25,7 @@ const Page = ({ onToggleMenu  }) => {
     const dispatch = useDispatch();
     const socket = useSocket();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const messageSound = useRef(
         new Howl({
@@ -126,8 +127,17 @@ const Page = ({ onToggleMenu  }) => {
     }, [socket]); 
 
     useEffect(() => {
-        if (location.search === '?chat=wotgadmin') {
+        const params = new URLSearchParams(location.search);
+        const chatParam = params.get('chat');
+
+        if (chatParam === 'wotgadmin') {
+            navigate(`?chat=${chatroomLoginId}`, { replace: true });
+        } else if (chatParam && !isNaN(chatParam)) {
+            handleSelectChatroom(Number(chatParam));
+        } else {
+            // Fallback: invalid or missing ?chat, use default AND update URL
             handleSelectChatroom(chatroomLoginId);
+            navigate(`?chat=${chatroomLoginId}`, { replace: true });
         }
     }, [location.search]);
       
@@ -160,6 +170,70 @@ const Page = ({ onToggleMenu  }) => {
         dispatch(wotgsocial.message.reactToMessageAction({ messageId, react: reactionType }));
     };
 
+    // Fallback to default chatroom if needed
+    const fallbackToDefaultChatroom = useCallback(async () => {
+
+        // Minimal fallback: no fetchMessages() inside
+        setSelectedChatroom(chatroomLoginId);
+        setIsChatVisible(true);
+
+        // Clear unread indicators
+        setChatrooms((prevChatrooms) =>
+            prevChatrooms.map((chat) =>
+                chat.id === chatroomLoginId
+                    ? { ...chat, unreadCount: 0, hasUnread: false }
+                    : chat
+            )
+        );
+
+        if (socket?.connected && user?.id) {
+            socket.emit('mark_as_read', { chatroomId: chatroomLoginId, userId: user.id });
+        }
+
+        navigate(`?chat=${chatroomLoginId}`, { replace: true });
+
+        // Finally fetch messages for the fallback
+        try {
+            const res = await dispatch(
+                wotgsocial.message.getMessagesByChatroomAction(chatroomLoginId)
+            );
+
+            if (res?.success) {
+                setMessages(res.data.messages);
+                setSelectedChatroomDetails(res.data.chatroom);
+            } else {
+                console.error('Fallback fetch also failed.');
+            }
+        } catch (err) {
+            console.error('Critical error during fallback:', err);
+        }
+    }, [chatroomLoginId, dispatch, navigate, socket, user]);
+
+    // Fetch messages for the selected chatroom
+    const fetchMessages = useCallback(async (chatroomId) => {
+        if (!isAuthenticated) return;
+
+        dispatch(common.ui.setLoading());
+
+        try {
+            const res = await dispatch(
+                wotgsocial.message.getMessagesByChatroomAction(chatroomId || selectedChatroom)
+            );
+
+            if (res?.success) {
+                setMessages(res.data.messages);
+                setSelectedChatroomDetails(res.data.chatroom);
+            } else {
+                await fallbackToDefaultChatroom(); // ⬅ safe fallback
+            }
+        } catch (error) {
+            console.error('Fetch Messages Error:', error);
+            await fallbackToDefaultChatroom(); // ⬅ safe fallback
+        } finally {
+            dispatch(common.ui.clearLoading());
+        }
+    }, [dispatch, selectedChatroom, isAuthenticated, fallbackToDefaultChatroom]);
+
     // Fetch chatrooms
     const fetchChatrooms = useCallback(
         async (chatId) => {
@@ -173,7 +247,7 @@ const Page = ({ onToggleMenu  }) => {
     
             if (res.success) {
                 // Determine the chatroom ID to hide based on the environment
-                const hiddenChatroomId = process.env.NODE_ENV === "development" ? 40 : 7;
+                const hiddenChatroomId = 7;
     
                 // Filter out the chatroom ID to be hidden
                 const filteredChatrooms = res.data.filter(chat => chat.id !== hiddenChatroomId);
@@ -251,21 +325,6 @@ const Page = ({ onToggleMenu  }) => {
         window.addEventListener('click', unlock);
         return () => window.removeEventListener('click', unlock);
     }, []);
-
-    // Fetch messages for the selected chatroom
-    const fetchMessages = useCallback(async (chatroomId) => {
-        if (!selectedChatroom && !isAuthenticated) return;
-
-        dispatch(common.ui.setLoading());
-        const res = await dispatch(wotgsocial.message.getMessagesByChatroomAction(chatroomId || selectedChatroom));
-        dispatch(common.ui.clearLoading());
-
-        if (res.success) {
-            setMessages(res.data.messages); // Update local state with messages
-            setSelectedChatroomDetails(res.data.chatroom); // Update the selected chatroom name
-        }
-    }, [selectedChatroom, dispatch]);
-    
 
     // Fetch messages when chatroom changes
     useEffect(() => {
@@ -351,29 +410,45 @@ const Page = ({ onToggleMenu  }) => {
 
     // Handle chatroom selection
     const handleSelectChatroom = async (chatroomId) => {
-        if (chatroomId) {
-            setSelectedChatroom(chatroomId);
-            setIsChatVisible(true);
-    
-            setChatrooms((prevChatrooms) =>
-                prevChatrooms.map((chat) =>
-                    chat.id === chatroomId
-                        ? { ...chat, unreadCount: 0, hasUnread: false }
-                        : chat
-                )
-            );
-    
-            if (socket && socket.connected) {
-                socket.emit('mark_as_read', { chatroomId, userId: user?.id });
+        if (!chatroomId) return;
+
+        // If already selected, avoid redundant update
+        setSelectedChatroom((prevId) => {
+            if (prevId !== chatroomId) {
+                return chatroomId;
             }
-    
-            await fetchMessages(chatroomId);
+            return prevId;
+        });
+
+        setIsChatVisible(true);
+
+        // Reset unread count for selected chatroom
+        setChatrooms((prevChatrooms) =>
+            prevChatrooms.map((chat) =>
+                chat.id === chatroomId
+                    ? { ...chat, unreadCount: 0, hasUnread: false }
+                    : chat
+            )
+        );
+
+        // Mark as read via socket
+        if (socket?.connected && user?.id) {
+            socket.emit('mark_as_read', { chatroomId, userId: user.id });
         }
+
+        // 🧠 Avoid URL update if already correct or it's wotgadmin
+        const currentParam = new URLSearchParams(location.search).get('chat');
+        if (currentParam !== 'wotgadmin' && currentParam !== String(chatroomId)) {
+            navigate(`?chat=${chatroomId}`, { replace: true });
+        }
+
+        await fetchMessages(chatroomId);
     };
-    
+
     const handleBackClick = () => {
         setIsChatVisible(false);  // Hide the chat window when back is clicked
     };
+
     
     // Handle sending a message
     const handleSendMessage = async (messageContent, selectedFile) => {

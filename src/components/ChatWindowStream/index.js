@@ -490,7 +490,7 @@ const ChatWindow = ({ messages,
                       {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
                     </p>
 
-                    {(msg?.category === 'automated' &&
+                    {/*(msg?.category === 'automated' &&
                       !isSender &&
                       myParticipant?.user?.user_role === 'guest') && (
                       <>
@@ -504,7 +504,7 @@ const ChatWindow = ({ messages,
                           </button>
                         </div>
                       </>
-                    )}
+                    )*/}
 
                     {/* Show Reactions Below Message */}
                     {msg?.reactions?.length > 0 && (

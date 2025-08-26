@@ -229,7 +229,7 @@
               )}
               {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
 
-              {msg?.category === 'automated' && (
+              {/*msg?.category === 'automated' && (
                 <div className={styles.automatedAction}>
                   <button
                     className={styles.automatedButton}
@@ -238,7 +238,7 @@
                     Sign Up Now
                   </button>
                 </div>
-              )}
+              )*/}
     
               {msg?.reactions?.length > 0 && (
                 <div

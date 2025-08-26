@@ -453,52 +453,58 @@ const Page = ({ onToggleMenu  }) => {
     // Handle sending a message
     const handleSendMessage = async (messageContent, selectedFile) => {
         if (!selectedChatroom || !user) return;
-      
-        // 1. If file exists, send file first
+
+        const isGuest = user.user_role === 'guest';
+
+        // 1) File message (let backend emit; don't socket.emit from client)
         if (selectedFile) {
-          const fileMessage = {
+            const fileMessage = {
             file: selectedFile,
             senderId: user.id,
             chatroomId: selectedChatroom,
             type: 'file',
-          };
-      
-          try {
+            };
+
+            try {
             setUploading(true);
-            const fileRes = await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
-
-            if (fileRes) {
-              const { content, senderId, chatroomId } = fileRes.data;
-              if (socket) {
-                socket.emit('new_message', {
-                  content,
-                  senderId,
-                  chatroomId,
-                  type: 'file',
-                });
-
-                setUploading(false);
-              }
-            }
-          } catch (err) {
+            await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
+            // ⛔️ DO NOT socket.emit here — backend already emits on success
+            } catch (err) {
             console.error('File message dispatch failed:', err);
-          }
+            } finally {
+            setUploading(false);
+            }
         }
-      
-        // 2. If message content exists, send text after
-        if (messageContent?.trim()) {
-          const textMessage = {
-            content: messageContent,
+
+        // 2) Text message (always send user's message first)
+        const trimmed = messageContent?.trim();
+        if (trimmed) {
+            const textMessage = {
+            content: trimmed,
             senderId: user.id,
             chatroomId: selectedChatroom,
             type: 'text',
-          };
-      
-          try {
+            };
+
+            try {
+            // Send user's message — backend will emit to the room
             await dispatch(wotgsocial.message.sendMessageAction(textMessage));
-          } catch (err) {
+
+            // If guest, trigger bot reply after a short delay
+            if (isGuest) {
+                setTimeout(() => {
+                dispatch(
+                    wotgsocial.message.sendBotReplyAction({
+                    message: { content: trimmed },
+                    userId: user.id,
+                    chatroomId: selectedChatroom,
+                    })
+                );
+                }, 800); // tweak delay as you like (typing feel)
+            }
+            } catch (err) {
             console.error('Text message dispatch failed:', err);
-          }
+            }
         }
     };
 

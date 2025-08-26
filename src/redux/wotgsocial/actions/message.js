@@ -1,4 +1,4 @@
-import { getMessagesByChatroom, sendMessage, sendAutomatedMessage, reactToMessage, sendFile  } from '../../../services/api/message';
+import { getMessagesByChatroom, sendMessage, sendAutomatedMessage, reactToMessage, sendFile, sendBotReply  } from '../../../services/api/message';
 
 // Types
 import * as types from '../types';
@@ -59,6 +59,25 @@ export const sendAutomatedMessageAction = (payload) => async (dispatch) => {
     return res;
   });
 }
+
+// Send Bot Reply
+export const sendBotReplyAction = (payload) => async (dispatch) => {
+  return sendBotReply(payload).then((res) => {
+    if (res.success) {
+      dispatch({
+        type: types.MESSAGE_CREATE_SUCCESS, // ✅ Reuse same reducer type
+        payload: res.data, // Bot replies return a single message
+      });
+    } else {
+      dispatch({
+        type: types.MESSAGE_CREATE_FAIL,
+        payload: res.msg,
+      });
+    }
+    
+    return res;
+  });
+};
 
 export const sendFileMessageAction = (payload) => async (dispatch) => {
   return sendFile(payload).then((res) => {

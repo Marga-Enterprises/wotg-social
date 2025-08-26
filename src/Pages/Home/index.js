@@ -459,51 +459,51 @@ const Page = ({ onToggleMenu  }) => {
         // 1) File message (let backend emit; don't socket.emit from client)
         if (selectedFile) {
             const fileMessage = {
-            file: selectedFile,
-            senderId: user.id,
-            chatroomId: selectedChatroom,
-            type: 'file',
+                file: selectedFile,
+                senderId: user.id,
+                chatroomId: selectedChatroom,
+                type: 'file',
             };
 
             try {
-            setUploading(true);
-            await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
-            // ⛔️ DO NOT socket.emit here — backend already emits on success
+                setUploading(true);
+                await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
+                // ⛔️ DO NOT socket.emit here — backend already emits on success
             } catch (err) {
-            console.error('File message dispatch failed:', err);
+                console.error('File message dispatch failed:', err);
             } finally {
-            setUploading(false);
+                setUploading(false);
             }
         }
 
         // 2) Text message (always send user's message first)
         const trimmed = messageContent?.trim();
         if (trimmed) {
-            const textMessage = {
-            content: trimmed,
-            senderId: user.id,
-            chatroomId: selectedChatroom,
-            type: 'text',
+                const textMessage = {
+                content: trimmed,
+                senderId: user.id,
+                chatroomId: selectedChatroom,
+                type: 'text',
             };
 
             try {
-            // Send user's message — backend will emit to the room
-            await dispatch(wotgsocial.message.sendMessageAction(textMessage));
+                // Send user's message — backend will emit to the room
+                await dispatch(wotgsocial.message.sendMessageAction(textMessage));
 
-            // If guest, trigger bot reply after a short delay
-            if (isGuest) {
-                setTimeout(() => {
-                dispatch(
-                    wotgsocial.message.sendBotReplyAction({
-                    message: { content: trimmed },
-                    userId: user.id,
-                    chatroomId: selectedChatroom,
-                    })
-                );
-                }, 800); // tweak delay as you like (typing feel)
-            }
+                // If guest, trigger bot reply after a short delay
+                if (isGuest) {
+                    setTimeout(() => {
+                        dispatch(
+                            wotgsocial.message.sendBotReplyAction({
+                                message: { content: trimmed },
+                                userId: user.id,
+                                chatroomId: selectedChatroom,
+                            })
+                        );
+                    }, 800); // tweak delay as you like (typing feel)
+                }
             } catch (err) {
-            console.error('Text message dispatch failed:', err);
+                console.error('Text message dispatch failed:', err);
             }
         }
     };

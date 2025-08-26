@@ -89,6 +89,13 @@
     color: white;
 }
 
+.avatarLink {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+
 .userImageWrapper {
   width: 38px;
   height: 38px;

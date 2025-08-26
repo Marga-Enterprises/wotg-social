@@ -88,3 +88,21 @@
     font-size: 1.4rem;
     color: white;
 }
+
+.userImageWrapper {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.userImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ensures image fills circle without distortion */
+  display: block;
+}

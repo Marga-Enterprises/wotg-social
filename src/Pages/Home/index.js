@@ -499,7 +499,16 @@ const Page = ({ onToggleMenu  }) => {
                                 userId: user.id,
                                 chatroomId: selectedChatroom,
                             })
-                        );
+                        ).then((res) => {
+                            if (res.success) {
+                                if (res.data.triggerRefresh) {
+                                    dispatch(wotgsocial.user.reloginAction(res.data.accessToken))
+                                        .finally(() => {
+                                          window.location.reload(); // Reload to refresh token and state
+                                        });
+                                }
+                            }
+                        });
                     }, 800); // tweak delay as you like (typing feel)
                 }
             } catch (err) {

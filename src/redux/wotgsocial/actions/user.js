@@ -1,5 +1,5 @@
 // API
-import { loginFunc, registerFunc, getAllUsers, updateUser, getUser, refreshTokenFunc, logoutUser,
+import { loginFunc, registerFunc, getAllUsers, updateUser, getUser,
     forgotPasswordFunc, resetPasswordFunc, guestLoginFunc
 } from '../../../services/api/user';
 import Cookies from 'js-cookie';
@@ -250,7 +250,21 @@ export const resetPasswordAction = (payload) => async (dispatch) => {
     }
 };
 
-
+export const reloginAction = (token) => async (dispatch) => {
+    if (token) {
+        try {
+            const account = jwtDecode(token);
+            setAuthorizationHeader(token);
+            dispatch(setUserDetails(account));
+            return { success: true, data: account };
+        } catch (err) {
+            console.error("Error in reloginAction:", err);
+            return { success: false, msg: "Invalid token." };
+        }
+    } else {
+        return { success: false, msg: "No token provided." };
+    }
+};
 
 // 🔹 LOGOUT ACTION
 export const userLogout = () => (dispatch) => {

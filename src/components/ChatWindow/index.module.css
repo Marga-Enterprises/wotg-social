@@ -53,6 +53,11 @@
   background-color: #831b1b;
 }
 
+.link {
+  color: #1a0dab; /* Standard link color */
+  text-decoration: underline;
+}
+
 .avatarWrapper {
   position: relative;
   width: 2rem;

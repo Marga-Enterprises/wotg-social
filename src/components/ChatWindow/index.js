@@ -125,7 +125,7 @@
         if (urlRegex.test(part)) {
           // URL part
           return (
-            <a key={index} href={part} target="_blank" rel="noopener noreferrer">
+            <a key={index} href={part} target="_blank" rel="noopener noreferrer" className={styles.link}>
               {part}
             </a>
           );

@@ -9,6 +9,7 @@
   // COMPONENT IMPORTS
   import LoadingSpinner from '../LoadingSpinner';
   import SignUpModal from '../SignUpModal';
+  import ActiveUsersInChatModal from '../ActiveUsersInChatModal';
   const MessageImageModal = lazy(() => import('../MessageImageModal'));
 
 
@@ -37,6 +38,7 @@
     const [message, setMessage] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [realtimeMessages, setRealtimeMessages] = useState([...messages]);
+    const [showActiveUsersModal, setShowActiveUsersModal] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [activeMessageId, setActiveMessageId] = useState(null);
     const [showMessageReactors, setShowMessageReactors] = useState(false);
@@ -392,8 +394,9 @@
                       </button>
                     </div>
                   )}
-                  { selectedChatroomDetails && (
+                  {selectedChatroomDetails && (
                     <div className={styles.participantDetails}>
+                      {/* 🔹 Avatar Section */}
                       <div
                         className={styles.chatAvatar}
                         style={{
@@ -401,48 +404,49 @@
                         }}
                       >
                         {selectedChatroomDetails?.Participants?.length === 2 ? (
-                          // Find the receiver (the participant who is NOT the current user)
-                          selectedChatroomDetails.Participants.filter(participant => participant?.user.id !== userId)
-                          .map((participant, index) => {
-                            const isOnline = onlineUsers.some(u => u.id === participant.user.id);
-                            const handleClick = () => {
-                              if (selectedChatroomDetails?.Participants?.length !== 2) {
-                                onOpenAddParticipantModal();
-                              }
-                            };
+                          // 🔹 PRIVATE CHAT: Show other user’s avatar
+                          selectedChatroomDetails.Participants
+                            .filter(participant => participant?.user.id !== userId)
+                            .map((participant, index) => {
+                              const isOnline = onlineUsers.some(u => u.id === participant.user.id);
+                              const handleClick = () => {
+                                if (selectedChatroomDetails?.Participants?.length !== 2) {
+                                  onOpenAddParticipantModal();
+                                }
+                              };
 
-                            return (
-                              <div key={index} className={styles.avatarWrapperWithDot}>
-                                <img
-                                  loading="lazy"
-                                  onClick={handleClick}
-                                  src={
-                                    participant.user.user_profile_picture
-                                      ? `${backendUrl}/${participant.user.user_profile_picture}`
-                                      : `https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon`
-                                  }
-                                  alt={participant.user.user_fname}
-                                  className={styles.avatarImage}
-                                />
-                                {isOnline && <div className={styles.avatarOnlineDot} />}
-                              </div>
-                            );
-                          })
+                              return (
+                                <div key={index} className={styles.avatarWrapperWithDot}>
+                                  <img
+                                    loading="lazy"
+                                    onClick={handleClick}
+                                    src={
+                                      participant.user.user_profile_picture
+                                        ? `${backendUrl}/${participant.user.user_profile_picture}`
+                                        : `https://www.gravatar.com/avatar/07be68f96fb33752c739563919f3d694?s=200&d=identicon`
+                                    }
+                                    alt={participant.user.user_fname}
+                                    className={styles.avatarImage}
+                                  />
+                                  {isOnline && <div className={styles.avatarOnlineDot} />}
+                                </div>
+                              );
+                            })
                         ) : (
-                          // If it's a group chat (more than 2 participants), show the chat name's first letter
-                          <span 
+                          // 🔹 GROUP CHAT AVATAR
+                          <span
                             onClick={() => {
                               if (selectedChatroomDetails?.Participants?.length !== 2) {
                                 onOpenAddParticipantModal();
                               }
-                            }} 
+                            }}
                             className={styles.avatarText}
                           >
                             {selectedChatroomDetails?.chatroom_photo ? (
-                              <img 
-                                src={`${backendUrl}/${selectedChatroomDetails.chatroom_photo}`} 
-                                alt="Chatroom" 
-                                className={styles.avatarImage} 
+                              <img
+                                src={`${backendUrl}/${selectedChatroomDetails.chatroom_photo}`}
+                                alt="Chatroom"
+                                className={styles.avatarImage}
                               />
                             ) : (
                               selectedChatroomDetails?.name
@@ -453,27 +457,42 @@
                         )}
                       </div>
 
-                      {/* Chat Name Display */}
+                      {/* 🔹 Chat Name + Status */}
                       <p className={styles.chatNameHeader}>
-                        {selectedChatroomDetails?.Participants?.length === 2
-                          ? selectedChatroomDetails.Participants.filter(
-                              (participant) => participant?.user.id !== userId
-                            ).map((participant, index) => {
+                        {selectedChatroomDetails?.Participants?.length === 2 ? (
+                          // 🔹 PRIVATE CHAT: show name + online status of the other user
+                          selectedChatroomDetails.Participants
+                            .filter(participant => participant?.user.id !== userId)
+                            .map((participant, index) => {
                               const isOnline = onlineUsers.some(u => u.id === participant.user.id);
-
                               return (
                                 <div key={index}>
-                                  <span>
-                                    {`${participant.user.user_fname} ${participant.user.user_lname}`}
-                                  </span>
-
+                                  <span>{`${participant.user.user_fname} ${participant.user.user_lname}`}</span>
                                   <span className={styles.status}>
                                     {` - ${isOnline ? 'Active Now' : 'Offline'}`}
                                   </span>
                                 </div>
-                              )
+                              );
                             })
-                          : selectedChatroomDetails?.name || ''}
+                        ) : (
+                          <div>
+                            <span>{selectedChatroomDetails?.name || ''}</span>
+                            {selectedChatroomDetails.Participants?.some(participant =>
+                              participant.user.id !== userId &&
+                              onlineUsers.some(u => u.id === participant.user.id)
+                            ) && (
+                              <span className={styles.status}>
+                                {' - '}
+                                <span
+                                  onClick={() => setShowActiveUsersModal(true)}
+                                  className={styles.activeNowClickable}
+                                >
+                                  Active Now
+                                </span>
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </p>
                     </div>
                   )}
@@ -611,6 +630,14 @@
 
           {showSignUpModal && (
             <SignUpModal onClose={() => setShowSignUpModal(false)} />
+          )}
+
+          {showActiveUsersModal && selectedChatroomDetails && (
+            <ActiveUsersInChatModal 
+              participants={selectedChatroomDetails.Participants}
+              onlineUsers={onlineUsers}
+              onClose={() => setShowActiveUsersModal(false)} 
+            />
           )}
       </>
     );

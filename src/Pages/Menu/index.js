@@ -10,6 +10,9 @@ import {
 
 import styles from './index.module.css';
 
+// sections
+import ActiveUsersSection from '../../sections/MenuPageSections/ActiveUsersSection';
+
 const menuItems = [
   { title: "Worship", subtitle: "Lift your heart", href: "/worship", icon: faPrayingHands },
   { title: "Chat", subtitle: "Connect with others", href: "/chat", icon: faComments },
@@ -102,6 +105,8 @@ const Page = () => {
           ))}
         </div>
       </motion.div>
+
+      <ActiveUsersSection />
     </div>
   );
 };

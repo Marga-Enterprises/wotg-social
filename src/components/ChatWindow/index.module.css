@@ -22,6 +22,14 @@
   }
 }
 
+.activeNowClickable {
+  color: #2ecc71;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+
 .messageContainer {
   flex: 1 1 auto;
   overflow-y: auto;

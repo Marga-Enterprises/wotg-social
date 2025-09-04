@@ -26,7 +26,7 @@ const Page = () => {
 
     const [book, setBook] = useState(1);
     const [chapter, setChapter] = useState(1);
-    const [language, setLanguage] = useState("eng");
+    const [language, setLanguage] = useState("fil");
     const [highlightedVerses, setHighlightedVerses] = useState({});
     const [verses, setVerses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -51,7 +51,7 @@ const Page = () => {
         // Get from localStorage first
         const storedLang = localStorage.getItem("bible_language");
         const paramLang = params.get("language");
-        const lang = storedLang || paramLang || "eng";
+        const lang = storedLang || paramLang || "fil";
       
         setBook(b);
         setChapter(c);

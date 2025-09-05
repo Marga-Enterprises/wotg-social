@@ -35,6 +35,15 @@
   }
 }
 
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  color: #c0392b; /* match your theme */
+}
+
+
 .header {
   display: flex;
   align-items: center;
@@ -68,6 +77,29 @@
 .worshipLink:hover {
   color: #c7080b;
   font-weight: 700;
+}
+
+.seeMoreBtn {
+  background: none;
+  border: none;
+  color: #3498db;   /* nice blue tone */
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.2s ease;
+  text-align: left; /* aligns with chat list */
+}
+
+.seeMoreBtn:hover {
+  color: #1d6fa5;   /* darker blue on hover */
+  text-decoration: underline;
+}
+
+.seeMoreBtn:focus {
+  outline: none;
+  color: #1d6fa5;
 }
 
 .headerIcon {

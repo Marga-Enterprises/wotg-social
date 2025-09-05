@@ -66,3 +66,44 @@
   color: #666;
   text-align: center;
 }
+
+.statHoverWrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.hoverDetails {
+  display: none;
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  min-width: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  font-size: 0.85rem;
+  color: #333;
+  text-align: left;
+}
+
+.statHoverWrapper:hover .hoverDetails {
+  display: block;
+}
+
+.userLine {
+  padding: 4px 6px;
+  border-bottom: 1px solid #f0f0f0;
+  line-height: 1.2;
+}
+
+.userLine:last-child {
+  border-bottom: none;
+}

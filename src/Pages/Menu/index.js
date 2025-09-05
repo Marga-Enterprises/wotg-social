@@ -12,6 +12,7 @@ import styles from './index.module.css';
 
 // sections
 import ActiveUsersSection from '../../sections/MenuPageSections/ActiveUsersSection';
+import VerseOfTheDaySection from '../../sections/MenuPageSections/VerseOfTheDaySection';
 
 const menuItems = [
   { title: "Worship", subtitle: "Lift your heart", href: "/worship", icon: faPrayingHands },
@@ -40,6 +41,8 @@ const Page = () => {
 
   return (
     <div className={styles.container}>
+      <VerseOfTheDaySection />
+
       {/* 🔹 Upcoming Events Section */}
       <div className={styles.sectionWrapper}>
         <h2 className={styles.sectionHeader}>Upcoming Events</h2>

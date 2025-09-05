@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -189,30 +189,42 @@ const ChatSidebar = ({
           </div>
         ) : chatrooms.length > 0 ? (
           <>
-            {/* Welcome Chats */}
-            <div className={styles.section}>
-              <h4 className={styles.sectionTitle}>Welcome Chats</h4>
-              <ul>
-                {(showAllWelcome ? welcomeChats : welcomeChats.slice(0, 5))
-                  .map(chat => renderChatItem(chat))}
-              </ul>
-              {welcomeChats.length > 5 && (
-                <button
-                  className={styles.seeMoreBtn}
-                  onClick={() => setShowAllWelcome(!showAllWelcome)}
-                >
-                  {showAllWelcome ? 'See Less' : 'See More'}
-                </button>
-              )}
-            </div>
+            {/* If there are welcome chats, show grouped sections */}
+            {welcomeChats.length > 0 ? (
+              <>
+                {/* Welcome Chats */}
+                <div className={styles.section}>
+                  <h4 className={styles.sectionTitle}>Welcome Chats</h4>
+                  <ul>
+                    {(showAllWelcome ? welcomeChats : welcomeChats.slice(0, 5))
+                      .map(chat => renderChatItem(chat))}
+                  </ul>
+                  {welcomeChats.length > 5 && (
+                    <button
+                      className={styles.seeMoreBtn}
+                      onClick={() => setShowAllWelcome(!showAllWelcome)}
+                    >
+                      {showAllWelcome ? 'See Less' : 'See More'}
+                    </button>
+                  )}
+                </div>
 
-            {/* Personal Chats */}
-            <div className={styles.section}>
-              <h4 className={styles.sectionTitle}>Personal Chats</h4>
+                {/* Personal Chats */}
+                {personalChats.length > 0 && (
+                  <div className={styles.section}>
+                    <h4 className={styles.sectionTitle}>Personal Chats</h4>
+                    <ul>
+                      {personalChats.map(chat => renderChatItem(chat))}
+                    </ul>
+                  </div>
+                )}
+              </>
+            ) : (
+              // If no welcome chats, just show personal chats without heading
               <ul>
                 {personalChats.map(chat => renderChatItem(chat))}
               </ul>
-            </div>
+            )}
           </>
         ) : (
           <p className={styles.noChatrooms}>No chatrooms available</p>
@@ -222,4 +234,4 @@ const ChatSidebar = ({
   );
 };
 
-export default ChatSidebar;
+export default React.memo(ChatSidebar);

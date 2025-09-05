@@ -24,7 +24,7 @@ const ActiveUsersSection = () => {
       {/* Header */}
       <div className={styles.header}>
         <span className={styles.title}>
-          <span className={styles.dot}></span> Live Community (Soon)
+          <span className={styles.dot}></span> Live Community
         </span>
         <span className={styles.status}>● Live</span>
       </div>

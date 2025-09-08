@@ -45,7 +45,7 @@ const Page = () => {
 
       {/* 🔹 Upcoming Events Section */}
       <div className={styles.sectionWrapper}>
-        <h2 className={styles.sectionHeader}>Upcoming Events</h2>
+        <h2 className={styles.sectionHeader}>Events</h2>
         <div className={styles.gridMenu}>
           {events.map((event, index) => (
             <motion.div

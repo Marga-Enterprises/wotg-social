@@ -11,13 +11,20 @@ const ActiveUsersSection = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on('online_users', (users) => {
+    const handleOnlineUsers = (users) => {
       setActiveUsersDetails(Object.values(users));
       setActiveUsersCount(Object.keys(users).length);
-    });
-  }, [socket]);
+    };
 
-  console.log('Active Users Details:', activeUsersDetails);
+    socket.on('online_users', handleOnlineUsers);
+
+    // Request current online users when re-entering the page
+    socket.emit('get_online_users'); // Ensure your backend supports this
+
+    return () => {
+      socket.off('online_users', handleOnlineUsers); // Cleanup on unmount
+    };
+  }, [socket]);
 
   return (
     <div className={styles.card}>

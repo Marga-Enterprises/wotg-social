@@ -44,3 +44,11 @@ export const createWorshipServiceAction = (videoId) => async (dispatch) => {
     return res;
   });
 };
+
+// redux/actions/worship.js
+export const setWorshipStatusFromSocket = (videoId) => (dispatch) => {
+  dispatch({
+    type: types.UPDATE_LATEST_WORSHIP_SUCCESS,
+    payload: { videoId },
+  });
+};

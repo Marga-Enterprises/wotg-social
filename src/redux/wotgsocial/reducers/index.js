@@ -5,13 +5,15 @@ import chatroom from './chatroom';
 import message from './message';
 import musicPlayer from './musicPlayer';
 import notification from './notification';
+import worship from './worship';
 
 const reducer = combineReducers({
   user,
   chatroom,
   message,
   musicPlayer,
-  notification
+  notification,
+  worship,
 });
 
 export default reducer;

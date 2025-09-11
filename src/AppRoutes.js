@@ -37,6 +37,7 @@ import Playlist from "./Pages/Playlist";
 import Feeds from "./Pages/Feeds";
 import Profile from "./Pages/Profile"; 
 import Notifications from "./Pages/Notifications";
+import Daan from "./Pages/DaanPapuntangLangit";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -87,6 +88,7 @@ function AppRoutes() {
         <Route path="/albums" element={<AuthRouter><AdminMusicDashboard /></AuthRouter>} />
         <Route path="/album/:id" element={<AuthRouter><MusicInAlbumPage /></AuthRouter>} />
         <Route path="/playlist/:id" element={<AuthRouter><Playlist /></AuthRouter>} />
+        <Route path="/daan-papuntang-langit" element={<Daan />} />
         <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
         <Route path="/music" element={<AuthRouter><MainMusic/></AuthRouter>} />
         <Route path="/feeds" element={<AuthRouter><Feeds /></AuthRouter>} />

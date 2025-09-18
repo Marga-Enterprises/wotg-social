@@ -3,10 +3,11 @@
 .chatContainer {
   display: flex;
   flex-direction: column;
-  background-image: url('https://wotg.sgp1.cdn.digitaloceanspaces.com/images/chat_bg.png');
+  /* background-image: url('https://wotg.sgp1.cdn.digitaloceanspaces.com/images/chat_bg.png');
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center; */
+  background: #ffffff;
   width: 100%;
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
@@ -123,12 +124,12 @@
 }
 
 .senderBubble {
-  background: #ff4d4f;
+  background: #4dc7ff;
   color: #fff;
 }
 
 .receiverBubble {
-  background-color: #ffffff; /* Receiver's message background */
+  background-color: #eeecec; /* Receiver's message background */
   color: #333;
 }
 
@@ -178,7 +179,7 @@
 }
 
 .messageTextarea:focus {
-  border-color: #a02626; /* Highlighted border color */
+  border-color: #4dc7ff; /* Highlighted border color */
   box-shadow: 0 0 3px rgba(190, 19, 19, 0.5); /* Optional glow effect */
 }
 
@@ -214,7 +215,7 @@
 }
 
 .emojiButton:hover {
-  color: #8f2c2e; /* Highlighted color */
+  color: #4dc7ff; /* Highlighted color */
 }
 
 .emojiPickerContainer {
@@ -239,7 +240,7 @@
 .sendIcon {
   width: 24px;
   height: 24px;
-  color: #ff4d4f;
+  color: #4dc7ff;
 }
 
 .chatHeader {

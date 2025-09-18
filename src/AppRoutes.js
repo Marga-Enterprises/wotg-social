@@ -38,6 +38,7 @@ import Feeds from "./Pages/Feeds";
 import Profile from "./Pages/Profile"; 
 import Notifications from "./Pages/Notifications";
 import Daan from "./Pages/DaanPapuntangLangit";
+import LandingWelcomePage from "./Pages/LandingWelcomePage";
 
 function AppRoutes() {
   const dispatch = useDispatch();
@@ -71,6 +72,7 @@ function AppRoutes() {
     <NewLayout onToggleMenu={onToggleMenu} menuOpen={menuOpen}>
       <Routes>
         <Route path="/chat" element={<AuthRouter><Home /></AuthRouter>} />
+        <Route path="/landing" element={<LandingWelcomePage/>}/>
         <Route path="/worship" element={<Worship />} />
         <Route path="/" element={<AuthRouter><Menu /></AuthRouter>} />
         <Route path="/profile/:id" element={<AuthRouter><Profile /></AuthRouter>} />

@@ -1,0 +1,74 @@
+/* Layout */
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  background: #f5f5f5;
+  padding: 16px;
+}
+
+.card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography */
+.title {
+  margin-top: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+}
+
+.description {
+  color: #444;
+  font-size: 15px;
+  margin: 12px 0 20px;
+}
+
+.note {
+  margin-top: 14px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Buttons */
+.btnChrome,
+.btnBrave,
+.btnDefault {
+  display: block;
+  padding: 14px 20px;
+  margin-top: 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #fff;
+  transition: background 0.2s ease;
+}
+
+.btnChrome {
+  background: #4285f4; /* Chrome blue */
+}
+.btnChrome:hover {
+  background: #3367d6;
+}
+
+.btnBrave {
+  background: #ff4400; /* Brave orange */
+}
+.btnBrave:hover {
+  background: #e63900;
+}
+
+.btnDefault {
+  background: #2b7a78; /* teal */
+}
+.btnDefault:hover {
+  background: #205c5c;
+}

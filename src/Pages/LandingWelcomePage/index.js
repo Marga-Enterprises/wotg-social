@@ -14,31 +14,33 @@ const Page = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.card}>
-        <h2 className={styles.title}>Buksan sa Browser</h2>
+        <h2 className={styles.title}>Hi kapatid!</h2>
         <p className={styles.description}>
-          Para mas maganda ang karanasan, buksan ang page na ito sa browser ng
-          iyong phone.
+          Para mas madali ka naming makausap ng aming mga admin at 
+          makasama sa community, buksan mo ang page na ito gamit ang browser 
+          sa iyong phone.  
+          Piliin lang ang isa sa mga button sa ibaba para lumipat.
         </p>
 
         {isAndroid && (
           <>
             <a
-              className={styles.btnChrome}
+              className={`${styles.button} ${styles.btnChrome}`}
               href="intent://community.wotgonline.com/chat#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=https%3A%2F%2Fcommunity.wotgonline.com%2Fchat;end"
             >
-              Buksan sa Chrome
+              Buksan gamit ang Chrome
             </a>
             <a
-              className={styles.btnBrave}
+              className={`${styles.button} ${styles.btnBrave}`}
               href="intent://community.wotgonline.com/chat#Intent;scheme=https;package=com.brave.browser;S.browser_fallback_url=https%3A%2F%2Fcommunity.wotgonline.com%2Fchat;end"
             >
-              Buksan sa Brave
+              Buksan gamit ang Brave
             </a>
           </>
         )}
 
         <a
-          className={styles.btnDefault}
+          className={`${styles.button} ${styles.btnDefault}`}
           href="https://community.wotgonline.com/chat"
           target="_blank"
         >
@@ -47,12 +49,12 @@ const Page = () => {
 
         {isIOS && (
           <p className={styles.note}>
-            Sa iPhone/iPad, ito ay bubukas sa Safari.
+            Kung iPhone o iPad ang gamit mo, automatic itong bubukas sa Safari.
           </p>
         )}
         {isAndroid && (
           <p className={styles.note}>
-            Kung hindi gumana ang Chrome o Brave, gamitin ang “Default Browser”.
+            Kapag hindi gumana ang Chrome o Brave, subukan ang “Default Browser”.
           </p>
         )}
       </div>

@@ -1,74 +1,87 @@
-/* Layout */
+/* Background with soft gradient */
 .wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
-  background: #f5f5f5;
-  padding: 16px;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
 }
 
+/* Card styling */
 .card {
   background: #fff;
-  padding: 24px;
-  border-radius: 8px;
-  max-width: 420px;
+  padding: 28px 24px;
+  border-radius: 16px;
+  max-width: 460px;
   width: 100%;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.4s ease-in-out;
 }
 
-/* Typography */
 .title {
-  margin-top: 0;
-  font-size: 22px;
+  margin: 0;
+  font-size: 24px;
   font-weight: 700;
   color: #222;
 }
 
 .description {
-  color: #444;
-  font-size: 15px;
-  margin: 12px 0 20px;
+  color: #555;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 16px 0 24px;
 }
 
 .note {
-  margin-top: 14px;
+  margin-top: 18px;
   font-size: 14px;
-  color: #666;
+  color: #777;
+  font-style: italic;
 }
 
-/* Buttons */
-.btnChrome,
-.btnBrave,
-.btnDefault {
+/* Buttons - base style */
+.button {
   display: block;
   padding: 14px 20px;
   margin-top: 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   color: #fff;
-  transition: background 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+/* Variants */
 .btnChrome {
-  background: #4285f4; /* Chrome blue */
+  background: #4285f4;
 }
 .btnChrome:hover {
   background: #3367d6;
 }
 
 .btnBrave {
-  background: #ff4400; /* Brave orange */
+  background: #ff5722;
 }
 .btnBrave:hover {
-  background: #e63900;
+  background: #e64a19;
 }
 
 .btnDefault {
-  background: #2b7a78; /* teal */
+  background: #2b7a78;
 }
 .btnDefault:hover {
   background: #205c5c;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
 }

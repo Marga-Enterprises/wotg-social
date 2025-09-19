@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './index.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -21,6 +21,15 @@ const ChatSidebar = ({
     []
   );
 
+  const getSortedChats = useCallback((chats) => {
+    return [...chats].sort((a, b) => {
+      const aTime = new Date(a.RecentMessage?.createdAt || a.updatedAt || 0).getTime();
+      const bTime = new Date(b.RecentMessage?.createdAt || b.updatedAt || 0).getTime();
+      return bTime - aTime; // newest on top
+    });
+  }, []);
+
+
   // 🔹 Responsive maxLength
   useEffect(() => {
     const handleResize = () => {
@@ -34,9 +43,10 @@ const ChatSidebar = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleChatSelection = (chatId) => {
+  const handleChatSelection = useCallback((chatId) => {
     onSelectChatroom(chatId);
-  };
+  }, [onSelectChatroom]);
+
 
   // 🔹 Chat Item Renderer
   const renderChatItem = (chat) => (
@@ -146,8 +156,8 @@ const ChatSidebar = ({
   );
 
   // 🔹 Split chats
-  const welcomeChats = chatrooms?.filter(chat => chat.welcome_chat) || [];
-  const personalChats = chatrooms?.filter(chat => !chat.welcome_chat) || [];
+  const welcomeChats = useMemo(() => getSortedChats(chatrooms?.filter(c => c.welcome_chat) || []), [chatrooms, getSortedChats]);
+  const personalChats = useMemo(() => getSortedChats(chatrooms?.filter(c => !c.welcome_chat) || []), [chatrooms, getSortedChats]);
 
   return (
     <div className={styles.chatContainer}>

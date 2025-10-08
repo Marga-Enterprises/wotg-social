@@ -25,23 +25,24 @@ messaging.onBackgroundMessage((payload) => {
   const { title, body, image } = payload.notification || {};
   const data = payload.data || {};
 
-  // ✅ Enhanced visibility + vibration + priority
+  // ✅ Enhanced visibility + sound + vibration + heads-up hint
   const notificationOptions = {
-    body: body,
-    icon: image || "/wotg-icon.ico",
-    badge: "/wotg-icon.ico",
+    body,
+    icon: image || "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
+    badge: "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
     data,
-    requireInteraction: true,
-    renotify: true,
-    tag: "wotg-message",
+    requireInteraction: true,               // keeps visible until user interacts
+    renotify: true,                         // vibrate/sound again if same tag
+    tag: "wotg-message",                    // group similar notifications
     vibrate: [200, 100, 200, 100, 200],
+    sound: "default",                       // 🔔 triggers Android sound channel
     actions: [
       { action: "open", title: "Open App" },
       { action: "dismiss", title: "Dismiss" },
     ],
-    // ✅ These two lines hint Android to display it as a popup heads-up
-    priority: "high",                 // non-standard but respected by Chrome Android via FCM
-    sound: "default",                 // plays system sound (and triggers heads-up popup)
+    // ✅ Chrome ignores `priority` inside here — this must come from FCM payload
+    // we still keep it for compatibility
+    priority: "high",
   };
 
   // ✅ Show notification
@@ -53,9 +54,10 @@ self.addEventListener("notificationclick", (event) => {
   console.log("🖱 Notification clicked:", event.notification);
   event.notification.close();
 
-  // Dismiss button handler
+  // Handle Dismiss button
   if (event.action === "dismiss") return;
 
+  // Open or focus app
   const url = event.notification?.data?.url || "https://community.wotgonline.com/";
 
   event.waitUntil(

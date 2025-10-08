@@ -24,7 +24,6 @@ export const requestForToken = async () => {
         });
 
         if (token) {
-            // console.log("🔥 FCM Token:", token);
             return token;
         } else {
             console.warn("❌ No registration token available.");
@@ -34,31 +33,29 @@ export const requestForToken = async () => {
     }
 };
 
-// 🔔 Listen for Foreground Notifications
-onMessage(messaging, (payload) => {
+// 🔔 Listen for Foreground Notifications (SAFE for Android)
+onMessage(messaging, async (payload) => {
     console.log("🔔 Foreground Notification:", payload);
 
-    // Show native notification using browser Notification API
-    if (Notification.permission === "granted") {
-        new Notification(payload.notification.title, {
-            body: payload.notification.body,
-            icon: payload.notification.image || "/favicon.ico",
-        });
+    const { title, body, image } = payload.notification || {};
+    const options = {
+        body: body,
+        icon: image || "/favicon.ico",
+    };
+
+    // ✅ Use service worker registration instead of new Notification()
+    if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.ready;
+        registration.showNotification(title || "WOTG Community", options);
+    } else if (Notification.permission === "granted") {
+        // fallback for browsers that allow Notification constructor (like desktop Chrome)
+        new Notification(title || "WOTG Community", options);
     }
 });
 
 // ✅ Register Service Worker for Background Notifications
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker
-        .register("/firebase-messaging-sw.js")
-        /*
-        .then((registration) => {
-            console.log("✅ Service Worker Registered:", registration);
-        })
-        .catch((error) => {
-            console.error("❌ Service Worker Registration Failed:", error);
-        });
-        */
+    navigator.serviceWorker.register("/firebase-messaging-sw.js");
 }
 
 export default messaging;

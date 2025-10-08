@@ -53,6 +53,7 @@ const Page = ({ onToggleMenu  }) => {
     const [searchQuery, setSearchQuery] = useState(''); // State to manage search input value
     const [uploading, setUploading] = useState(false);
     const [onlineUsers, setOnlineUsers] = useState([]);
+    const [botChatroomId, setBotChatroomId] = useState(null);
 
     const setHideNavbar = useSetHideNavbar();
 
@@ -238,35 +239,36 @@ const Page = ({ onToggleMenu  }) => {
     const fetchChatrooms = useCallback(
         async (chatId) => {
             dispatch(common.ui.setLoading());
-    
             const res = await dispatch(
-                wotgsocial.chatroom.getAllChatroomsAction({ search: searchQuery }) // Pass the search query
+                wotgsocial.chatroom.getAllChatroomsAction({ search: searchQuery })
             );
-    
             dispatch(common.ui.clearLoading());
-    
+
             if (res.success) {
-                // Determine the chatroom ID to hide based on the environment
                 const hiddenChatroomId = 7;
-    
-                // Filter out the chatroom ID to be hidden
-                const filteredChatrooms = res.data.filter(chat => chat.id !== hiddenChatroomId);
-    
+                const filteredChatrooms = res.data.filter(
+                    (chat) => chat.id !== hiddenChatroomId
+                );
                 setChatrooms(filteredChatrooms);
-    
+
+                // ✅ detect bot/welcome chatroom dynamically
+                const botRoom = filteredChatrooms.find(
+                    (chat) =>
+                        chat.name?.toLowerCase().includes('welcome') ||
+                        chat.name?.toLowerCase().includes('guest') ||
+                        chat.type === 'bot'
+                );
+                if (botRoom) setBotChatroomId(botRoom.id);
+
                 if (filteredChatrooms.length > 0) {
                     if (chatId) {
                         handleSelectChatroom(chatId);
-                    } else {
-                        if (!searchQuery) {
-                            // handleSelectChatroom(filteredChatrooms[0].id);
-                        }
                     }
                 }
             }
         },
-        [dispatch, isAuthenticated, searchQuery] // Add searchQuery as a dependency
-    );    
+        [dispatch, searchQuery]
+    );  
 
     const handleNewMessage = useCallback((message) => {
         setChatrooms((prevChatrooms) => {
@@ -456,7 +458,7 @@ const Page = ({ onToggleMenu  }) => {
 
         const isGuest = user.user_role === 'guest';
 
-        // 1) File message (let backend emit; don't socket.emit from client)
+        // 1) Handle file message
         if (selectedFile) {
             const fileMessage = {
                 file: selectedFile,
@@ -464,11 +466,9 @@ const Page = ({ onToggleMenu  }) => {
                 chatroomId: selectedChatroom,
                 type: 'file',
             };
-
             try {
                 setUploading(true);
                 await dispatch(wotgsocial.message.sendFileMessageAction(fileMessage));
-                // ⛔️ DO NOT socket.emit here — backend already emits on success
             } catch (err) {
                 console.error('File message dispatch failed:', err);
             } finally {
@@ -476,10 +476,10 @@ const Page = ({ onToggleMenu  }) => {
             }
         }
 
-        // 2) Text message (always send user's message first)
+        // 2) Handle text message
         const trimmed = messageContent?.trim();
         if (trimmed) {
-                const textMessage = {
+            const textMessage = {
                 content: trimmed,
                 senderId: user.id,
                 chatroomId: selectedChatroom,
@@ -487,11 +487,10 @@ const Page = ({ onToggleMenu  }) => {
             };
 
             try {
-                // Send user's message — backend will emit to the room
                 await dispatch(wotgsocial.message.sendMessageAction(textMessage));
 
-                // If guest, trigger bot reply after a short delay
-                if (isGuest) {
+                // ✅ Trigger bot reply ONLY in the botChatroomId
+                if (isGuest && botChatroomId && selectedChatroom === botChatroomId) {
                     setTimeout(() => {
                         dispatch(
                             wotgsocial.message.sendBotReplyAction({
@@ -500,16 +499,13 @@ const Page = ({ onToggleMenu  }) => {
                                 chatroomId: selectedChatroom,
                             })
                         ).then((res) => {
-                            if (res.success) {
-                                if (res.data.triggerRefresh) {
-                                    dispatch(wotgsocial.user.reloginAction(res.data.accessToken))
-                                        .finally(() => {
-                                          window.location.reload(); // Reload to refresh token and state
-                                        });
-                                }
+                            if (res.success && res.data.triggerRefresh) {
+                                dispatch(
+                                    wotgsocial.user.reloginAction(res.data.accessToken)
+                                ).finally(() => window.location.reload());
                             }
                         });
-                    }, 800); // tweak delay as you like (typing feel)
+                    }, 800);
                 }
             } catch (err) {
                 console.error('Text message dispatch failed:', err);

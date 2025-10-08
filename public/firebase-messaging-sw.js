@@ -14,8 +14,6 @@ const firebaseConfig = {
 
 // ✅ Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-
-// ✅ Initialize Firebase Messaging
 const messaging = firebase.messaging();
 
 // 🔔 Handle background notifications
@@ -25,27 +23,25 @@ messaging.onBackgroundMessage((payload) => {
   const { title, body, image } = payload.notification || {};
   const data = payload.data || {};
 
-  // ✅ Enhanced visibility + sound + vibration + heads-up hint
+  // ✅ Use the URL from backend payload (fallback if missing)
+  const url = data?.url || "https://community.wotgonline.com/";
+
   const notificationOptions = {
-    body,
+    body: body || "You have a new message.",
     icon: image || "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
     badge: "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
-    data,
-    requireInteraction: true,               // keeps visible until user interacts
-    renotify: true,                         // vibrate/sound again if same tag
-    tag: "wotg-message",                    // group similar notifications
+    data: { ...data, url }, // ✅ store full data for click handling
+    requireInteraction: true,  // stays until clicked
+    renotify: true,
+    tag: "wotg-message",
     vibrate: [200, 100, 200, 100, 200],
-    sound: "default",                       // 🔔 triggers Android sound channel
+    sound: "default",
     actions: [
-      { action: "open", title: "Open App" },
+      { action: "open", title: "Open" },
       { action: "dismiss", title: "Dismiss" },
     ],
-    // ✅ Chrome ignores `priority` inside here — this must come from FCM payload
-    // we still keep it for compatibility
-    priority: "high",
   };
 
-  // ✅ Show notification
   self.registration.showNotification(title || "WOTG Community", notificationOptions);
 });
 
@@ -54,21 +50,26 @@ self.addEventListener("notificationclick", (event) => {
   console.log("🖱 Notification clicked:", event.notification);
   event.notification.close();
 
-  // Handle Dismiss button
+  // Ignore dismiss action
   if (event.action === "dismiss") return;
 
-  // Open or focus app
+  // ✅ Always retrieve URL from notification data
   const url = event.notification?.data?.url || "https://community.wotgonline.com/";
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      // ✅ If WOTG tab exists, focus it & navigate to new URL
       for (const client of clientList) {
         if (client.url.startsWith(self.location.origin) && "focus" in client) {
           client.navigate(url);
           return client.focus();
         }
       }
-      if (clients.openWindow) return clients.openWindow(url);
+
+      // ✅ Otherwise open new tab
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
     })
   );
 });

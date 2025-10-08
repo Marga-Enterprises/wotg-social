@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// 🔥 Firebase Config (Load from .env)
+// 🔥 Firebase Config (Load from .env or static)
 const firebaseConfig = {
   apiKey: "AIzaSyC9V0q1iXkXiNRyTpWT13DBjJZLs9WfCgI",
   authDomain: "wotg-community-app.firebaseapp.com",
@@ -41,28 +41,45 @@ export const requestForToken = async () => {
   }
 };
 
-// 🔔 Foreground Notifications (Android-safe, uses service worker)
+// 🔔 Foreground Notifications (when tab is active)
+// 🔔 Foreground Notifications (when tab is active)
 onMessage(messaging, async (payload) => {
-  console.log("🔔 Foreground message:", payload);
+  console.log("🔔 Foreground message received:", payload);
 
   const { title, body, image } = payload.notification || {};
+  const data = payload.data || {};
+  const url = data?.url || "https://community.wotgonline.com/";
+
   const options = {
     body,
     icon: image || "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
     badge: "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
+    data: { ...data, url },
     vibrate: [200, 100, 200],
-    sound: "default",           // 🔥 important for audible alert
-    requireInteraction: true,   // 🔥 stays visible until tapped
+    sound: "default",
+    requireInteraction: true, // keeps visible until tapped
     tag: "wotg-message",
   };
 
-  // ✅ Use SW to ensure consistent Android behavior
+  // ✅ Use Service Worker (Android-safe, consistent UX)
   if ("serviceWorker" in navigator) {
     const registration = await navigator.serviceWorker.ready;
-    registration.showNotification(title || "WOTG Community", options);
+    const notification = await registration.showNotification(
+      title || "WOTG Community",
+      options
+    );
+
+    // ✅ Handle click for foreground notifications
+    registration.addEventListener("notificationclick", (event) => {
+      event.notification.close();
+      const targetUrl = event.notification?.data?.url || url;
+      // ❌ clients is not available here — use window.open instead
+      window.open(targetUrl, "_blank");
+    });
   } else if (Notification.permission === "granted") {
-    // Fallback for desktop browsers
-    new Notification(title || "WOTG Community", options);
+    // ✅ Desktop fallback (if SW is not yet active)
+    const notification = new Notification(title || "WOTG Community", options);
+    notification.onclick = () => window.open(url, "_blank");
   }
 });
 

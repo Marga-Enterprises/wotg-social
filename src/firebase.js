@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
+// 🔥 Firebase Config (Load from .env or static)
 const firebaseConfig = {
   apiKey: "AIzaSyC9V0q1iXkXiNRyTpWT13DBjJZLs9WfCgI",
   authDomain: "wotg-community-app.firebaseapp.com",
@@ -15,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-// 🔥 Request permission + token
+// 🔥 Request Notification Permission & Get FCM Token
 export const requestForToken = async () => {
   try {
     const permission = await Notification.requestPermission();
@@ -29,16 +30,21 @@ export const requestForToken = async () => {
         "BKDt6S3thDMAKi4acX80ecjhWpaYZK3IqVpTWOdsxfeiYGCWur3vt_VwlfdyuU1jP5lzpZoNymEW2VBVN6VQJSY",
     });
 
-    console.log("🔥 FCM Token:", token);
-    return token;
-  } catch (err) {
-    console.error("Error getting FCM token:", err);
+    if (token) {
+      console.log("🔥 FCM Token:", token);
+      return token;
+    } else {
+      console.warn("⚠️ No registration token available.");
+    }
+  } catch (error) {
+    console.error("Error getting FCM token:", error);
   }
 };
 
-// 🔔 Foreground notifications
+// 🔔 Foreground Notifications (when tab is active)
+// 🔔 Foreground Notifications (when tab is active)
 onMessage(messaging, async (payload) => {
-  console.log("🔔 Foreground message:", payload);
+  console.log("🔔 Foreground message received:", payload);
 
   const { title, body, image } = payload.notification || {};
   const data = payload.data || {};
@@ -51,28 +57,38 @@ onMessage(messaging, async (payload) => {
     data: { ...data, url },
     vibrate: [200, 100, 200],
     sound: "default",
-    requireInteraction: true,
-    silent: false,                 // 🔊 Force sound/vibration
-    renotify: true,                // 🔁 repeat vibration if same tag
-    timestamp: Date.now(),         // 🕒 helps Chrome treat as new
+    requireInteraction: true, // keeps visible until tapped
     tag: "wotg-message",
   };
 
+  // ✅ Use Service Worker (Android-safe, consistent UX)
   if ("serviceWorker" in navigator) {
     const registration = await navigator.serviceWorker.ready;
-    await registration.showNotification(title || "WOTG Community", options);
-  } else {
-    new Notification(title || "WOTG Community", options).onclick = () =>
-      window.open(url, "_blank");
+    const notification = await registration.showNotification(
+      title || "WOTG Community",
+      options
+    );
+
+    // ✅ Handle click for foreground notifications
+    registration.addEventListener("notificationclick", (event) => {
+      event.notification.close();
+      const targetUrl = event.notification?.data?.url || url;
+      // ❌ clients is not available here — use window.open instead
+      window.open(targetUrl, "_blank");
+    });
+  } else if (Notification.permission === "granted") {
+    // ✅ Desktop fallback (if SW is not yet active)
+    const notification = new Notification(title || "WOTG Community", options);
+    notification.onclick = () => window.open(url, "_blank");
   }
 });
 
-// ✅ Register service worker
+// ✅ Register Service Worker for Background Notifications
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
     .then(() => console.log("✅ Service Worker registered for FCM"))
-    .catch((err) => console.error("❌ SW registration failed:", err));
+    .catch((err) => console.error("❌ Service Worker registration failed:", err));
 }
 
 export default messaging;

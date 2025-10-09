@@ -1,7 +1,12 @@
-importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js");
+// -------------------------------------------------------------
+// 🔥 Firebase Cloud Messaging Service Worker
+// Works on Android Chrome + Desktop + Background states
+// -------------------------------------------------------------
 
-// 🔥 Firebase Config (must match your firebase.js)
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js");
+
+// ⚙️ Firebase Config (MUST match firebase.js)
 const firebaseConfig = {
   apiKey: "AIzaSyC9V0q1iXkXiNRyTpWT13DBjJZLs9WfCgI",
   authDomain: "wotg-community-app.firebaseapp.com",
@@ -16,60 +21,73 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// 🔔 Handle background notifications
+// -------------------------------------------------------------
+// 🔔 Handle Background Notifications (Android + Desktop)
+// -------------------------------------------------------------
 messaging.onBackgroundMessage((payload) => {
   console.log("📩 Background message received:", payload);
 
   const { title, body, image } = payload.notification || {};
   const data = payload.data || {};
-
-  // ✅ Use the URL from backend payload (fallback if missing)
   const url = data?.url || "https://community.wotgonline.com/";
 
   const notificationOptions = {
-    body: body || "You have a new message.",
+    body: body || "You have a new notification.",
     icon: image || "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
     badge: "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
-    data: { ...data, url }, // ✅ store full data for click handling
-    requireInteraction: true,  // stays until clicked
+    data: { ...data, url },
+    tag: "wotg-message", // prevents stacking duplicates
     renotify: true,
-    tag: "wotg-message",
+    requireInteraction: true, // keeps visible until interacted
     vibrate: [200, 100, 200, 100, 200],
-    sound: "default",
     actions: [
       { action: "open", title: "Open" },
       { action: "dismiss", title: "Dismiss" },
     ],
   };
 
+  // ✅ Show the actual notification
   self.registration.showNotification(title || "WOTG Community", notificationOptions);
 });
 
-// 🖱 Handle notification click
+// -------------------------------------------------------------
+// 🖱 Handle Notification Click (Tap or Action Buttons)
+// -------------------------------------------------------------
 self.addEventListener("notificationclick", (event) => {
   console.log("🖱 Notification clicked:", event.notification);
   event.notification.close();
 
-  // Ignore dismiss action
+  // 🧩 Ignore dismiss action
   if (event.action === "dismiss") return;
 
-  // ✅ Always retrieve URL from notification data
-  const url = event.notification?.data?.url || "https://community.wotgonline.com/";
+  const targetUrl = event.notification?.data?.url || "https://community.wotgonline.com/";
 
+  // ✅ Ensure tab focus or open new tab
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      // ✅ If WOTG tab exists, focus it & navigate to new URL
       for (const client of clientList) {
+        // If a WOTG tab already exists → focus + navigate it
         if (client.url.startsWith(self.location.origin) && "focus" in client) {
-          client.navigate(url);
+          client.navigate(targetUrl);
           return client.focus();
         }
       }
-
-      // ✅ Otherwise open new tab
+      // Otherwise open a new tab
       if (clients.openWindow) {
-        return clients.openWindow(url);
+        return clients.openWindow(targetUrl);
       }
     })
   );
 });
+
+// -------------------------------------------------------------
+// 💡 Android Peeking Behavior Notes
+// -------------------------------------------------------------
+// ✅ Chrome on Android automatically shows “peeking” heads-up
+//    for high-priority notifications with vibration or sound.
+// ✅ ensure your FCM payload includes:
+//     "notification": { "title": "...", "body": "...", "icon": "..." },
+//     "android": { "priority": "high", "notification": { "sound": "default" } }
+// ✅ Vibration pattern + requireInteraction help trigger peeking
+// ✅ HTTPS is mandatory for web push (not localhost)
+// -------------------------------------------------------------

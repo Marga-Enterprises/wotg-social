@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
-// 🔥 Firebase Config (Load from .env or static)
+// 🔥 Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyC9V0q1iXkXiNRyTpWT13DBjJZLs9WfCgI",
   authDomain: "wotg-community-app.firebaseapp.com",
@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-// 🔥 Request Notification Permission & Get FCM Token
+// 🔔 Ask for permission and get FCM token
 export const requestForToken = async () => {
   try {
     const permission = await Notification.requestPermission();
@@ -34,61 +34,68 @@ export const requestForToken = async () => {
       console.log("🔥 FCM Token:", token);
       return token;
     } else {
-      console.warn("⚠️ No registration token available.");
+      console.warn("⚠️ No registration token available. Check permission or VAPID key.");
+      return null;
     }
   } catch (error) {
-    console.error("Error getting FCM token:", error);
+    console.error("🚫 Error getting FCM token:", error);
+    return null;
   }
 };
 
-// 🔔 Foreground Notifications (when tab is active)
-// 🔔 Foreground Notifications (when tab is active)
+// 🔥 Listen for messages when app is open / foreground
 onMessage(messaging, async (payload) => {
   console.log("🔔 Foreground message received:", payload);
 
   const { title, body, image } = payload.notification || {};
   const data = payload.data || {};
-  const url = data?.url || "https://community.wotgonline.com/";
+  const url = data.url || "https://community.wotgonline.com/";
 
   const options = {
-    body,
+    body: body || "",
     icon: image || "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
     badge: "https://wotg.sgp1.cdn.digitaloceanspaces.com/images/wotgLogo.webp",
     data: { ...data, url },
     vibrate: [200, 100, 200],
     sound: "default",
-    requireInteraction: true, // keeps visible until tapped
+    requireInteraction: true, // stays visible until tapped
     tag: "wotg-message",
   };
 
-  // ✅ Use Service Worker (Android-safe, consistent UX)
-  if ("serviceWorker" in navigator) {
-    const registration = await navigator.serviceWorker.ready;
-    const notification = await registration.showNotification(
-      title || "WOTG Community",
-      options
-    );
-
-    // ✅ Handle click for foreground notifications
-    registration.addEventListener("notificationclick", (event) => {
-      event.notification.close();
-      const targetUrl = event.notification?.data?.url || url;
-      // ❌ clients is not available here — use window.open instead
-      window.open(targetUrl, "_blank");
-    });
-  } else if (Notification.permission === "granted") {
-    // ✅ Desktop fallback (if SW is not yet active)
-    const notification = new Notification(title || "WOTG Community", options);
-    notification.onclick = () => window.open(url, "_blank");
+  try {
+    // ✅ Use Service Worker if available (Android-friendly)
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title || "WOTG Community", options);
+    } else if (Notification.permission === "granted") {
+      // ✅ Desktop fallback (in case SW not ready)
+      const notification = new Notification(title || "WOTG Community", options);
+      notification.onclick = () => window.open(url, "_blank");
+    }
+  } catch (err) {
+    console.error("⚠️ Error showing notification:", err);
   }
 });
 
-// ✅ Register Service Worker for Background Notifications
+// ✅ Register the service worker (for background notifications)
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
-    .then(() => console.log("✅ Service Worker registered for FCM"))
-    .catch((err) => console.error("❌ Service Worker registration failed:", err));
+    .then((registration) => {
+      console.log("✅ FCM Service Worker registered:", registration.scope);
+    })
+    .catch((err) => {
+      console.error("❌ Service Worker registration failed:", err);
+    });
 }
+
+// ✅ Automatically re-request token if permission is lost or refreshed
+navigator.permissions?.query({ name: "notifications" }).then((status) => {
+  status.onchange = () => {
+    if (Notification.permission === "granted") {
+      requestForToken();
+    }
+  };
+});
 
 export default messaging;

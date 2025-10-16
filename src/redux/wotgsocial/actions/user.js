@@ -1,6 +1,6 @@
 // API
 import { loginFunc, registerFunc, getAllUsers, updateUser, getUser,
-    forgotPasswordFunc, resetPasswordFunc, guestLoginFunc
+    forgotPasswordFunc, resetPasswordFunc, guestLoginFunc, updateUserThroughChat
 } from '../../../services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -30,6 +30,23 @@ export const getAllUsersAction = (payload) => async (dispatch) => {
 
 export const updateUserAction = (payload) => async (dispatch) => {
     return updateUser(payload).then((res) => {
+        if (res.success) {
+            dispatch({
+                type: types.USER_UPDATE_SUCCESS,
+                payload: res.data,
+            });
+        } else {
+            dispatch({
+                type: types.USER_UPDATE_FAIL,
+                payload: res.msg,
+            });
+        }
+        return res; 
+    });
+};
+
+export const updateUserThroughChatAction = (payload) => async (dispatch) => {
+    return updateUserThroughChat(payload).then((res) => {
         if (res.success) {
             dispatch({
                 type: types.USER_UPDATE_SUCCESS,

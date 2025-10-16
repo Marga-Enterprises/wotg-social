@@ -10,6 +10,7 @@
   import LoadingSpinner from '../LoadingSpinner';
   import SignUpModal from '../SignUpModal';
   import ActiveUsersInChatModal from '../ActiveUsersInChatModal';
+
   const MessageImageModal = lazy(() => import('../MessageImageModal'));
 
 
@@ -46,6 +47,7 @@
     const [previewUrl, setPreviewUrl] = useState(null);
     const [modalImageUrl, setModalImageUrl] = useState(null);
     const [showSignUpModal, setShowSignUpModal] = useState(false);
+    const [targetUserId, setTargetUserId] = useState(null);
 
     const longPressTimeout = useRef(null);
     const messagesEndRef = useRef(null); // This ref will target the bottom of the messages container
@@ -102,6 +104,11 @@
           scrollToBottom();
         });
       }, 100); // zero delay works best when using rAF
+    };
+
+    const handleOpenSignUpModal = (userId) => {
+      setTargetUserId(userId);
+      setShowSignUpModal(true);
     };
     
     const renderMessageContent = useCallback((content, type) => {
@@ -231,16 +238,16 @@
               )}
               {msg?.content ? renderMessageContent(msg.content, msg.type) : "No content available"}
 
-              {/*msg?.category === 'automated' && (
+              {msg?.category === 'automated' && msg?.targetUserId === userId && (
                 <div className={styles.automatedAction}>
                   <button
                     className={styles.automatedButton}
-                    onClick={() => setShowSignUpModal(true)}
+                    onClick={() => handleOpenSignUpModal(msg?.targetUserId)}
                   >
                     Sign Up Now
                   </button>
                 </div>
-              )*/}
+              )}
     
               {msg?.reactions?.length > 0 && (
                 <div
@@ -629,7 +636,10 @@
           ) }
 
           {showSignUpModal && (
-            <SignUpModal onClose={() => setShowSignUpModal(false)} />
+            <SignUpModal 
+              onClose={() => setShowSignUpModal(false)}
+              targetUserId={targetUserId}
+            />
           )}
 
           {showActiveUsersModal && selectedChatroomDetails && (

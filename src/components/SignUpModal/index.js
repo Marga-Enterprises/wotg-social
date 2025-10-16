@@ -2,17 +2,16 @@ import React, { useState, useEffect } from 'react';
 import styles from './index.module.css';
 import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
+import { user } from '../../redux/wotgsocial/actions';
 
-const SignUpModal = ({ onClose }) => {
+const SignUpModal = ({ onClose, targetUserId }) => {
   const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
+    id: targetUserId || '',
     user_fname: '',
     user_lname: '',
-    user_gender: '',
     email: '',
-    user_mobile_number: '',
-    user_social_media: '',
   });
 
   const [error, setError] = useState('');
@@ -29,10 +28,14 @@ const SignUpModal = ({ onClose }) => {
 
     dispatch(common.ui.setLoading());
 
-    dispatch(wotgsocial.user.addUser(formData))
+    dispatch(wotgsocial.user.updateUserThroughChatAction(formData))
       .then(res => {
         if (res.success) {
-          window.location.replace('/');
+          if (res.success && res.data.triggerRefresh) {
+            dispatch(
+              wotgsocial.user.reloginAction(res.data.accessToken)
+            ).finally(() => window.location.reload());
+          }
         } else {
           setError(res.payload || 'Failed to register.');
         }
@@ -91,46 +94,6 @@ const SignUpModal = ({ onClose }) => {
                   placeholder="Enter your email"
                   required
                 />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Mobile Number</label>
-                <input
-                  type="tel"
-                  name="user_mobile_number"
-                  value={formData.user_mobile_number}
-                  onChange={handleChange}
-                  className={styles.input}
-                  placeholder="09XXXXXXXXX"
-                  required
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Messenger Name</label>
-                <input
-                  type="text"
-                  name="user_social_media"
-                  value={formData.user_social_media}
-                  onChange={handleChange}
-                  className={styles.input}
-                  placeholder="Your Facebook/Messenger name"
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.label}>Gender</label>
-                <select
-                  name="user_gender"
-                  value={formData.user_gender}
-                  onChange={handleChange}
-                  className={styles.input}
-                  required
-                >
-                  <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
               </div>
             </div>
 

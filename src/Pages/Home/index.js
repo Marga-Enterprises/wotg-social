@@ -448,7 +448,7 @@ const Page = ({ onToggleMenu }) => {
         await dispatch(wotgsocial.message.sendMessageAction(textMessage));
 
         // 🤖 Trigger bot reply for guest users
-        if (isGuest && botChatroomId && selectedChatroom === botChatroomId) {
+        /*if (isGuest && botChatroomId && selectedChatroom === botChatroomId) {
           setTimeout(() => {
             dispatch(
               wotgsocial.message.sendBotReplyAction({
@@ -464,7 +464,7 @@ const Page = ({ onToggleMenu }) => {
               }
             });
           }, 800);
-        }
+        }*/
       } catch (err) {
         console.error("Text message dispatch failed:", err);
       }

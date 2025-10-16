@@ -1,7 +1,7 @@
 // utils
 import * as methods from '../../utils/methods';
 
-import { GET, POST, PUT_FORM_DATA } from '../request';
+import { GET, POST, PUT_FORM_DATA, PUT } from '../request';
 
 export async function loginFunc(payload) {
   return POST('/auth/login', payload);
@@ -38,6 +38,10 @@ export async function updateUser(payload) {
 
 export async function getUser(payload) {
   return GET(`/users/${payload.id}`);
+}
+
+export async function updateUserThroughChat(payload) {
+  return PUT (`/auth/update-through-chat/${payload.id}`, payload);
 }
 
 export async function forgotPasswordFunc(payload) {

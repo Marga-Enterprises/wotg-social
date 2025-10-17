@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './index.module.css';
 import { useDispatch } from 'react-redux';
 import { wotgsocial, common } from '../../redux/combineActions';
-import { user } from '../../redux/wotgsocial/actions';
 
 const SignUpModal = ({ onClose, targetUserId }) => {
   const dispatch = useDispatch();
@@ -54,6 +53,25 @@ const SignUpModal = ({ onClose, targetUserId }) => {
         <div className={styles.modalContent}>
           <button className={styles.closeButton} onClick={onClose}>&times;</button>
           <h2 className={styles.title}>Sign Up</h2>
+
+          {/* 👋 Greeting Message Section */}
+          <div className={styles.greetingMessage}>
+            <p>Hello kapatid! 👋</p>
+            <p>
+              Maraming salamat sa pag-bisita sa ating <strong>Word on the Go (WOTG)</strong> app.  
+              Dito ay makikita mo ang mga inspiring features gaya ng <em>daily devotions, Bible, journal, community feeds</em>, at marami pang iba.  
+              Maaari ka ring makipag-ugnayan sa amin dito mismo!
+            </p>
+            <p>
+              Para makapagsimula, punan mo lamang ang mga detalye sa ibaba:
+              <br />• First Name  
+              <br />• Last Name  
+              <br />• Email Address
+            </p>
+            <p>
+              Kapag nakapag-fill out ka na, maikokonek na kita sa ating team para tulungan kang makilala pa nang mas malalim ang Panginoon. 🙏
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className={styles.profileForm}>
             <div className={styles.profileDetails}>

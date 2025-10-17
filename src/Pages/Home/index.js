@@ -56,13 +56,12 @@ const Page = ({ onToggleMenu }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isChatVisible, setIsChatVisible] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalOpenForAddParticipant, setIsModalOpenForAddParticipant] =
-    useState(false);
+  const [isModalOpenForAddParticipant, setIsModalOpenForAddParticipant] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [uploading, setUploading] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [botChatroomId, setBotChatroomId] = useState(null);
+  const [chatLoading, setChatLoading] = useState(false);
 
   // 🧩 Fetch authentication and user details
   useEffect(() => {
@@ -201,30 +200,33 @@ const Page = ({ onToggleMenu }) => {
   const fetchMessages = useCallback(
     async (chatroomId) => {
       if (!isAuthenticated) return;
+      const activeChatroomId = chatroomId || selectedChatroom;
+
+      setChatLoading(true); // ⏳ start loading
       dispatch(common.ui.setLoading());
 
       try {
         const res = await dispatch(
-          wotgsocial.message.getMessagesByChatroomAction(
-            chatroomId || selectedChatroom
-          )
+          wotgsocial.message.getMessagesByChatroomAction(activeChatroomId)
         );
 
-        if (res?.success) {
+        if (res?.success && selectedChatroom === activeChatroomId) {
           setMessages(res.data.messages);
           setSelectedChatroomDetails(res.data.chatroom);
-        } else {
-          await fallbackToDefaultChatroom();
         }
       } catch (error) {
         console.error("Fetch Messages Error:", error);
-        await fallbackToDefaultChatroom();
+        if (selectedChatroom === activeChatroomId) {
+          await fallbackToDefaultChatroom();
+        }
       } finally {
+        setChatLoading(false); // ✅ stop loading
         dispatch(common.ui.clearLoading());
       }
     },
     [dispatch, selectedChatroom, isAuthenticated, fallbackToDefaultChatroom]
   );
+
 
   // 🗂️ Fetch all chatrooms
   const fetchChatrooms = useCallback(
@@ -247,7 +249,6 @@ const Page = ({ onToggleMenu }) => {
             c.name?.toLowerCase().includes("guest") ||
             c.type === "bot"
         );
-        if (botRoom) setBotChatroomId(botRoom.id);
 
         if (filtered.length > 0 && chatId) {
           handleSelectChatroom(chatId);
@@ -499,11 +500,13 @@ const Page = ({ onToggleMenu }) => {
           className={isMobile ? styles.chatWindowVisible : ""}
           onBackClick={handleBackClick}
           isMobile={isMobile}
+          guestChatroomId={chatroomLoginId}
           uploading={uploading}
           onMessageReaction={handleReactMessage}
           onOpenAddParticipantModal={handleOpenAddParticipantModal}
           userDetails={user}
           onlineUsers={onlineUsers}
+          isChatLoading={chatLoading}
         />
       )}
 

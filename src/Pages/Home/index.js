@@ -124,20 +124,35 @@ const Page = ({ onToggleMenu }) => {
     socket.on("online_users", (users) => setOnlineUsers(users));
   }, [socket]);
 
-  // 🧭 Handle URL chat parameter (?chat=)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const chatParam = params.get("chat");
 
+    // Determine final chatroom ID to use
+    let chatIdToJoin = chatroomLoginId;
+
     if (chatParam === "wotgadmin") {
+      chatIdToJoin = chatroomLoginId;
       navigate(`?chat=${chatroomLoginId}`, { replace: true });
     } else if (chatParam && !isNaN(chatParam)) {
-      handleSelectChatroom(Number(chatParam));
+      chatIdToJoin = Number(chatParam);
     } else {
-      handleSelectChatroom(chatroomLoginId);
       navigate(`?chat=${chatroomLoginId}`, { replace: true });
     }
-  }, [location.search]);
+
+    if (chatIdToJoin) {
+      // 🚀 Leave previous room (if any) before joining new one
+      if (selectedChatroom && selectedChatroom !== chatIdToJoin) {
+        socket?.emit("leave_room", selectedChatroom);
+      }
+
+      // 🚀 Join the new chatroom immediately for realtime updates
+      socket?.emit("join_room", chatIdToJoin);
+
+      // 📩 Load chat messages
+      handleSelectChatroom(chatIdToJoin);
+    }
+  }, [location.search, socket, chatroomLoginId, selectedChatroom]);
 
   // 📦 Modal Controls
   const handleOpenCreateChatroomModal = () => setIsModalOpen(true);
@@ -228,6 +243,24 @@ const Page = ({ onToggleMenu }) => {
   );
 
 
+  // 🔁 Join chatroom on socket
+  const joinChatroom = useCallback(
+    (chatroomId) => {
+      if (!socket || !chatroomId) return;
+      socket.emit("join_room", chatroomId);
+    },
+    [socket]
+  );
+
+  // 🔁 Leave chatroom
+  const leaveChatroom = useCallback(
+    (chatroomId) => {
+      if (!socket || !chatroomId) return;
+      socket.emit("leave_room", chatroomId);
+    },
+    [socket]
+  );
+
   // 🗂️ Fetch all chatrooms
   const fetchChatrooms = useCallback(
     async (chatId) => {
@@ -307,6 +340,21 @@ const Page = ({ onToggleMenu }) => {
     if (isAuthenticated) fetchChatrooms();
   }, [fetchChatrooms, isAuthenticated]);
 
+  // after joinChatroom and leaveChatroom definitions
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleReconnect = () => {
+      if (selectedChatroom) {
+        joinChatroom(selectedChatroom);
+      }
+    };
+
+    socket.on("connect", handleReconnect);
+    return () => socket.off("connect", handleReconnect);
+  }, [socket, selectedChatroom, joinChatroom]);
+
+
   // 🎵 Unlock sound on first click (browser policy)
   useEffect(() => {
     const unlock = () => {
@@ -379,34 +427,36 @@ const Page = ({ onToggleMenu }) => {
   const handleSelectChatroom = async (chatroomId) => {
     if (!chatroomId) return;
 
-    setSelectedChatroom((prevId) =>
-      prevId !== chatroomId ? chatroomId : prevId
-    );
+    // Leave old room if switching
+    if (selectedChatroom && selectedChatroom !== chatroomId) {
+      leaveChatroom(selectedChatroom);
+    }
 
+    // Join new room
+    joinChatroom(chatroomId);
+    setSelectedChatroom(chatroomId);
     setIsChatVisible(true);
 
-    // Reset unread count
+    // Reset unread badge
     setChatrooms((prev) =>
       prev.map((chat) =>
-        chat.id === chatroomId
-          ? { ...chat, unreadCount: 0, hasUnread: false }
-          : chat
+        chat.id === chatroomId ? { ...chat, unreadCount: 0, hasUnread: false } : chat
       )
     );
 
-    // Mark as read
     if (socket?.connected && user?.id) {
       socket.emit("mark_as_read", { chatroomId, userId: user.id });
     }
 
-    // Update URL if needed
+    // Update URL
     const currentParam = new URLSearchParams(location.search).get("chat");
-    if (currentParam !== "wotgadmin" && currentParam !== String(chatroomId)) {
+    if (currentParam !== String(chatroomId)) {
       navigate(`?chat=${chatroomId}`, { replace: true });
     }
 
     await fetchMessages(chatroomId);
   };
+
 
   // 🔙 Go back to sidebar (mobile)
   const handleBackClick = () => setIsChatVisible(false);

@@ -220,9 +220,16 @@ const ChatWindow = ({
   
   const participantsMap = useMemo(() => {
     const map = new Map();
-    selectedChatroomDetails?.Participants?.forEach(participant => {
-      map.set(participant.user.id, participant.user);
+
+    if (!selectedChatroomDetails?.Participants) return map;
+
+    selectedChatroomDetails.Participants.forEach((participant) => {
+      // ✅ Only process participants with valid user object + id
+      if (participant?.user && participant.user.id) {
+        map.set(participant.user.id, participant.user);
+      }
     });
+
     return map;
   }, [selectedChatroomDetails?.Participants]);
   

@@ -516,19 +516,35 @@ const ChatWindow = ({
                       ) : (
                         <div>
                           <span>{selectedChatroomDetails?.name || ''}</span>
-                          {selectedChatroomDetails.Participants?.some(participant =>
-                            participant.user.id !== userId &&
-                            onlineUsers.some(u => u.id === participant.user.id)
-                          ) && (
-                            <span className={styles.status}>
-                              {' - '}
-                              <span
-                                onClick={() => setShowActiveUsersModal(true)}
-                                className={styles.activeNowClickable}
-                              >
-                                Active Now
+                          {/* 🔹 Status logic for group or welcome chat */}
+                          {selectedChatroomDetails?.welcome_chat ? (
+                            (() => {
+                              const targetUserId = selectedChatroomDetails?.target_user_id;
+                              const isTargetOnline = onlineUsers?.some(u => u.id === targetUserId);
+
+                              return isTargetOnline ? (
+                                <span className={styles.status}>
+                                  {' - '}
+                                  <span onClick={() => setShowActiveUsersModal(true)} className={styles.activeNowClickable}>Active Now</span>
+                                </span>
+                              ) : null;
+                            })()
+                          ) : (
+                            selectedChatroomDetails.Participants?.some(
+                              participant =>
+                                participant.user.id !== userId &&
+                                onlineUsers.some(u => u.id === participant.user.id)
+                            ) && (
+                              <span className={styles.status}>
+                                {' - '}
+                                <span
+                                  onClick={() => setShowActiveUsersModal(true)}
+                                  className={styles.activeNowClickable}
+                                >
+                                  Active Now
+                                </span>
                               </span>
-                            </span>
+                            )
                           )}
                         </div>
                       )}

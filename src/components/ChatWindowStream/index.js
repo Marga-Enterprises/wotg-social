@@ -108,19 +108,35 @@ const ChatWindow = ({ messages,
   // Handle Send Message
   const handleSend = () => {
     if ((!message.trim() && !selectedFile) || !selectedChatroom) return;
-  
+
     // Pass both message and file to the parent handler
     onSendMessage(message, selectedFile);
-  
-    setMessage(''); // Clear input
-    removePreview(); // Reset file selection
-  
-    // Reset textarea height
+
     const textarea = document.querySelector(`.${styles.messageTextarea}`);
+
+    // ✅ If textarea exists, keep focus after sending
     if (textarea) {
+      // Clear input and file selection
+      setMessage('');
+      removePreview();
+
+      // Reset height
       textarea.style.height = 'auto';
+
+      // 🔹 Delay to let React re-render before refocusing (fixes mobile keyboard hiding)
+      setTimeout(() => {
+        textarea.focus();
+
+        // Optional: ensures cursor stays visible
+        const len = textarea.value.length;
+        textarea.setSelectionRange(len, len);
+      }, 50);
+    } else {
+      // Fallback (if textarea not found)
+      setMessage('');
+      removePreview();
     }
-  }; 
+  };
 
   const handleSendAutomatedMessage = (receiver) => {
     // if (!selectedChatroomDetails || !userId) return;

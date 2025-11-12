@@ -110,25 +110,40 @@ const ChatWindow = ({
   // Handle Send Message
   const handleSend = () => {
     if ((!message.trim() && !selectedFile) || !selectedChatroom) return;
-  
+
     // Pass both message and file to the parent handler
     onSendMessage(message, selectedFile);
-  
-    setMessage('');       // Clear input
-    removePreview();      // Reset file selection
-  
-    // Reset textarea height
+
     const textarea = document.querySelector(`.${styles.messageTextarea}`);
+
+    // ✅ Preserve focus on mobile after sending
     if (textarea) {
+      // Temporarily store cursor position
+      const cursorPosition = textarea.selectionStart;
+
+      // Clear message
+      setMessage('');       
+      removePreview();      
+
+      // Reset height
       textarea.style.height = 'auto';
+
+      // Small delay ensures re-render completes before refocusing
+      setTimeout(() => {
+        textarea.focus();
+        // Optional: move cursor back to start position (for iOS Safari)
+        textarea.setSelectionRange(cursorPosition, cursorPosition);
+
+        // ✅ Smooth scroll to bottom without losing keyboard
+        requestAnimationFrame(() => {
+          scrollToBottom();
+        });
+      }, 50);
+    } else {
+      // Fallback if textarea not found
+      setMessage('');
+      removePreview();
     }
-  
-    // ✅ Wait for DOM update and then scroll to bottom safely
-    setTimeout(() => {
-      requestAnimationFrame(() => {
-        scrollToBottom();
-      });
-    }, 100); // zero delay works best when using rAF
   };
 
   const handleOpenSignUpModal = (userId) => {

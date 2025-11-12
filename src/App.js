@@ -1,10 +1,9 @@
 // App.js
-import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./AppRoutes";
 import { NavbarProvider } from "./contexts/NavbarContext";
-import { SocketProvider } from "./contexts/SocketContext"; // ✅ Import it
-import { usePushSubscription } from "./hooks/usePushSubscription"; // ✅ Import the hook
+import { SocketProvider } from "./contexts/SocketContext";
+import { usePushSubscription } from "./hooks/usePushSubscription";
 import MusicControlsSection from './sections/MusicControlsSection';
 
 import Cookies from 'js-cookie';
@@ -17,7 +16,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <SocketProvider> {/* ✅ Wrap here */}
+      <SocketProvider>
         <NavbarProvider>
           <AppRoutes />
           <MusicControlsSection />

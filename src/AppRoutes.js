@@ -52,20 +52,55 @@ function AppRoutes() {
   const onToggleMenu = () => setMenuOpen((prev) => !prev);
 
   useEffect(() => {
+    console.log("%c[GuestLogin] useEffect triggered", "color: cyan; font-weight: bold;");
+    console.log("%c[GuestLogin] token:", "color: gray;", token);
+    console.log("%c[GuestLogin] autoLoginDisabled:", "color: gray;", autoLoginDisabled);
+
     if (!token && !autoLoginDisabled) {
+      console.log("%c[GuestLogin] No token detected → Initiating guest login...", "color: orange;");
+
+      console.log("%c[GuestLogin] Dispatching guestLoginFunction...", "color: yellow;");
       dispatch(wotgsocial.user.guestLoginFunction())
         .then((res) => {
+          console.log("%c[GuestLogin] Dispatch resolved.", "color: lightgreen;");
+          console.log("%c[GuestLogin] Response received:", "color: lightblue;", res);
+
           if (res.success) {
-            console.log("Guest login successful:", location.pathname + location.search);
+            console.log(
+              "%c[GuestLogin] ✅ Guest login successful!",
+              "color: green; font-weight: bold;"
+            );
+            console.log(
+              "%c[GuestLogin] Redirecting to:",
+              "color: cyan;",
+              location.pathname + location.search
+            );
+
+            // Redirect user to the same page after successful login
             window.location.href = location.pathname + location.search;
           } else {
-            console.error("Guest login failed:", res.payload);
+            console.error(
+              "%c[GuestLogin] ❌ Guest login failed:",
+              "color: red; font-weight: bold;",
+              res.payload
+            );
           }
         })
         .catch((error) => {
-          console.error("An error occurred during guest login:", error);
+          console.error(
+            "%c[GuestLogin] 💥 Error occurred during guest login:",
+            "color: red; font-weight: bold;",
+            error
+          );
         });
+    } else {
+      console.log("%c[GuestLogin] Token present or auto-login disabled. Skipping guest login.", "color: gray;");
     }
+
+    // Cleanup (optional, if you want to log unmount)
+    return () => {
+      console.log("%c[GuestLogin] useEffect cleanup triggered.", "color: gray;");
+    };
   }, [dispatch, autoLoginDisabled, token]);
 
   return (

@@ -1,14 +1,14 @@
-/* Background with soft gradient */
+/* Background */
 .wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100%;
+  min-height: 100vh;
   padding: 20px;
   background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
 }
 
-/* Card styling */
+/* Card */
 .card {
   background: #fff;
   padding: 28px 24px;
@@ -28,60 +28,48 @@
 }
 
 .description {
-  color: #555;
+  color: #444;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 16px 0 24px;
 }
 
-.note {
-  margin-top: 18px;
-  font-size: 14px;
-  color: #777;
-  font-style: italic;
+/* Countdown text */
+.countdown {
+  font-size: 18px;
+  font-weight: 600;
+  color: #b71c1c;
+  margin-bottom: 12px;
 }
 
-/* Buttons - base style */
+/* Subtext */
+.subtext {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #777;
+}
+
+/* Messenger button */
 .button {
   display: block;
   padding: 14px 20px;
-  margin-top: 14px;
+  margin-top: 18px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
   color: #fff;
+  background: #1877f2; /* Messenger blue */
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-
-/* Variants */
-.btnChrome {
-  background: #4285f4;
-}
-.btnChrome:hover {
-  background: #3367d6;
-}
-
-.btnBrave {
-  background: #ff5722;
-}
-.btnBrave:hover {
-  background: #e64a19;
-}
-
-.btnDefault {
-  background: #2b7a78;
-}
-.btnDefault:hover {
-  background: #205c5c;
+  background: #0f63c9;
 }
 
 /* Fade-in animation */
 @keyframes fadeIn {
-  from {opacity: 0; transform: translateY(10px);}
-  to {opacity: 1; transform: translateY(0);}
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

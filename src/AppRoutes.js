@@ -2,10 +2,10 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { wotgsocial } from "./redux/combineActions";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 
-// Components
-import NewLayout from "./components/NewLayout"; // ✅ Use new layout
+// Layouts & Routers
+import NewLayout from "./components/NewLayout";
 import AuthRouter from "./components/AuthRouter";
 import AdminRouter from "./components/AdminRouter";
 
@@ -35,7 +35,7 @@ import MusicInAlbumPage from "./Pages/MusicInAlbumPage";
 import MainMusic from "./Pages/MainMusic";
 import Playlist from "./Pages/Playlist";
 import Feeds from "./Pages/Feeds";
-import Profile from "./Pages/Profile"; 
+import Profile from "./Pages/Profile";
 import Notifications from "./Pages/Notifications";
 import Daan from "./Pages/DaanPapuntangLangit";
 import LandingWelcomePage from "./Pages/LandingWelcomePage";
@@ -44,70 +44,27 @@ function AppRoutes() {
   const dispatch = useDispatch();
   const location = useLocation();
 
-  const token = Cookies.get('token');
-  const autoLoginDisabled = Cookies.get('autoLoginDisabled');
+  const token = Cookies.get("token");
+  const autoLoginDisabled = Cookies.get("autoLoginDisabled");
 
-  // ✅ State for hamburger menu toggle
   const [menuOpen, setMenuOpen] = useState(false);
   const onToggleMenu = () => setMenuOpen((prev) => !prev);
 
   useEffect(() => {
-    console.log("%c[GuestLogin] useEffect triggered", "color: cyan; font-weight: bold;");
-    console.log("%c[GuestLogin] token:", "color: gray;", token);
-    console.log("%c[GuestLogin] autoLoginDisabled:", "color: gray;", autoLoginDisabled);
-
     if (!token && !autoLoginDisabled) {
-      console.log("%c[GuestLogin] No token detected → Initiating guest login...", "color: orange;");
-
-      console.log("%c[GuestLogin] Dispatching guestLoginFunction...", "color: yellow;");
-      dispatch(wotgsocial.user.guestLoginFunction())
-        .then((res) => {
-          console.log("%c[GuestLogin] Dispatch resolved.", "color: lightgreen;");
-          console.log("%c[GuestLogin] Response received:", "color: lightblue;", res);
-
-          if (res.success) {
-            console.log(
-              "%c[GuestLogin] ✅ Guest login successful!",
-              "color: green; font-weight: bold;"
-            );
-            console.log(
-              "%c[GuestLogin] Redirecting to:",
-              "color: cyan;",
-              location.pathname + location.search
-            );
-
-            // Redirect user to the same page after successful login
-            window.location.href = location.pathname + location.search;
-          } else {
-            console.error(
-              "%c[GuestLogin] ❌ Guest login failed:",
-              "color: red; font-weight: bold;",
-              res.payload
-            );
-          }
-        })
-        .catch((error) => {
-          console.error(
-            "%c[GuestLogin] 💥 Error occurred during guest login:",
-            "color: red; font-weight: bold;",
-            error
-          );
-        });
-    } else {
-      console.log("%c[GuestLogin] Token present or auto-login disabled. Skipping guest login.", "color: gray;");
+      dispatch(wotgsocial.user.guestLoginFunction()).then((res) => {
+        if (res?.success) {
+          window.location.href = location.pathname + location.search;
+        }
+      });
     }
-
-    // Cleanup (optional, if you want to log unmount)
-    return () => {
-      console.log("%c[GuestLogin] useEffect cleanup triggered.", "color: gray;");
-    };
   }, [dispatch, autoLoginDisabled, token]);
 
   return (
     <NewLayout onToggleMenu={onToggleMenu} menuOpen={menuOpen}>
       <Routes>
         <Route path="/chat" element={<AuthRouter><Home /></AuthRouter>} />
-        <Route path="/landing" element={<LandingWelcomePage/>}/>
+        <Route path="/landing" element={<LandingWelcomePage />} />
         <Route path="/worship" element={<Worship />} />
         <Route path="/" element={<AuthRouter><Menu /></AuthRouter>} />
         <Route path="/profile/:id" element={<AuthRouter><Profile /></AuthRouter>} />
@@ -127,7 +84,7 @@ function AppRoutes() {
         <Route path="/playlist/:id" element={<AuthRouter><Playlist /></AuthRouter>} />
         <Route path="/daan-papuntang-langit" element={<Daan />} />
         <Route path="/blog/watch-video/:id" element={<AuthRouter><WatchVideo /></AuthRouter>} />
-        <Route path="/music" element={<AuthRouter><MainMusic/></AuthRouter>} />
+        <Route path="/music" element={<AuthRouter><MainMusic /></AuthRouter>} />
         <Route path="/feeds" element={<AuthRouter><Feeds /></AuthRouter>} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

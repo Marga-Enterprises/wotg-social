@@ -145,15 +145,12 @@ const ChatWindow = ({ messages,
   }
   
   const handleSendReaction = (reaction) => {
-      // console.log('[[[REACTION CHAT STREAM COMPONENT]]]', reaction);  
-
       if (onSendReaction) {
           onSendReaction(reaction);
       }
   };
 
   const handleFileIconClick = () => {
-    // console.log('File icon clicked!');
     fileInputRef.current?.click();
   };
   
@@ -467,8 +464,6 @@ const ChatWindow = ({ messages,
                           const lname =
                             sender?.user?.user_lname || sender?.user_lname || "Unknown";
 
-                          console.log("Sender details in activeUserPopover:", sender);
-
                           return (
                             <div className={styles.userPopover}>
                               <button
@@ -510,7 +505,6 @@ const ChatWindow = ({ messages,
                       !isSender &&
                       myParticipant?.user?.user_role === 'guest') && (
                       <>
-                        {console.log('MY ROLE', myParticipant.user.user_role)}
                         <div className={styles.automatedAction}>
                           <button
                             className={styles.automatedButton}

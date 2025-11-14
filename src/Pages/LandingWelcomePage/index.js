@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import styles from "./index.module.css";
 
 const Page = () => {
-  const [seconds, setSeconds] = useState(10);
+  const [seconds, setSeconds] = useState(12);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,9 +26,11 @@ const Page = () => {
         <h2 className={styles.title}>Paglilipat sa Admin</h2>
 
         <p className={styles.description}>
-          Kapatid, ililipat ka namin sa isa sa ating admin upang mas mabigyan ka ng
+          Kapatid, ililipat ka namin sa isa sa aming admin upang mas mabigyan ka ng 
           gabay at ma-assist ka nang maayos.  
-          Sa ilang sandali ay ire-redirect ka namin sa Messenger ng aming admin.
+          Pagkatapos mong ma-redirect, i-message mo lamang ang aming admin at 
+          maghintay ka po sandali habang siya ay nagrereply.  
+          Nawa'y maging daan ito para mas lalo kang mapalapit sa Panginoon.
         </p>
 
         <p className={styles.countdown}>
@@ -41,7 +43,7 @@ const Page = () => {
 
         <a
           className={styles.button}
-          href="https://m.me/ate.dona.perez"
+          href="https://m.me/wotg.wordonthego"
           target="_blank"
         >
           Buksan ang Messenger

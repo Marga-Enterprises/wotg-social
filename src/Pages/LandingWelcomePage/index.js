@@ -10,7 +10,7 @@ const Page = () => {
       setSeconds((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          window.location.href = "https://m.me/ate.dona.perez";
+          window.location.href = "https://m.me/wotg.wordonthego";
           return 0;
         }
         return prev - 1;
